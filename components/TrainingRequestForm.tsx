@@ -78,32 +78,42 @@ const TrainingRequestForm: React.FC = () => {
       });
 
       // Gửi email thông báo cho các đối tác phù hợp
+      let emailNotificationMessage = '';
       try {
         // Lấy danh sách đối tác có năng lực phù hợp
         const trainingTypes = processedDetails.map(detail => detail.type);
+        console.log('🔍 Tìm đối tác phù hợp cho các loại đào tạo:', trainingTypes);
+
         const partnersQuery = await db.collection('partners')
           .where('status', '==', 'approved')
           .where('subscribesToEmails', '==', true)
           .get();
 
+        console.log('📊 Tìm thấy', partnersQuery.size, 'đối tác đã approved và đăng ký nhận email');
+
         const matchingPartners = [];
         partnersQuery.forEach(doc => {
           const partner = doc.data();
           // Kiểm tra xem đối tác có năng lực phù hợp với bất kỳ loại đào tạo nào trong yêu cầu không
-          const hasMatchingCapability = partner.capabilities.some(capability =>
+          const hasMatchingCapability = partner.capabilities && partner.capabilities.some(capability =>
             trainingTypes.includes(capability)
           );
           if (hasMatchingCapability) {
             matchingPartners.push(partner);
+            console.log('✅ Đối tác phù hợp:', partner.email, '- Capabilities:', partner.capabilities);
           }
         });
+
+        console.log('📧 Số lượng đối tác phù hợp sẽ nhận email:', matchingPartners.length);
 
         // Gửi email thông báo cho các đối tác phù hợp
         if (matchingPartners.length > 0) {
           const partnerEmails = matchingPartners.map(partner => partner.email);
           const trainingTypesText = trainingTypes.join(', ');
-          
-          await sendEmail(
+
+          console.log('📬 Đang queue email cho:', partnerEmails);
+
+          const emailId = await sendEmail(
             partnerEmails,
             `Yêu cầu đào tạo mới: ${trainingTypesText}`,
             `
@@ -129,13 +139,21 @@ const TrainingRequestForm: React.FC = () => {
             <p>Vui lòng đăng nhập vào hệ thống để xem chi tiết và phản hồi yêu cầu này.</p>
             `
           );
+
+          console.log('✅ Email đã được queue thành công với ID:', emailId);
+          emailNotificationMessage = ` Đã gửi thông báo đến ${matchingPartners.length} đơn vị đào tạo phù hợp.`;
+        } else {
+          console.log('⚠️ Không tìm thấy đối tác phù hợp với yêu cầu này');
+          emailNotificationMessage = ' Lưu ý: Hiện chưa có đơn vị đào tạo nào phù hợp trong hệ thống, nhưng yêu cầu của bạn đã được lưu lại.';
         }
       } catch (emailErr) {
-        console.error("Error sending notification emails: ", emailErr);
+        console.error("❌ Error sending notification emails: ", emailErr);
+        console.error("Error details:", emailErr);
         // Không throw lỗi này để không ảnh hưởng đến việc tạo yêu cầu
+        emailNotificationMessage = ' (Lưu ý: Có lỗi khi gửi email thông báo, nhưng yêu cầu của bạn đã được lưu thành công)';
       }
 
-      setSuccess('Yêu cầu của bạn đã được gửi thành công! Các đơn vị đào tạo sẽ sớm liên hệ với bạn.');
+      setSuccess('Yêu cầu của bạn đã được gửi thành công!' + emailNotificationMessage + ' Các đơn vị đào tạo sẽ sớm liên hệ với bạn.');
       setFormData(initialFormState);
       setTrainingDetails([initialDetailState]);
       setIsUrgent(false);
