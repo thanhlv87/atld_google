@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { db, firebase } from '../services/firebaseConfig';
+import { db, firebase, sendEmail } from '../services/firebaseConfig';
 import { TRAINING_TYPES, TRAINING_GROUPS } from '../types';
 
 const TrainingRequestForm: React.FC = () => {
@@ -69,13 +69,72 @@ const TrainingRequestForm: React.FC = () => {
 
     setSubmitting(true);
     try {
-      await db.collection('trainingRequests').add({
+      const requestRef = await db.collection('trainingRequests').add({
         ...formData,
         trainingDetails: processedDetails,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         viewedBy: [],
         urgent: isUrgent,
       });
+
+      // Gửi email thông báo cho các đối tác phù hợp
+      try {
+        // Lấy danh sách đối tác có năng lực phù hợp
+        const trainingTypes = processedDetails.map(detail => detail.type);
+        const partnersQuery = await db.collection('partners')
+          .where('status', '==', 'approved')
+          .where('subscribesToEmails', '==', true)
+          .get();
+
+        const matchingPartners = [];
+        partnersQuery.forEach(doc => {
+          const partner = doc.data();
+          // Kiểm tra xem đối tác có năng lực phù hợp với bất kỳ loại đào tạo nào trong yêu cầu không
+          const hasMatchingCapability = partner.capabilities.some(capability =>
+            trainingTypes.includes(capability)
+          );
+          if (hasMatchingCapability) {
+            matchingPartners.push(partner);
+          }
+        });
+
+        // Gửi email thông báo cho các đối tác phù hợp
+        if (matchingPartners.length > 0) {
+          const partnerEmails = matchingPartners.map(partner => partner.email);
+          const trainingTypesText = trainingTypes.join(', ');
+          
+          await sendEmail(
+            partnerEmails,
+            `Yêu cầu đào tạo mới: ${trainingTypesText}`,
+            `
+            <h2>Thông báo yêu cầu đào tạo mới</h2>
+            <p>Chúng tôi nhận được yêu cầu đào tạo mới với các nội dung sau:</p>
+            <ul>
+              ${processedDetails.map(detail => `
+                <li>
+                  <strong>${detail.type}</strong> - Nhóm: ${detail.group}, Số lượng: ${detail.participants} học viên
+                </li>
+              `).join('')}
+            </ul>
+            <p><strong>Thông tin khách hàng:</strong></p>
+            <ul>
+              <li>Tên: ${formData.clientName}</li>
+              <li>Email: ${formData.clientEmail}</li>
+              <li>Điện thoại: ${formData.clientPhone}</li>
+              <li>Địa điểm: ${formData.location}</li>
+              <li>Mô tả: ${formData.description}</li>
+            </ul>
+            <p>Thời lượng: ${formData.trainingDuration} | Thời gian mong muốn: ${formData.preferredTime}</p>
+            ${isUrgent ? '<p style="color: red; font-weight: bold;">Đây là yêu cầu khẩn cấp!</p>' : ''}
+            <p>Vui lòng đăng nhập vào hệ thống để xem chi tiết và phản hồi yêu cầu này.</p>
+            `
+          );
+        }
+      } catch (emailErr) {
+        console.error("Error sending notification emails: ", emailErr);
+        // Không throw lỗi này để không ảnh hưởng đến việc tạo yêu cầu
+      }
+
       setSuccess('Yêu cầu của bạn đã được gửi thành công! Các đơn vị đào tạo sẽ sớm liên hệ với bạn.');
       setFormData(initialFormState);
       setTrainingDetails([initialDetailState]);

@@ -38,6 +38,8 @@ const DocumentUploadForm: React.FC<{ onUploadSuccess: () => void }> = ({ onUploa
                 downloadUrl,
                 fileName: uploadTask.ref.name,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                viewCount: 0,
+                downloadCount: 0,
             });
 
             // Reset form
@@ -115,32 +117,66 @@ const DocumentUploadForm: React.FC<{ onUploadSuccess: () => void }> = ({ onUploa
     );
 };
 
-const DocumentItem: React.FC<{ doc: Document; isAdmin: boolean; onDelete: (id: string, fileName: string) => void; }> = ({ doc, isAdmin, onDelete }) => (
-    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center">
-        <div>
-            <h3 className="text-xl font-bold text-neutral-dark">{doc.title}</h3>
-            <p className="text-gray-600 mt-1">{doc.description}</p>
+const DocumentItem: React.FC<{ doc: Document; isAdmin: boolean; onDelete: (id: string, fileName: string) => void; }> = ({ doc, isAdmin, onDelete }) => {
+    const handleView = async () => {
+        try {
+            await db.collection('documents').doc(doc.id).update({
+                viewCount: firebase.firestore.FieldValue.increment(1)
+            });
+        } catch (error) {
+            console.error("Error updating view count: ", error);
+        }
+    };
+
+    const handleDownload = async () => {
+        try {
+            await db.collection('documents').doc(doc.id).update({
+                downloadCount: firebase.firestore.FieldValue.increment(1)
+            });
+        } catch (error) {
+            console.error("Error updating download count: ", error);
+        }
+    };
+
+    return (
+        <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex flex-col h-full">
+            <div className="flex-1">
+                <h3 className="text-lg font-bold text-neutral-dark mb-2">{doc.title}</h3>
+                <p className="text-gray-600 text-sm mb-4">{doc.description}</p>
+            </div>
+            <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
+                <div className="flex space-x-4 text-sm text-gray-500">
+                    <span className="flex items-center">
+                        <i className="fas fa-eye mr-1"></i> {doc.viewCount}
+                    </span>
+                    <span className="flex items-center">
+                        <i className="fas fa-download mr-1"></i> {doc.downloadCount}
+                    </span>
+                </div>
+                <div className="flex space-x-2 flex-shrink-0">
+                    <a
+                        href={doc.downloadUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:opacity-90 transition duration-300 text-sm"
+                        onClick={handleDownload}
+                    >
+                        <i className="fas fa-download mr-1"></i>Tải
+                    </a>
+                    <a
+                        href={doc.downloadUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:opacity-90 transition duration-300 text-sm"
+                        onClick={handleView}
+                    >
+                        <i className="fas fa-eye mr-1"></i>Xem
+                    </a>
+                </div>
+            </div>
         </div>
-        <div className="flex items-center mt-4 sm:mt-0 sm:ml-4 flex-shrink-0 space-x-3">
-             <a 
-                href={doc.downloadUrl} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="bg-primary text-white font-semibold py-2 px-5 rounded-lg hover:opacity-90 transition duration-300"
-            >
-                <i className="fas fa-download mr-2"></i>Tải về
-            </a>
-            {isAdmin && (
-                 <button
-                    onClick={() => onDelete(doc.id, doc.fileName)}
-                    className="bg-red-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-red-700 transition duration-300"
-                 >
-                    <i className="fas fa-trash-alt"></i>
-                 </button>
-            )}
-        </div>
-    </div>
-);
+    );
+};
 
 
 const DocumentsPage: React.FC<DocumentsPageProps> = ({ isAdmin }) => {
@@ -207,15 +243,15 @@ const DocumentsPage: React.FC<DocumentsPageProps> = ({ isAdmin }) => {
           </div>
       )}
 
-      <div className="space-y-6 max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {loading ? (
-            <p className="text-center text-gray-500">Đang tải tài liệu...</p>
+            <p className="text-center text-gray-500 col-span-full">Đang tải tài liệu...</p>
           ) : documents.length > 0 ? (
             documents.map(doc => (
                 <DocumentItem key={doc.id} doc={doc} isAdmin={isAdmin} onDelete={handleDeleteDocument} />
             ))
           ) : (
-            <div className="text-center text-gray-500 pt-6">
+            <div className="text-center text-gray-500 pt-6 col-span-full">
                 <p>Chưa có tài liệu nào được đăng tải.</p>
             </div>
           )}

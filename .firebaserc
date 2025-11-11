@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "gen-lang-client-0113063590"
-  }
+  },
+  "targets": {
+    "gen-lang-client-0113063590": {
+      "hosting": {
+        "main": [
+          "gen-lang-client-0113063590"
+        ],
+        "atld": [
+          "atld"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

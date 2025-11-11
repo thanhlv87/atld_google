@@ -44,6 +44,8 @@ export interface Document {
   downloadUrl: string;
   fileName: string;
   createdAt: firebase.firestore.Timestamp;
+  viewCount: number;
+  downloadCount: number;
 }
 
 // Hằng số cho các nhóm đào tạo trong form

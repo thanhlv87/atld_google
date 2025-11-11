@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { db, firebase } from '../services/firebaseConfig';
+import { db, firebase, sendEmail } from '../services/firebaseConfig';
 import { PartnerProfile, TrainingRequest } from '../types';
 import PartnerTable from '../components/PartnerTable';
 import TrainingRequestCard from '../components/TrainingRequestCard';
@@ -120,12 +120,55 @@ const AdminPage: React.FC = () => {
 
     const handleUpdatePartnerStatus = (uid: string, newStatus: 'approved' | 'rejected') => {
         setActionError(null);
-        db.collection('partners').doc(uid).update({ status: newStatus })
+        // Lấy thông tin đối tác để gửi email
+        db.collection('partners').doc(uid).get()
+        .then((doc) => {
+            if (doc.exists) {
+                const partner = doc.data() as PartnerProfile;
+                db.collection('partners').doc(uid).update({ status: newStatus })
+                .then(() => {
+                    // Gửi email thông báo cho đối tác về thay đổi trạng thái
+                    const subject = newStatus === 'approved'
+                        ? 'Tài khoản của bạn đã được phê duyệt'
+                        : 'Thông báo về trạng thái tài khoản';
+                    
+                    const htmlContent = newStatus === 'approved'
+                        ? `
+                        <h2>Chúc mừng! Tài khoản của bạn đã được phê duyệt</h2>
+                        <p>Kính gửi ${partner.email},</p>
+                        <p>Chúng tôi vui mừng thông báo rằng tài khoản của bạn đã được phê duyệt. Bây giờ bạn có thể truy cập hệ thống và bắt đầu nhận các yêu cầu đào tạo.</p>
+                        <p>Vui lòng đăng nhập vào hệ thống để xem các yêu cầu đào tạo phù hợp với năng lực của bạn.</p>
+                        <p>Trân trọng,<br/>Đội ngũ quản trị hệ thống</p>
+                        `
+                        : `
+                        <h2>Thông báo về trạng thái tài khoản</h2>
+                        <p>Kính gửi ${partner.email},</p>
+                        <p>Chúng tôi xin thông báo rằng tài khoản của bạn đã được cập nhật trạng thái thành từ chối. Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với quản trị viên.</p>
+                        <p>Trân trọng,<br/>Đội ngũ quản trị hệ thống</p>
+                        `;
+                    
+                    sendEmail(partner.email, subject, htmlContent)
+                    .catch(emailErr => {
+                        console.error('Error sending notification email:', emailErr);
+                    });
+                })
+                .catch((err: any) => {
+                    console.error('PERMISSION ERROR updating partner status:', err);
+                    const errorMessage = `LỖI PHÂN QUYỀN: Không thể cập nhật đối tác. Vui lòng kiểm tra lại Security Rules trên Firebase để đảm bảo tài khoản Admin có quyền "update" collection "partners". Lỗi gốc: ${err.message}`;
+                    setActionError(errorMessage);
+                });
+            }
+        })
+        .catch((err) => {
+            console.error('Error fetching partner data:', err);
+            // Nếu không lấy được thông tin đối tác, vẫn cập nhật trạng thái
+            db.collection('partners').doc(uid).update({ status: newStatus })
             .catch((err: any) => {
                 console.error('PERMISSION ERROR updating partner status:', err);
                 const errorMessage = `LỖI PHÂN QUYỀN: Không thể cập nhật đối tác. Vui lòng kiểm tra lại Security Rules trên Firebase để đảm bảo tài khoản Admin có quyền "update" collection "partners". Lỗi gốc: ${err.message}`;
                 setActionError(errorMessage);
             });
+        });
     };
 
     const handleDeletePartner = (uid: string) => {
