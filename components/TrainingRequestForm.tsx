@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { db, firebase, sendEmail } from '../services/firebaseConfig';
 import { TRAINING_TYPES, TRAINING_GROUPS } from '../types';
+import { generatePartnerNotificationEmail } from '../utils/emailTemplates';
 
 const TrainingRequestForm: React.FC = () => {
   const initialDetailState = { type: TRAINING_TYPES[0], group: TRAINING_GROUPS[0], participants: '', customType: '' };
@@ -113,31 +114,25 @@ const TrainingRequestForm: React.FC = () => {
 
           console.log('📬 Đang queue email cho:', partnerEmails);
 
+          // Generate beautiful HTML email template
+          const emailHtml = generatePartnerNotificationEmail(
+            processedDetails,
+            {
+              clientName: formData.clientName,
+              clientEmail: formData.clientEmail,
+              clientPhone: formData.clientPhone,
+              location: formData.location,
+              description: formData.description,
+              trainingDuration: formData.trainingDuration,
+              preferredTime: formData.preferredTime,
+            },
+            isUrgent
+          );
+
           const emailId = await sendEmail(
             partnerEmails,
-            `Yêu cầu đào tạo mới: ${trainingTypesText}`,
-            `
-            <h2>Thông báo yêu cầu đào tạo mới</h2>
-            <p>Chúng tôi nhận được yêu cầu đào tạo mới với các nội dung sau:</p>
-            <ul>
-              ${processedDetails.map(detail => `
-                <li>
-                  <strong>${detail.type}</strong> - Nhóm: ${detail.group}, Số lượng: ${detail.participants} học viên
-                </li>
-              `).join('')}
-            </ul>
-            <p><strong>Thông tin khách hàng:</strong></p>
-            <ul>
-              <li>Tên: ${formData.clientName}</li>
-              <li>Email: ${formData.clientEmail}</li>
-              <li>Điện thoại: ${formData.clientPhone}</li>
-              <li>Địa điểm: ${formData.location}</li>
-              <li>Mô tả: ${formData.description}</li>
-            </ul>
-            <p>Thời lượng: ${formData.trainingDuration} | Thời gian mong muốn: ${formData.preferredTime}</p>
-            ${isUrgent ? '<p style="color: red; font-weight: bold;">Đây là yêu cầu khẩn cấp!</p>' : ''}
-            <p>Vui lòng đăng nhập vào hệ thống để xem chi tiết và phản hồi yêu cầu này.</p>
-            `
+            `🎯 Yêu cầu đào tạo mới: ${trainingTypesText}`,
+            emailHtml
           );
 
           console.log('✅ Email đã được queue thành công với ID:', emailId);
