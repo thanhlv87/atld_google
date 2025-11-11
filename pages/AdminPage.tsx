@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { db } from '../services/firebaseConfig';
+import React, { useState, useEffect, useMemo } from 'react';
+import { db, firebase } from '../services/firebaseConfig';
 import { PartnerProfile, TrainingRequest } from '../types';
 import PartnerTable from '../components/PartnerTable';
 import TrainingRequestCard from '../components/TrainingRequestCard';
 import PendingPartnerCard from '../components/PendingPartnerCard';
 import PartnerDetailModal from '../components/PartnerDetailModal';
-import ViewersModal from '../components/ViewersModal'; // Import component mới
+import ViewersModal from '../components/ViewersModal';
+import KPIStatCard from '../components/KPIStatCard';
+import GrowthChart from '../components/GrowthChart';
+import InfoPanel from '../components/InfoPanel';
+
 
 const AdminPage: React.FC = () => {
     const [partners, setPartners] = useState<PartnerProfile[]>([]);
@@ -14,7 +18,7 @@ const AdminPage: React.FC = () => {
     const [loadError, setLoadError] = useState('');
     const [actionError, setActionError] = useState<string | null>(null);
     const [selectedPartner, setSelectedPartner] = useState<PartnerProfile | null>(null);
-    const [viewingPartners, setViewingPartners] = useState<PartnerProfile[] | null>(null); // State cho modal viewers
+    const [viewingPartners, setViewingPartners] = useState<PartnerProfile[] | null>(null);
 
     useEffect(() => {
         setLoadError('');
@@ -24,7 +28,12 @@ const AdminPage: React.FC = () => {
             .orderBy('createdAt', 'desc')
             .onSnapshot(
                 (querySnapshot) => {
-                    const partnersData = querySnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as PartnerProfile));
+                    const partnersData = querySnapshot.docs.map(doc => ({ 
+                        uid: doc.id, 
+                        ...doc.data(),
+                        // Ensure createdAt is a Firestore Timestamp
+                        createdAt: doc.data().createdAt || firebase.firestore.Timestamp.now()
+                    } as PartnerProfile));
                     setPartners(partnersData);
                     setLoading(false);
                 },
@@ -54,6 +63,61 @@ const AdminPage: React.FC = () => {
         };
     }, []);
     
+    // Memoized calculations for the dashboard
+    const dashboardData = useMemo(() => {
+        const pendingPartners = partners.filter(p => p.status === 'pending');
+        const approvedPartners = partners.filter(p => p.status === 'approved');
+        const urgentRequests = requests.filter(r => r.urgent);
+        
+        // Calculate Hot Training Types
+        const trainingTypeCounts: { [key: string]: number } = requests.reduce((acc, req) => {
+            req.trainingDetails?.forEach(detail => {
+                acc[detail.type] = (acc[detail.type] || 0) + 1;
+            });
+            return acc;
+        }, {} as { [key: string]: number });
+
+        const sortedTypes = Object.entries(trainingTypeCounts)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 3);
+        
+        const totalRequests = requests.length;
+        const hotTrainingTypes = sortedTypes.map(([type, count]) => ({
+            text: `${type}: ${count} yêu cầu`,
+            details: `${totalRequests > 0 ? ((count / totalRequests) * 100).toFixed(0) : 0}%`
+        }));
+
+        // Calculate "Needs Attention" items
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+        const oldPendingPartnersCount = pendingPartners.filter(p => {
+             // Ensure createdAt is not null and is a Firestore Timestamp
+            return p.createdAt && 'toDate' in p.createdAt && p.createdAt.toDate() < threeDaysAgo;
+        }).length;
+        
+        const unviewedRequestsCount = requests.filter(r => !r.viewedBy || r.viewedBy.length === 0).length;
+
+        const attentionItems = [];
+        if (oldPendingPartnersCount > 0) {
+            attentionItems.push({ text: `${oldPendingPartnersCount} đối tác chờ duyệt > 3 ngày` });
+        }
+        if (unviewedRequestsCount > 0) {
+            attentionItems.push({ text: `${unviewedRequestsCount} yêu cầu chưa có ai xem` });
+        }
+
+
+        return {
+            totalRequests: requests.length,
+            approvedPartnersCount: approvedPartners.length,
+            urgentRequestsCount: urgentRequests.length,
+            pendingPartnersCount: pendingPartners.length,
+            hotTrainingTypes,
+            attentionItems
+        };
+    }, [partners, requests]);
+
+
     const handleUpdatePartnerStatus = (uid: string, newStatus: 'approved' | 'rejected') => {
         setActionError(null);
         db.collection('partners').doc(uid).update({ status: newStatus })
@@ -66,7 +130,6 @@ const AdminPage: React.FC = () => {
 
     const handleDeletePartner = (uid: string) => {
         setActionError(null);
-        // Removed window.confirm to work in sandboxed environments
         db.collection('partners').doc(uid).delete()
             .catch((err: any) => {
                 console.error('PERMISSION ERROR deleting partner:', err);
@@ -77,7 +140,6 @@ const AdminPage: React.FC = () => {
     
     const handleDeleteRequest = (id: string) => {
         setActionError(null);
-        // Removed window.confirm to work in sandboxed environments
         db.collection('trainingRequests').doc(id).delete()
             .catch((err: any) => {
                 console.error('PERMISSION ERROR deleting request:', err);
@@ -97,22 +159,13 @@ const AdminPage: React.FC = () => {
     };
 
     const handleShowViewers = (request: TrainingRequest) => {
-        if (!request.viewedBy || request.viewedBy.length === 0) {
-            return;
-        }
-        // Tối ưu: Lọc từ danh sách partners đã có sẵn thay vì query lại DB
+        if (!request.viewedBy || request.viewedBy.length === 0) return;
         const viewers = partners.filter(p => request.viewedBy.includes(p.uid));
         setViewingPartners(viewers);
     };
 
-
-    if (loading) {
-        return <div className="text-center p-10">Đang tải dữ liệu...</div>;
-    }
-
-    if (loadError) {
-        return <div className="text-center p-10 text-red-500">{loadError}</div>;
-    }
+    if (loading) return <div className="text-center p-10">Đang tải dữ liệu...</div>;
+    if (loadError) return <div className="text-center p-10 text-red-500">{loadError}</div>;
 
     const pendingPartners = partners.filter(p => p.status === 'pending');
     const managedPartners = partners.filter(p => p.status === 'approved' || p.status === 'rejected');
@@ -122,11 +175,9 @@ const AdminPage: React.FC = () => {
             <div className="container mx-auto p-4 md:p-8">
                 <div className="text-center mb-10">
                     <h1 className="text-3xl md:text-4xl font-bold text-neutral-dark mb-2">
-                        <i className="fas fa-user-shield mr-3"></i>Bảng điều khiển Quản trị
+                        <i className="fas fa-tachometer-alt mr-3"></i>Bảng điều khiển Quản trị
                     </h1>
-                    <p className="text-gray-600">
-                        Quản lý toàn bộ dữ liệu của hệ thống.
-                    </p>
+                    <p className="text-gray-600">Tổng quan tình hình hoạt động của hệ thống.</p>
                 </div>
 
                 {actionError && (
@@ -138,6 +189,24 @@ const AdminPage: React.FC = () => {
                         </button>
                     </div>
                 )}
+
+                {/* --- Start of Dashboard --- */}
+                <section className="mb-12">
+                    {/* KPI Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <KPIStatCard icon="fa-file-alt" title="Tổng số yêu cầu" value={dashboardData.totalRequests.toString()} details="Tất cả thời gian" />
+                        <KPIStatCard icon="fa-handshake" title="Đối tác đã duyệt" value={dashboardData.approvedPartnersCount.toString()} details="Đang hoạt động" />
+                        <KPIStatCard icon="fa-exclamation-circle" title="Yêu cầu khẩn cấp" value={dashboardData.urgentRequestsCount.toString()} details="Cần ưu tiên" />
+                        <KPIStatCard icon="fa-user-clock" title="Đối tác chờ duyệt" value={dashboardData.pendingPartnersCount.toString()} details="Cần hành động" />
+                    </div>
+                    {/* Chart and Info Panels */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                       <div className="lg:col-span-1"><GrowthChart title="Tăng trưởng (6 tháng qua)" /></div>
+                       <div className="lg:col-span-1"><InfoPanel icon="fa-fire" title="Loại hình đào tạo 'Hot'" items={dashboardData.hotTrainingTypes} /></div>
+                       <div className="lg:col-span-1"><InfoPanel icon="fa-bell" title="Cần chú ý" items={dashboardData.attentionItems} theme="danger" /></div>
+                    </div>
+                </section>
+                {/* --- End of Dashboard --- */}
                 
                 <div className="space-y-12">
                      <section>
@@ -166,7 +235,8 @@ const AdminPage: React.FC = () => {
                         <PartnerTable 
                             partners={managedPartners} 
                             onDelete={handleDeletePartner} 
-                            viewType="managed" 
+                            viewType="managed"
+                            onViewDetails={setSelectedPartner}
                         />
                     </section>
                     
@@ -180,7 +250,7 @@ const AdminPage: React.FC = () => {
                                         request={request}
                                         isAdminView={true}
                                         onDeleteRequest={handleDeleteRequest}
-                                        onShowViewers={handleShowViewers} // Pass the handler
+                                        onShowViewers={handleShowViewers}
                                     />
                                 ))}
                             </div>

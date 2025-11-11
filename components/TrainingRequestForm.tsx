@@ -16,6 +16,7 @@ const TrainingRequestForm: React.FC = () => {
 
   const [formData, setFormData] = useState(initialFormState);
   const [trainingDetails, setTrainingDetails] = useState([initialDetailState]);
+  const [isUrgent, setIsUrgent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -73,10 +74,12 @@ const TrainingRequestForm: React.FC = () => {
         trainingDetails: processedDetails,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         viewedBy: [],
+        urgent: isUrgent,
       });
       setSuccess('Yêu cầu của bạn đã được gửi thành công! Các đơn vị đào tạo sẽ sớm liên hệ với bạn.');
       setFormData(initialFormState);
       setTrainingDetails([initialDetailState]);
+      setIsUrgent(false);
     } catch (err) {
       console.error("Error adding document: ", err);
       setError('Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại.');
@@ -146,6 +149,22 @@ const TrainingRequestForm: React.FC = () => {
             </div>
             <input type="text" name="location" placeholder="Địa điểm huấn luyện (*)" value={formData.location} onChange={handleChange} className={inputClasses} required />
             <textarea name="description" placeholder="Mô tả chi tiết yêu cầu khác (ví dụ: yêu cầu về giảng viên, chứng chỉ...)" value={formData.description} onChange={handleChange} rows={4} className={inputClasses} required />
+        </div>
+        
+        {/* Urgent Request Checkbox */}
+        <div className="mt-4 p-4 border border-yellow-300 bg-yellow-50 rounded-lg">
+            <label className="flex items-center space-x-3 cursor-pointer">
+                <input
+                    type="checkbox"
+                    checked={isUrgent}
+                    onChange={(e) => setIsUrgent(e.target.checked)}
+                    className="h-5 w-5 text-primary focus:ring-primary border-gray-300 rounded"
+                />
+                <span className="font-semibold text-neutral-dark">
+                    Yêu cầu báo giá khẩn cấp
+                    <span className="font-normal text-sm block text-gray-600">Đánh dấu nếu bạn cần triển khai huấn luyện trong vòng 7 ngày. Yêu cầu của bạn sẽ được ưu tiên hiển thị.</span>
+                </span>
+            </label>
         </div>
 
         

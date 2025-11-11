@@ -6,9 +6,10 @@ interface PartnerTableProps {
     onDelete?: (uid: string) => void;
     onUpdateStatus?: (uid: string, status: 'approved' | 'rejected') => void;
     viewType: 'pending' | 'managed';
+    onViewDetails?: (partner: PartnerProfile) => void;
 }
 
-const PartnerTable: React.FC<PartnerTableProps> = ({ partners, onDelete, onUpdateStatus, viewType }) => {
+const PartnerTable: React.FC<PartnerTableProps> = ({ partners, onDelete, onUpdateStatus, viewType, onViewDetails }) => {
     return (
         <div className="bg-white shadow-md rounded-lg overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -31,7 +32,11 @@ const PartnerTable: React.FC<PartnerTableProps> = ({ partners, onDelete, onUpdat
                         </tr>
                     ) : (
                         partners.map((partner) => (
-                            <tr key={partner.uid}>
+                            <tr 
+                                key={partner.uid}
+                                onClick={() => onViewDetails && onViewDetails(partner)}
+                                className={onViewDetails ? 'cursor-pointer hover:bg-gray-50 transition-colors' : ''}
+                            >
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{partner.email}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{partner.taxId}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{partner.phone}</td>
@@ -48,12 +53,20 @@ const PartnerTable: React.FC<PartnerTableProps> = ({ partners, onDelete, onUpdat
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-4">
                                      {viewType === 'pending' && onUpdateStatus && (
                                         <>
-                                            <button onClick={() => onUpdateStatus(partner.uid, 'approved')} className="text-green-600 hover:text-green-900 font-bold">Duyệt</button>
-                                            <button onClick={() => onUpdateStatus(partner.uid, 'rejected')} className="text-yellow-600 hover:text-yellow-900 font-bold">Từ chối</button>
+                                            <button onClick={(e) => { e.stopPropagation(); onUpdateStatus(partner.uid, 'approved'); }} className="text-green-600 hover:text-green-900 font-bold">Duyệt</button>
+                                            <button onClick={(e) => { e.stopPropagation(); onUpdateStatus(partner.uid, 'rejected'); }} className="text-yellow-600 hover:text-yellow-900 font-bold">Từ chối</button>
                                         </>
                                     )}
                                     {viewType === 'managed' && onDelete && (
-                                        <button onClick={() => onDelete(partner.uid)} className="text-red-600 hover:text-red-900">Xóa</button>
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Ngăn sự kiện click của hàng
+                                                onDelete(partner.uid);
+                                            }} 
+                                            className="text-red-600 hover:text-red-900"
+                                        >
+                                            Xóa
+                                        </button>
                                     )}
                                 </td>
                             </tr>

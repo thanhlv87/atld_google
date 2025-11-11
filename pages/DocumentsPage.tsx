@@ -44,12 +44,18 @@ const DocumentUploadForm: React.FC<{ onUploadSuccess: () => void }> = ({ onUploa
             setTitle('');
             setDescription('');
             setFile(null);
-            (e.target as HTMLFormElement).reset();
+            if (e.target instanceof HTMLFormElement) {
+                e.target.reset();
+            }
             onUploadSuccess();
             
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error uploading document: ", err);
-            setError('Đã xảy ra lỗi khi đăng tải. Vui lòng thử lại.');
+            if (err.code === 'storage/unauthorized') {
+                setError(`Lỗi phân quyền. Tài khoản của bạn không có quyền đăng tải tệp. Vui lòng kiểm tra lại Firebase Storage Rules. Quy tắc cần cho phép ghi ('allow write') vào đường dẫn 'documents/' đối với những tài khoản admin (có document UID tồn tại trong collection 'admins' của Firestore).`);
+            } else {
+                setError('Đã xảy ra lỗi khi đăng tải. Vui lòng thử lại.');
+            }
         } finally {
             setUploading(false);
         }
@@ -81,7 +87,12 @@ const DocumentUploadForm: React.FC<{ onUploadSuccess: () => void }> = ({ onUploa
                     className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
                     required
                 />
-                {error && <p className="text-red-500 text-sm">{error}</p>}
+                {error && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert">
+                    <p className="font-bold">Lỗi!</p>
+                    <p className="text-sm">{error}</p>
+                  </div>
+                )}
                 <button
                     type="submit"
                     disabled={uploading}
@@ -135,6 +146,7 @@ const DocumentItem: React.FC<{ doc: Document; isAdmin: boolean; onDelete: (id: s
 const DocumentsPage: React.FC<DocumentsPageProps> = ({ isAdmin }) => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionError, setActionError] = useState('');
 
   const fetchDocuments = async () => {
     setLoading(true);
@@ -154,6 +166,7 @@ const DocumentsPage: React.FC<DocumentsPageProps> = ({ isAdmin }) => {
   }, []);
 
   const handleDeleteDocument = async (id: string, fileName: string) => {
+    setActionError('');
     if (window.confirm('Bạn có chắc chắn muốn xóa tài liệu này? Hành động này sẽ xóa cả tệp đính kèm.')) {
         try {
             // Delete file from Storage
@@ -164,9 +177,13 @@ const DocumentsPage: React.FC<DocumentsPageProps> = ({ isAdmin }) => {
             await db.collection('documents').doc(id).delete();
             
             setDocuments(prev => prev.filter(doc => doc.id !== id));
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error deleting document: ", error);
-            alert("Đã xảy ra lỗi khi xóa tài liệu.");
+            if (error.code === 'storage/unauthorized') {
+                 setActionError('Lỗi phân quyền: Bạn không có quyền xóa tệp này. Vui lòng kiểm tra lại Firebase Storage Rules.');
+            } else {
+                 setActionError("Đã xảy ra lỗi khi xóa tài liệu.");
+            }
         }
     }
   };
@@ -183,6 +200,12 @@ const DocumentsPage: React.FC<DocumentsPageProps> = ({ isAdmin }) => {
       </div>
       
       {isAdmin && <DocumentUploadForm onUploadSuccess={fetchDocuments} />}
+
+      {actionError && (
+          <div className="max-w-4xl mx-auto bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
+              <p>{actionError}</p>
+          </div>
+      )}
 
       <div className="space-y-6 max-w-4xl mx-auto">
           {loading ? (

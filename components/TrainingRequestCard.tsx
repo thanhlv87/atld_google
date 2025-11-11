@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { db, firebase } from '../services/firebaseConfig';
 import { TrainingRequest } from '../types';
 import { PartnerStatus } from '../App';
+import html2canvas from 'html2canvas';
+
 
 interface TrainingRequestCardProps {
   request: TrainingRequest;
@@ -22,6 +24,9 @@ const InfoIcon: React.FC<{className?: string}> = ({className}) => (
 const TrainingRequestCard: React.FC<TrainingRequestCardProps> = ({ request, user, onLoginRequired, isAdminView = false, onDeleteRequest, onShowViewers, partnerStatus }) => {
   const [showContact, setShowContact] = useState(isAdminView);
   const [isUnlocking, setIsUnlocking] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
 
   const hasUnlocked = user && request.viewedBy.includes(user.uid);
   const totalParticipants = request.trainingDetails?.reduce((sum, detail) => sum + detail.participants, 0) || 0;
@@ -75,19 +80,70 @@ const TrainingRequestCard: React.FC<TrainingRequestCardProps> = ({ request, user
         onDeleteRequest(request.id);
     }
   };
+  
+  const handleExportImage = async () => {
+      if (!cardRef.current || isExporting) return;
+      setIsExporting(true);
+      try {
+          const canvas = await html2canvas(cardRef.current, {
+              useCORS: true,
+              backgroundColor: '#ffffff', // Explicitly set a white background
+              // Remove the export button from the capture
+              ignoreElements: (element) => element.classList.contains('export-button'),
+          });
+          const image = canvas.toDataURL('image/png', 1.0);
+          const link = document.createElement('a');
+          link.href = image;
+          link.download = `yeu-cau-${request.id}.png`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+      } catch (error) {
+          console.error("Error exporting image:", error);
+          alert("Đã xảy ra lỗi khi xuất ảnh.");
+      } finally {
+          setIsExporting(false);
+      }
+  };
+
 
   const firstTrainingType = request.trainingDetails?.[0]?.type || 'Yêu cầu Huấn luyện';
   const otherTypesCount = (request.trainingDetails?.length || 0) > 1 ? ` (+${request.trainingDetails.length - 1})` : '';
   const cardTitle = `${firstTrainingType}${otherTypesCount}`;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 transition-shadow hover:shadow-xl flex flex-col h-full">
+    <div ref={cardRef} className="bg-white border border-gray-200 rounded-lg p-4 transition-shadow hover:shadow-xl flex flex-col h-full">
       <div className="flex-grow">
         <div className="flex justify-between items-start mb-3">
-          <h3 className="text-lg font-bold text-neutral-dark leading-tight pr-2" title={cardTitle}>{cardTitle}</h3>
-          <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
-            {request.createdAt ? timeSince(request.createdAt.toDate()) : 'Vừa xong'}
-          </span>
+            <div className="flex-grow">
+                 <h3 className="text-lg font-bold text-neutral-dark leading-tight pr-2" title={cardTitle}>{cardTitle}</h3>
+                 {request.urgent && (
+                     <span className="mt-1.5 inline-block bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                         <i className="fas fa-exclamation-circle mr-1"></i> KHẨN CẤP
+                     </span>
+                 )}
+            </div>
+            <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
+                 <span className="text-xs text-gray-500">
+                    {request.createdAt ? timeSince(request.createdAt.toDate()) : 'Vừa xong'}
+                </span>
+                 <button
+                    onClick={handleExportImage}
+                    disabled={isExporting}
+                    className="export-button p-2 h-8 w-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-wait"
+                    aria-label="Xuất ảnh thẻ yêu cầu"
+                    title="Xuất ảnh"
+                >
+                    {isExporting ? (
+                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    ) : (
+                        <i className="fas fa-camera"></i>
+                    )}
+                </button>
+            </div>
         </div>
         
         {isAdminView && (

@@ -10,9 +10,12 @@ interface TrainingRequestListProps {
   loading: boolean;
   onLoginRequired: () => void;
   partnerStatus: PartnerStatus;
+  searchQuery?: string;
 }
 
-const TrainingRequestList: React.FC<TrainingRequestListProps> = ({ requests, user, loading, onLoginRequired, partnerStatus }) => {
+const TrainingRequestList: React.FC<TrainingRequestListProps> = ({ requests, user, loading, onLoginRequired, partnerStatus, searchQuery }) => {
+  const hasActiveSearch = searchQuery && searchQuery.trim() !== '';
+
   return (
     <div>
       {loading ? (
@@ -33,7 +36,11 @@ const TrainingRequestList: React.FC<TrainingRequestListProps> = ({ requests, use
         </div>
       ) : (
         <div className="text-center py-10 bg-white rounded-lg shadow-md border">
-          <p className="text-neutral-dark">Chưa có yêu cầu nào được tạo. Hãy là người đầu tiên!</p>
+          {hasActiveSearch ? (
+             <p className="text-neutral-dark">Không tìm thấy yêu cầu nào phù hợp với tìm kiếm của bạn.</p>
+          ) : (
+             <p className="text-neutral-dark">Chưa có yêu cầu nào được tạo. Hãy là người đầu tiên!</p>
+          )}
         </div>
       )}
     </div>

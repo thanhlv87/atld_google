@@ -20,6 +20,7 @@ export interface TrainingRequest {
   location: string;
   createdAt: firebase.firestore.Timestamp;
   viewedBy: string[]; // Array of user UIDs who have viewed the contact info
+  urgent: boolean; // True if the request is urgent
 }
 
 export interface PartnerProfile {
@@ -33,6 +34,7 @@ export interface PartnerProfile {
     subscribesToEmails: boolean;
     status: 'pending' | 'approved' | 'rejected';
     membership: 'free' | 'premium';
+    createdAt: firebase.firestore.Timestamp;
 }
 
 export interface Document {

@@ -50,7 +50,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       <section className="bg-gradient-to-br from-primary to-orange-600 text-white">
         <div className="container mx-auto px-4 py-20 md:py-32 text-center">
           <h1 className="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">Nền tảng kết nối Đào tạo An toàn Lao động</h1>
-          <p className="text-lg md:text-xl max-w-3xl mx-auto mb-8">Kết nối doanh nghiệp với các đối tác đào tạo ATLD uy tín, chuyên nghiệp trên toàn quốc.</p>
+          <p className="text-lg md:text-xl max-w-3xl mx-auto mb-8">Kết nối doanh nghiệp với các đối tác đào tạo ATLD uy tín trên toàn quốc.</p>
           <div className="flex flex-wrap justify-center items-center gap-4">
             <button onClick={scrollToForm} className="bg-white text-primary font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-gray-100 transition duration-300">
               Tạo Yêu Cầu Miễn Phí
