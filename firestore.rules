@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // == HÀM HỖ TRỢ ==
+    function isAdmin() {
+      return exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // == QUY TẮC CHO HỒ SƠ ĐỐI TÁC ==
+    match /partners/{partnerId} {
+      allow read: if true;  // Bất kỳ ai cũng có thể đọc
+      allow create: if request.auth != null && request.auth.uid == partnerId;
+      allow update: if request.auth != null && (request.auth.uid == partnerId || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // == QUY TẮC CHO CÁC YÊU CẦU HUẤN LUYỆN ==
+    match /trainingRequests/{requestId} {
+      allow read, create: if true;
+      allow update: if request.auth != null;
+      allow delete: if isAdmin();
+    }
+
+    // == QUY TẮC CHO TÀI LIỆU ==
+    match /documents/{docId} {
+      allow read: if true;  // Public read
+      allow write: if request.auth != null;  // Authenticated users có thể upload
+    }
+
+    // == QUY TẮC CHO QUYỀN ADMIN ==
+    match /admins/{adminId} {
+      allow get: if request.auth != null && request.auth.uid == adminId;
+      allow list, write: if false;  // Chặn list và write từ client
+    }
+  }
+}
