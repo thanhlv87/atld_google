@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Allow anyone to create training requests (public form)
+    match /trainingRequests/{requestId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    // Allow anyone to create email documents (needed for trigger extension)
+    match /mail/{mailId} {
+      allow create: if true;
+      allow read, update, delete: if false; // Only extension can read/update
+    }
+
+    // Partners collection
+    match /partners/{partnerId} {
+      // Allow users to create their partner profile
+      allow create: if request.auth != null && request.auth.uid == partnerId;
+      // Allow partners to read and update their own profile
+      allow read, update: if request.auth != null && request.auth.uid == partnerId;
+      // Allow admins to read all partners (you can add admin logic here)
+      allow read: if request.auth != null;
+    }
+
+    // Users collection (if needed)
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Default deny all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

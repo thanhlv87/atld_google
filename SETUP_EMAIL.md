@@ -15,6 +15,49 @@ Code gửi email đã được implement nhưng **cần cài đặt Firebase Ext
    - Tự động gửi email khi có document mới
    - Cập nhật trạng thái gửi trong document
 
+## Bước 0: Deploy Firestore Security Rules (QUAN TRỌNG!)
+
+**Phải làm bước này trước, nếu không sẽ bị lỗi HTTP 400 khi gửi email!**
+
+### Cách 1: Deploy qua Firebase CLI (Khuyến nghị)
+
+1. **Cài đặt Firebase CLI** (nếu chưa có):
+   ```bash
+   npm install -g firebase-tools
+   ```
+
+2. **Login vào Firebase**:
+   ```bash
+   firebase login
+   ```
+
+3. **Deploy Firestore rules**:
+   ```bash
+   firebase deploy --only firestore:rules
+   ```
+
+4. **Kiểm tra kết quả**:
+   - Vào [Firebase Console](https://console.firebase.google.com/)
+   - Chọn project `gen-lang-client-0113063590`
+   - Vào **Firestore Database** → **Rules**
+   - Kiểm tra rules đã được update
+
+### Cách 2: Update trực tiếp trên Firebase Console
+
+Nếu không muốn dùng CLI, bạn có thể copy/paste rules trực tiếp:
+
+1. Vào [Firebase Console](https://console.firebase.google.com/)
+2. Chọn project `gen-lang-client-0113063590`
+3. Vào **Firestore Database** → **Rules**
+4. Copy nội dung từ file `firestore.rules` và paste vào editor
+5. Click **Publish**
+
+**Lưu ý:** Rules cho phép:
+- ✅ Bất kỳ ai cũng có thể tạo training requests (public form)
+- ✅ Bất kỳ ai cũng có thể tạo email documents (cần cho extension)
+- ✅ Chỉ authenticated users mới đọc/update được data
+- ✅ Partners chỉ đọc/update được profile của mình
+
 ## Bước 1: Cài đặt Firebase Extension
 
 ### 1.1. Truy cập Firebase Console
@@ -158,6 +201,57 @@ Nếu có lỗi, field `delivery.error` sẽ chứa thông tin lỗi.
 5. Đợi vài giây → Check email của đối tác test
 
 ## Troubleshooting
+
+### ⚠️ Vấn đề 0: Lỗi HTTP 400 - Permission Denied khi submit form
+
+**Triệu chứng:**
+- User thấy message: "Có lỗi khi gửi email thông báo"
+- Browser Console hiển thị: `Failed to load resource: the server responded with a status of 400 ()`
+- Console log: `❌ Error sending notification emails` với error code `permission-denied`
+
+**Nguyên nhân:**
+Firestore Security Rules chưa cho phép write vào collection `mail`.
+
+**Giải pháp:**
+
+1. **Kiểm tra Firestore Rules hiện tại:**
+   - Vào [Firebase Console](https://console.firebase.google.com/)
+   - Chọn project `gen-lang-client-0113063590`
+   - Vào **Firestore Database** → **Rules**
+   - Xem rules hiện tại
+
+2. **Deploy Firestore Rules mới:**
+
+   **Option A - Dùng Firebase CLI (Nhanh nhất):**
+   ```bash
+   # Trong thư mục project
+   firebase deploy --only firestore:rules
+   ```
+
+   **Option B - Update trên Console:**
+   - Copy toàn bộ nội dung từ file `firestore.rules`
+   - Paste vào Rules editor trên Firebase Console
+   - Click **Publish**
+
+3. **Verify rules đã được apply:**
+   - Refresh trang Firestore Rules
+   - Đảm bảo có dòng:
+     ```
+     match /mail/{mailId} {
+       allow create: if true;
+       ...
+     }
+     ```
+
+4. **Test lại:**
+   - Refresh ứng dụng (Ctrl+Shift+R / Cmd+Shift+R)
+   - Submit form training request
+   - Kiểm tra Browser Console → Phải thấy: `✅ Email đã được queue thành công`
+
+**Debugging tips:**
+- Mở Browser Console (F12) trước khi submit form
+- Xem detailed error logs với error code
+- Nếu vẫn lỗi `permission-denied`, check lại rules đã publish chưa
 
 ### Vấn đề 1: Không thấy email được gửi
 
