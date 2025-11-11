@@ -1,0 +1,5 @@
+{
+  "name": "Nền Tảng Huấn Luyện An Toàn",
+  "description": "Một ứng dụng web kết nối khách hàng có nhu cầu huấn luyện an toàn lao động với các công ty đào tạo chuyên nghiệp. Khách hàng có thể đăng yêu cầu, và các công ty đào tạo đã xác thực có thể xem thông tin liên hệ để báo giá.",
+  "requestFramePermissions": []
+}

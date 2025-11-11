@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nền Tảng Huấn Luyện An Toàn</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#EA580C', // A warmer, richer Orange-600
+              'primary-dark': '#C2410C', // Orange-700 for hover
+              secondary: '#FBBF24', // Amber-400
+              accent: '#3B82F6', // Blue-500
+              neutral: {
+                light: '#f8fafc', // A modern, clean light gray (slate-50)
+                DEFAULT: '#f1f5f9', // slate-100
+                dark: '#334155',    // slate-700
+              }
+            }
+          }
+        }
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.5.0/"
+  }
+}
+</script>
+</head>
+  <body class="bg-neutral-light">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

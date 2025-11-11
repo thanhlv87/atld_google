@@ -1,0 +1,179 @@
+import React, { useState } from 'react';
+import { auth, db, firebase } from '../services/firebaseConfig';
+import { PARTNER_CAPABILITIES } from '../types';
+
+interface LoginModalProps {
+  onClose: () => void;
+}
+
+const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const initialRegisterState = {
+    taxId: '',
+    address: '',
+    phone: '',
+    notableClients: '',
+    capabilities: [] as string[],
+    subscribesToEmails: true,
+  };
+  const [registerData, setRegisterData] = useState(initialRegisterState);
+
+  const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setRegisterData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCapabilityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+    setRegisterData(prev => {
+        const capabilities = checked
+            ? [...prev.capabilities, value]
+            : prev.capabilities.filter(c => c !== value);
+        return { ...prev, capabilities };
+    });
+  };
+
+  const handleSubscribeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRegisterData(prev => ({ ...prev, subscribesToEmails: e.target.checked }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      if (isLogin) {
+        await auth.signInWithEmailAndPassword(email, password);
+      } else {
+        if (!registerData.phone.trim()) {
+            setError('Vui lòng nhập số điện thoại.');
+            setLoading(false);
+            return;
+        }
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+        if (user) {
+            await db.collection('partners').doc(user.uid).set({
+                uid: user.uid,
+                email: email,
+                taxId: registerData.taxId,
+                address: registerData.address,
+                phone: registerData.phone,
+                notableClients: registerData.notableClients,
+                capabilities: registerData.capabilities,
+                subscribesToEmails: registerData.subscribesToEmails,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                status: 'pending',
+                membership: 'free',
+            });
+        }
+      }
+      onClose();
+    } catch (err: any) {
+        switch (err.code) {
+            case 'auth/user-not-found': setError('Không tìm thấy tài khoản với email này.'); break;
+            case 'auth/wrong-password': setError('Mật khẩu không chính xác.'); break;
+            case 'auth/email-already-in-use': setError('Email này đã được sử dụng.'); break;
+            case 'auth/weak-password': setError('Mật khẩu phải có ít nhất 6 ký tự.'); break;
+            case 'auth/invalid-email': setError('Địa chỉ email không hợp lệ.'); break;
+            default: setError('Đã xảy ra lỗi. Vui lòng thử lại.'); break;
+        }
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  const inputClasses = "w-full p-3 border border-gray-300 rounded-lg bg-white text-neutral-dark focus:ring-2 focus:ring-primary placeholder-gray-500";
+
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4" onClick={onClose}>
+      <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <h2 className="text-2xl font-bold text-center text-primary mb-2">
+          {isLogin ? 'Đăng nhập Đối tác' : 'Đăng ký Hồ sơ Đối tác'}
+        </h2>
+        <p className="text-center text-neutral-dark mb-6 text-sm">
+          {isLogin ? 'Truy cập để xem thông tin chi tiết và báo giá các yêu cầu.' : 'Hoàn thành hồ sơ để kết nối với các doanh nghiệp có nhu cầu.'}
+        </p>
+
+        {isLogin ? (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClasses} required />
+            <input type="password" placeholder="Mật khẩu" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClasses} required />
+            {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+            <button type="submit" disabled={loading} className="w-full flex justify-center items-center bg-primary text-white font-bold py-3 rounded-lg hover:opacity-90 transition duration-300 disabled:bg-primary-dark disabled:opacity-75 disabled:cursor-wait">
+              {loading ? (
+                  <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>Đang xử lý...</span>
+                  </>
+              ) : 'Đăng nhập'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Standard auth fields */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input type="email" placeholder="Email đăng nhập (*)" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClasses} required />
+                <input type="password" placeholder="Mật khẩu (*)" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClasses} required />
+            </div>
+            {/* Company profile fields */}
+            <input type="text" name="taxId" placeholder="Mã số thuế (*)" value={registerData.taxId} onChange={handleRegisterChange} className={inputClasses} required />
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input type="text" name="address" placeholder="Địa chỉ công ty (*)" value={registerData.address} onChange={handleRegisterChange} className={inputClasses} required />
+                <input type="tel" name="phone" placeholder="Số điện thoại (*)" value={registerData.phone} onChange={handleRegisterChange} className={inputClasses} required />
+             </div>
+            <textarea name="notableClients" placeholder="Các khách hàng/dự án tiêu biểu (cách nhau bởi dấu phẩy)" value={registerData.notableClients} onChange={handleRegisterChange} rows={3} className={inputClasses} />
+            
+            <div>
+                <label className="font-semibold text-neutral-dark mb-2 block text-sm">Năng lực đào tạo (*)</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 max-h-40 overflow-y-auto p-3 border rounded-lg bg-gray-50">
+                    {PARTNER_CAPABILITIES.map(type => (
+                        <label key={type} className="flex items-center space-x-2 text-sm text-gray-700 cursor-pointer">
+                            <input type="checkbox" value={type} onChange={handleCapabilityChange} checked={registerData.capabilities.includes(type)} className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" />
+                            <span>{type}</span>
+                        </label>
+                    ))}
+                </div>
+            </div>
+
+            <label className="flex items-center space-x-3 text-sm text-gray-700 cursor-pointer pt-2">
+                <input type="checkbox" name="subscribesToEmails" checked={registerData.subscribesToEmails} onChange={handleSubscribeChange} className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" />
+                <span>Tôi muốn nhận email thông báo khi có yêu cầu mới.</span>
+            </label>
+            
+            {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+            <button type="submit" disabled={loading} className="w-full flex justify-center items-center bg-primary text-white font-bold py-3 rounded-lg hover:opacity-90 transition duration-300 disabled:bg-primary-dark disabled:opacity-75 disabled:cursor-wait">
+              {loading ? (
+                  <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>Đang xử lý...</span>
+                  </>
+              ) : 'Hoàn tất Đăng ký'}
+            </button>
+          </form>
+        )}
+
+        <p className="text-center text-sm mt-6">
+          {isLogin ? "Chưa có tài khoản Đối tác?" : "Đã có tài khoản?"}
+          <button onClick={() => { setIsLogin(!isLogin); setError(''); }} className="text-accent font-semibold ml-1 hover:underline">
+            {isLogin ? 'Đăng ký ngay' : 'Đăng nhập'}
+          </button>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default LoginModal;

@@ -1,0 +1,163 @@
+import React, { useState } from 'react';
+import { db, firebase } from '../services/firebaseConfig';
+import { TrainingRequest } from '../types';
+import { PartnerStatus } from '../App';
+
+interface TrainingRequestCardProps {
+  request: TrainingRequest;
+  user?: firebase.User | null;
+  onLoginRequired?: () => void;
+  isAdminView?: boolean;
+  onDeleteRequest?: (id: string) => void;
+  onShowViewers?: (request: TrainingRequest) => void;
+  partnerStatus?: PartnerStatus;
+}
+
+const InfoIcon: React.FC<{className?: string}> = ({className}) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-5 w-5 mr-2 inline"} viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+    </svg>
+);
+
+const TrainingRequestCard: React.FC<TrainingRequestCardProps> = ({ request, user, onLoginRequired, isAdminView = false, onDeleteRequest, onShowViewers, partnerStatus }) => {
+  const [showContact, setShowContact] = useState(isAdminView);
+  const [isUnlocking, setIsUnlocking] = useState(false);
+
+  const hasUnlocked = user && request.viewedBy.includes(user.uid);
+  const totalParticipants = request.trainingDetails?.reduce((sum, detail) => sum + detail.participants, 0) || 0;
+
+
+  const handleUnlockContact = async () => {
+    if (!user) {
+      onLoginRequired?.();
+      return;
+    }
+     if (user && partnerStatus && partnerStatus !== 'approved') {
+        alert('Tài khoản của bạn cần được quản trị viên phê duyệt để sử dụng tính năng này.');
+        return;
+    }
+    if (hasUnlocked) {
+        setShowContact(true);
+        return;
+    }
+    setIsUnlocking(true);
+    try {
+      const requestRef = db.collection('trainingRequests').doc(request.id);
+      await requestRef.update({
+        viewedBy: firebase.firestore.FieldValue.arrayUnion(user.uid)
+      });
+      setShowContact(true);
+    } catch (error) {
+      console.error("Error unlocking contact: ", error);
+      alert("Đã xảy ra lỗi. Vui lòng thử lại.");
+    } finally {
+      setIsUnlocking(false);
+    }
+  };
+  
+  const timeSince = (date: Date) => {
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + " năm trước";
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + " tháng trước";
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + " ngày trước";
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + " giờ trước";
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + " phút trước";
+    return "Vừa xong";
+  }
+
+  const handleDeleteClick = () => {
+    if (onDeleteRequest) {
+        onDeleteRequest(request.id);
+    }
+  };
+
+  const firstTrainingType = request.trainingDetails?.[0]?.type || 'Yêu cầu Huấn luyện';
+  const otherTypesCount = (request.trainingDetails?.length || 0) > 1 ? ` (+${request.trainingDetails.length - 1})` : '';
+  const cardTitle = `${firstTrainingType}${otherTypesCount}`;
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg p-4 transition-shadow hover:shadow-xl flex flex-col h-full">
+      <div className="flex-grow">
+        <div className="flex justify-between items-start mb-3">
+          <h3 className="text-lg font-bold text-neutral-dark leading-tight pr-2" title={cardTitle}>{cardTitle}</h3>
+          <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
+            {request.createdAt ? timeSince(request.createdAt.toDate()) : 'Vừa xong'}
+          </span>
+        </div>
+        
+        {isAdminView && (
+             <button
+                onClick={() => onShowViewers?.(request)}
+                disabled={!request.viewedBy || request.viewedBy.length === 0}
+                className="mb-2 text-sm text-accent font-bold flex items-center cursor-pointer disabled:cursor-not-allowed disabled:text-gray-400 hover:underline"
+                aria-label="Xem danh sách người đã xem"
+            >
+                <i className="fas fa-eye mr-1"></i>
+                <span>{request.viewedBy?.length || 0} lượt xem</span>
+            </button>
+        )}
+        
+        <div className="text-sm text-gray-700 space-y-1.5 mt-3 border-t pt-3">
+          <p><strong><i className="fas fa-map-marker-alt w-5 text-center mr-1 text-gray-400"></i>Địa điểm:</strong> {request.location}</p>
+          <p><strong><i className="fas fa-clock w-5 text-center mr-1 text-gray-400"></i>Thời gian:</strong> {request.trainingDuration}</p>
+          <p><strong><i className="fas fa-calendar-alt w-5 text-center mr-1 text-gray-400"></i>Thời điểm:</strong> {request.preferredTime}</p>
+          <p><strong><i className="fas fa-users w-5 text-center mr-1 text-gray-400"></i>Tổng số:</strong> {totalParticipants} học viên</p>
+        </div>
+        
+        <div className="border-t mt-3 pt-3 text-sm text-gray-600">
+            <h4 className="font-semibold text-neutral-dark mb-2">Nội dung chi tiết:</h4>
+            <ul className="list-disc list-inside space-y-1">
+               {request.trainingDetails?.map((detail, index) => (
+                  <li key={index}>
+                    {detail.type}: <strong>{detail.participants} học viên</strong>
+                  </li>
+                ))}
+            </ul>
+        </div>
+      </div>
+
+      <div className="flex-shrink-0 mt-4">
+        {(showContact || hasUnlocked) ? (
+          <div className="bg-green-100 border border-green-200 p-3 rounded-lg text-sm text-neutral-dark space-y-1">
+              <h4 className="font-bold text-green-800 mb-1 flex items-center"><InfoIcon className="h-5 w-5 mr-1 inline"/>Thông Tin Liên Hệ</h4>
+              <p><strong>Tên:</strong> {request.clientName}</p>
+              <p><strong>Email:</strong> <a href={`mailto:${request.clientEmail}`} className="text-accent hover:underline">{request.clientEmail}</a></p>
+              <p><strong>SĐT:</strong> <a href={`tel:${request.clientPhone}`} className="text-accent hover:underline">{request.clientPhone}</a></p>
+          </div>
+        ) : (
+          <button 
+            onClick={handleUnlockContact} 
+            disabled={isUnlocking || (user && partnerStatus === 'pending')}
+            className="w-full flex justify-center items-center bg-primary text-white font-bold py-2.5 rounded-lg hover:bg-primary-dark transition duration-300 disabled:bg-primary-dark disabled:opacity-75 disabled:cursor-wait text-base">
+            {isUnlocking ? (
+                <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Đang xử lý...</span>
+                </>
+            ) : (user && partnerStatus === 'pending' 
+                    ? 'Tài khoản chờ duyệt' 
+                    : 'Xem thông tin & Báo giá')}
+          </button>
+        )}
+         {isAdminView && onDeleteRequest && (
+            <button 
+                onClick={handleDeleteClick}
+                className="w-full mt-2 bg-red-600 text-white font-bold py-2.5 rounded-lg hover:bg-red-700 transition duration-300 text-base"
+            >
+                <i className="fas fa-trash-alt mr-2"></i>Xóa Yêu Cầu
+            </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default TrainingRequestCard;
