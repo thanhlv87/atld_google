@@ -21,6 +21,7 @@ export interface TrainingRequest {
   createdAt: firebase.firestore.Timestamp;
   viewedBy: string[]; // Array of user UIDs who have viewed the contact info
   urgent: boolean; // True if the request is urgent
+  clientSubscribesToEmails: boolean; // True if client wants to receive email notifications
 }
 
 export interface PartnerProfile {
