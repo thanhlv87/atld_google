@@ -21,13 +21,10 @@ const StatCard: React.FC<{ value: string; label: string; icon: string; gradient:
   </div>
 );
 
-const ProcessStep: React.FC<{ number: string; title: string; description: string, gradient: string; icon: string }> = ({ number, title, description, gradient, icon }) => (
+const ProcessStep: React.FC<{ number: string; title: string; description: string, gradient: string }> = ({ number, title, description, gradient }) => (
   <div className="relative bg-white rounded-2xl shadow-lg p-8 border border-gray-100 text-center h-full hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group">
     <div className={`flex items-center justify-center h-16 w-16 rounded-2xl bg-gradient-to-br ${gradient} text-white font-bold text-2xl mx-auto mb-6 shadow-md group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
       {number}
-    </div>
-    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} bg-opacity-10 mb-4`}>
-      <i className={`fas ${icon} text-xl bg-gradient-to-br ${gradient} bg-clip-text text-transparent`}></i>
     </div>
     <h3 className="text-xl font-bold text-neutral-dark mb-3 group-hover:text-primary transition-colors">{title}</h3>
     <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
@@ -161,7 +158,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 <h3 className="text-2xl font-bold">Dành cho Doanh nghiệp</h3>
               </div>
             </div>
-            <div className="grid lg:grid-cols-4 gap-8">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
               <ProcessStep number="1" title="Gửi yêu cầu" description="Điền form nhu cầu đào tạo chi tiết của doanh nghiệp." gradient="from-blue-500 to-blue-700" />
               <ProcessStep number="2" title="Nhận báo giá" description="Các đối tác uy tín gửi báo giá và chương trình phù hợp." gradient="from-blue-500 to-blue-700" />
               <ProcessStep number="3" title="So sánh & chọn" description="Lựa chọn đối tác có báo giá và năng lực phù hợp nhất." gradient="from-blue-500 to-blue-700" />
