@@ -31,10 +31,16 @@ const BenefitCard: React.FC<{ icon: string; title: string; description: string }
     </div>
 );
 
-const CourseCard: React.FC<{ icon: string; title: string }> = ({ icon, title }) => (
-    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 text-center transition-transform hover:-translate-y-2">
-        <i className={`fas ${icon} text-5xl text-primary mb-4`}></i>
-        <h4 className="font-bold text-neutral-dark">{title}</h4>
+const CourseCard: React.FC<{ icon: string; title: string; onClick?: () => void }> = ({ icon, title, onClick }) => (
+    <div
+        onClick={onClick}
+        className="bg-white p-6 rounded-lg shadow-md border border-gray-200 text-center transition-all hover:-translate-y-2 hover:shadow-xl cursor-pointer group"
+    >
+        <i className={`fas ${icon} text-5xl text-primary mb-4 group-hover:scale-110 transition-transform`}></i>
+        <h4 className="font-bold text-neutral-dark group-hover:text-primary transition-colors">{title}</h4>
+        <p className="text-xs text-gray-500 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <i className="fas fa-arrow-right mr-1"></i>Xem chi tiết
+        </p>
     </div>
 );
 
@@ -123,13 +129,16 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           <div className="container mx-auto px-4">
               <div className="text-center mb-12">
                   <h2 className="text-3xl md:text-4xl font-bold text-neutral-dark">Các khóa đào tạo phổ biến</h2>
+                  <p className="text-gray-600 mt-2">Nhấn vào từng khóa để xem thông tin chi tiết</p>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                  <CourseCard icon="fa-hard-hat" title="An toàn Xây dựng" />
-                  <CourseCard icon="fa-bolt" title="An toàn Điện" />
-                  <CourseCard icon="fa-fire-extinguisher" title="PCCC & Cứu nạn" />
-                  <CourseCard icon="fa-vials" title="An toàn Hóa chất" />
-                  <CourseCard icon="fa-users-cog" title="Vận hành thiết bị" />
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  <CourseCard icon="fa-bolt" title="An toàn Điện" onClick={() => onNavigate('training-an-toan-dien')} />
+                  <CourseCard icon="fa-hard-hat" title="An toàn Xây dựng" onClick={() => onNavigate('training-an-toan-xay-dung')} />
+                  <CourseCard icon="fa-flask" title="An toàn Hóa chất" onClick={() => onNavigate('training-an-toan-hoa-chat')} />
+                  <CourseCard icon="fa-fire-extinguisher" title="PCCC" onClick={() => onNavigate('training-pccc')} />
+                  <CourseCard icon="fa-shipping-fast" title="Thiết bị Nâng" onClick={() => onNavigate('training-an-toan-thiet-bi-nang')} />
+                  <CourseCard icon="fa-climbing" title="Làm việc Trên cao" onClick={() => onNavigate('training-an-toan-lam-viec-tren-cao')} />
+                  <CourseCard icon="fa-medkit" title="Sơ Cấp Cứu" onClick={() => onNavigate('training-so-cap-cuu')} />
               </div>
           </div>
       </section>

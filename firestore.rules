@@ -29,6 +29,40 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
+    // Quotes collection
+    match /quotes/{quoteId} {
+      // Allow authenticated partners to create quotes
+      allow create: if request.auth != null
+                    && request.resource.data.partnerId == request.auth.uid;
+
+      // Allow partners to read and update their own quotes
+      allow read, update: if request.auth != null
+                          && resource.data.partnerId == request.auth.uid;
+
+      // Allow admins to read all quotes (admins are authenticated)
+      allow read: if request.auth != null;
+
+      // Allow partners to delete their own quotes
+      allow delete: if request.auth != null
+                    && resource.data.partnerId == request.auth.uid;
+    }
+
+    // Documents collection (for downloadable files)
+    match /documents/{documentId} {
+      // Anyone can read documents
+      allow read: if true;
+      // Only authenticated users (admins) can create/update/delete
+      allow create, update, delete: if request.auth != null;
+    }
+
+    // Admins collection
+    match /admins/{adminId} {
+      // Only authenticated users can read (to check if they're admin)
+      allow read: if request.auth != null;
+      // No one can write (managed outside Firestore)
+      allow write: if false;
+    }
+
     // Default deny all other collections
     match /{document=**} {
       allow read, write: if false;

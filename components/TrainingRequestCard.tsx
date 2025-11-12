@@ -3,6 +3,7 @@ import { db, firebase } from '../services/firebaseConfig';
 import { TrainingRequest } from '../types';
 import { PartnerStatus } from '../App';
 import html2canvas from 'html2canvas';
+import QuoteForm from './QuoteForm';
 
 
 interface TrainingRequestCardProps {
@@ -25,6 +26,7 @@ const TrainingRequestCard: React.FC<TrainingRequestCardProps> = ({ request, user
   const [showContact, setShowContact] = useState(isAdminView);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [showQuoteForm, setShowQuoteForm] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
 
@@ -179,15 +181,26 @@ const TrainingRequestCard: React.FC<TrainingRequestCardProps> = ({ request, user
 
       <div className="flex-shrink-0 mt-4">
         {(showContact || hasUnlocked) ? (
-          <div className="bg-green-100 border border-green-200 p-3 rounded-lg text-sm text-neutral-dark space-y-1">
-              <h4 className="font-bold text-green-800 mb-1 flex items-center"><InfoIcon className="h-5 w-5 mr-1 inline"/>Thông Tin Liên Hệ</h4>
-              <p><strong>Tên:</strong> {request.clientName}</p>
-              <p><strong>Email:</strong> <a href={`mailto:${request.clientEmail}`} className="text-accent hover:underline">{request.clientEmail}</a></p>
-              <p><strong>SĐT:</strong> <a href={`tel:${request.clientPhone}`} className="text-accent hover:underline">{request.clientPhone}</a></p>
-          </div>
+          <>
+            <div className="bg-green-100 border border-green-200 p-3 rounded-lg text-sm text-neutral-dark space-y-1">
+                <h4 className="font-bold text-green-800 mb-1 flex items-center"><InfoIcon className="h-5 w-5 mr-1 inline"/>Thông Tin Liên Hệ</h4>
+                <p><strong>Tên:</strong> {request.clientName}</p>
+                <p><strong>Email:</strong> <a href={`mailto:${request.clientEmail}`} className="text-accent hover:underline">{request.clientEmail}</a></p>
+                <p><strong>SĐT:</strong> <a href={`tel:${request.clientPhone}`} className="text-accent hover:underline">{request.clientPhone}</a></p>
+            </div>
+            {!isAdminView && user && (
+              <button
+                onClick={() => setShowQuoteForm(true)}
+                className="w-full mt-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold py-2.5 rounded-lg hover:opacity-90 transition-all text-base flex items-center justify-center"
+              >
+                <i className="fas fa-paper-plane mr-2"></i>
+                Gửi Báo Giá
+              </button>
+            )}
+          </>
         ) : (
-          <button 
-            onClick={handleUnlockContact} 
+          <button
+            onClick={handleUnlockContact}
             disabled={isUnlocking || (user && partnerStatus === 'pending')}
             className="w-full flex justify-center items-center bg-primary text-white font-bold py-2.5 rounded-lg hover:bg-primary-dark transition duration-300 disabled:bg-primary-dark disabled:opacity-75 disabled:cursor-wait text-base">
             {isUnlocking ? (
@@ -198,13 +211,13 @@ const TrainingRequestCard: React.FC<TrainingRequestCardProps> = ({ request, user
                     </svg>
                     <span>Đang xử lý...</span>
                 </>
-            ) : (user && partnerStatus === 'pending' 
-                    ? 'Tài khoản chờ duyệt' 
+            ) : (user && partnerStatus === 'pending'
+                    ? 'Tài khoản chờ duyệt'
                     : 'Xem thông tin & Báo giá')}
           </button>
         )}
          {isAdminView && onDeleteRequest && (
-            <button 
+            <button
                 onClick={handleDeleteClick}
                 className="w-full mt-2 bg-red-600 text-white font-bold py-2.5 rounded-lg hover:bg-red-700 transition duration-300 text-base"
             >
@@ -212,6 +225,19 @@ const TrainingRequestCard: React.FC<TrainingRequestCardProps> = ({ request, user
             </button>
         )}
       </div>
+
+      {/* Quote Form Modal */}
+      {showQuoteForm && user && (
+        <QuoteForm
+          request={request}
+          partnerUid={user.uid}
+          partnerEmail={user.email || ''}
+          onClose={() => setShowQuoteForm(false)}
+          onSuccess={() => {
+            setShowQuoteForm(false);
+          }}
+        />
+      )}
     </div>
   );
 };

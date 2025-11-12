@@ -8,8 +8,12 @@ import HomePage from './pages/HomePage';
 import RequestsPage from './pages/RequestsPage';
 import DocumentsPage from './pages/DocumentsPage';
 import AdminPage from './pages/AdminPage';
+import TrainingLandingPage from './pages/TrainingLandingPage';
 
-export type Page = 'home' | 'requests' | 'documents' | 'admin';
+export type Page = 'home' | 'requests' | 'documents' | 'admin' |
+  'training-an-toan-dien' | 'training-an-toan-xay-dung' | 'training-an-toan-hoa-chat' |
+  'training-pccc' | 'training-an-toan-thiet-bi-nang' | 'training-an-toan-lam-viec-tren-cao' |
+  'training-so-cap-cuu';
 export type PartnerStatus = 'pending' | 'approved' | 'rejected' | null;
 
 const App: React.FC = () => {
@@ -76,7 +80,33 @@ const App: React.FC = () => {
     setPage(newPage);
   }
 
+  const handleCreateRequestClick = () => {
+    const scrollToForm = () => {
+      document.getElementById('create-request-form')?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    if (page === 'home') {
+      scrollToForm();
+    } else {
+      setPage('home');
+      // Wait for the home page to render before scrolling
+      setTimeout(scrollToForm, 100);
+    }
+  };
+
   const renderPage = () => {
+    // Check if it's a training landing page
+    if (page.startsWith('training-')) {
+      const trainingType = page.replace('training-', '');
+      return (
+        <TrainingLandingPage
+          trainingType={trainingType}
+          onNavigate={handleNavigate}
+          onCreateRequestClick={handleCreateRequestClick}
+        />
+      );
+    }
+
     switch (page) {
       case 'home':
         return <HomePage onNavigate={handleNavigate} />;
