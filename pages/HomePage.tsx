@@ -137,7 +137,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   <CourseCard icon="fa-flask" title="An toàn Hóa chất" onClick={() => onNavigate('training-an-toan-hoa-chat')} />
                   <CourseCard icon="fa-fire-extinguisher" title="PCCC" onClick={() => onNavigate('training-pccc')} />
                   <CourseCard icon="fa-shipping-fast" title="Thiết bị Nâng" onClick={() => onNavigate('training-an-toan-thiet-bi-nang')} />
-                  <CourseCard icon="fa-climbing" title="Làm việc Trên cao" onClick={() => onNavigate('training-an-toan-lam-viec-tren-cao')} />
+                  <CourseCard icon="fa-level-up-alt" title="Làm việc Trên cao" onClick={() => onNavigate('training-an-toan-lam-viec-tren-cao')} />
                   <CourseCard icon="fa-medkit" title="Sơ Cấp Cứu" onClick={() => onNavigate('training-so-cap-cuu')} />
               </div>
           </div>
