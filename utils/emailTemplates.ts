@@ -299,3 +299,323 @@ export const generatePartnerNotificationEmail = (
 </html>
   `.trim();
 };
+
+interface QuoteNotificationData {
+  clientName: string;
+  requestId: string;
+  partnerName: string;
+  partnerEmail: string;
+  price: number;
+  timeline: string;
+  notes: string;
+  trainingDetails: TrainingDetail[];
+}
+
+/**
+ * Generate beautiful HTML email template for quote notification to client
+ */
+export const generateQuoteNotificationEmail = (data: QuoteNotificationData): string => {
+  const formattedPrice = data.price.toLocaleString('vi-VN');
+  const trainingTypesText = data.trainingDetails.map(d => d.type).join(', ');
+
+  return `
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bạn có báo giá mới</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #333333;
+    }
+    .email-container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+      padding: 40px 30px;
+      text-align: center;
+      color: #ffffff;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .header p {
+      margin: 10px 0 0 0;
+      font-size: 16px;
+      opacity: 0.95;
+    }
+    .new-badge {
+      display: inline-block;
+      background-color: #f59e0b;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 12px;
+      animation: bounce 1s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    .content {
+      padding: 40px 30px;
+    }
+    .section {
+      margin-bottom: 32px;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #16a34a;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    .quote-card {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      border: 2px solid #22c55e;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .price-display {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .price-amount {
+      font-size: 36px;
+      font-weight: 800;
+      color: #16a34a;
+      display: block;
+    }
+    .price-label {
+      font-size: 14px;
+      color: #15803d;
+      display: block;
+      margin-top: 8px;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .info-item {
+      display: flex;
+      padding: 12px;
+      background-color: #fafafa;
+      border-radius: 6px;
+    }
+    .info-item .label {
+      font-weight: 600;
+      color: #475569;
+      min-width: 140px;
+    }
+    .info-item .value {
+      color: #1e293b;
+      flex: 1;
+    }
+    .notes-box {
+      background-color: #f8fafc;
+      padding: 16px;
+      border-radius: 6px;
+      border-left: 4px solid #22c55e;
+      line-height: 1.6;
+      color: #334155;
+      white-space: pre-wrap;
+    }
+    .training-item {
+      background-color: #f8fafc;
+      border-left: 4px solid #22c55e;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .cta-button {
+      display: block;
+      width: 100%;
+      max-width: 320px;
+      margin: 32px auto;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+      color: #ffffff;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    }
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+    }
+    .footer {
+      background-color: #f8fafc;
+      padding: 30px;
+      text-align: center;
+      border-top: 1px solid #e5e7eb;
+    }
+    .footer p {
+      margin: 8px 0;
+      color: #64748b;
+      font-size: 14px;
+    }
+    .footer a {
+      color: #16a34a;
+      text-decoration: none;
+    }
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, #e5e7eb, transparent);
+      margin: 24px 0;
+    }
+    @media only screen and (max-width: 600px) {
+      .email-container {
+        margin: 0;
+        border-radius: 0;
+      }
+      .header {
+        padding: 30px 20px;
+      }
+      .header h1 {
+        font-size: 24px;
+      }
+      .content {
+        padding: 30px 20px;
+      }
+      .price-amount {
+        font-size: 28px;
+      }
+      .info-item {
+        flex-direction: column;
+        gap: 4px;
+      }
+      .info-item .label {
+        min-width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <!-- Header -->
+    <div class="header">
+      <h1>🎉 Bạn Có Báo Giá Mới!</h1>
+      <p>Một đơn vị đào tạo đã quan tâm đến yêu cầu của bạn</p>
+      <div class="new-badge">✨ MỚI</div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Quote Card -->
+      <div class="quote-card">
+        <div style="text-align: center; margin-bottom: 16px;">
+          <h2 style="margin: 0; color: #16a34a; font-size: 20px;">💼 Báo Giá Chi Tiết</h2>
+        </div>
+
+        <div class="price-display">
+          <span class="price-amount">${formattedPrice} VND</span>
+          <span class="price-label">Giá báo cho yêu cầu của bạn</span>
+        </div>
+
+        <div style="text-align: center; padding: 16px 0; border-top: 1px solid #86efac; border-bottom: 1px solid #86efac; margin: 16px 0;">
+          <div style="font-size: 14px; color: #15803d; margin-bottom: 4px;">⏱️ Thời gian thực hiện</div>
+          <div style="font-size: 18px; font-weight: 700; color: #16a34a;">${data.timeline}</div>
+        </div>
+      </div>
+
+      <!-- Partner Info Section -->
+      <div class="section">
+        <div class="section-title">👥 Thông tin đơn vị đào tạo</div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="label">Tên đơn vị:</div>
+            <div class="value">${data.partnerName}</div>
+          </div>
+          <div class="info-item">
+            <div class="label">Email liên hệ:</div>
+            <div class="value"><a href="mailto:${data.partnerEmail}" style="color: #16a34a; text-decoration: none;">${data.partnerEmail}</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Quote Details Section -->
+      <div class="section">
+        <div class="section-title">📝 Chi tiết báo giá</div>
+        <div class="notes-box">
+${data.notes}
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Request Summary Section -->
+      <div class="section">
+        <div class="section-title">📚 Yêu cầu đào tạo của bạn</div>
+        ${data.trainingDetails.map(detail => `
+          <div class="training-item">
+            <strong>${detail.type}</strong> - ${detail.participants} học viên (${detail.group})
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- CTA Button -->
+      <a href="mailto:${data.partnerEmail}" class="cta-button">
+        📧 Liên hệ đơn vị đào tạo ngay
+      </a>
+
+      <!-- Info Box -->
+      <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 16px; border-radius: 4px; margin-top: 24px;">
+        <p style="margin: 0; color: #1e40af; font-size: 14px; line-height: 1.6;">
+          💡 <strong>Lưu ý:</strong> Bạn có thể nhận nhiều báo giá từ các đơn vị đào tạo khác nhau. Hãy so sánh kỹ về giá cả, chất lượng và thời gian để chọn đơn vị phù hợp nhất với nhu cầu của mình.
+        </p>
+      </div>
+
+      <!-- Action Items -->
+      <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 20px; border-radius: 8px; margin-top: 24px;">
+        <h3 style="margin: 0 0 12px 0; color: #16a34a; font-size: 16px;">✅ Bước tiếp theo</h3>
+        <ol style="margin: 0; padding-left: 20px; color: #15803d; font-size: 14px; line-height: 1.8;">
+          <li>Xem xét kỹ báo giá và so sánh với các đơn vị khác (nếu có)</li>
+          <li>Liên hệ trực tiếp với đơn vị đào tạo qua email hoặc điện thoại</li>
+          <li>Trao đổi thêm về chương trình, giảng viên, chứng chỉ</li>
+          <li>Thương lượng giá cả và ký hợp đồng</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p><strong>SafetyConnect - Nền tảng kết nối đào tạo ATLD</strong></p>
+      <p>Email này được gửi tự động từ hệ thống</p>
+      <p>Mọi thắc mắc vui lòng truy cập <a href="https://atld.web.app">atld.web.app</a></p>
+      <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+        <p style="font-size: 12px; color: #94a3b8;">
+          © ${new Date().getFullYear()} SafetyConnect. All rights reserved.
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+  `.trim();
+};

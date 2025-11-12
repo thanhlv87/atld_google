@@ -1,10 +1,51 @@
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/firestore';
-import 'firebase/compat/auth';
-import 'firebase/compat/storage';
+// Firebase v9 Modular SDK
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
+import {
+  getFirestore,
+  Firestore,
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  limit,
+  onSnapshot,
+  serverTimestamp,
+  Timestamp,
+  arrayUnion,
+  arrayRemove,
+  QuerySnapshot,
+  DocumentSnapshot,
+  DocumentReference,
+  CollectionReference,
+  Query
+} from 'firebase/firestore';
+import {
+  getAuth,
+  Auth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+  onAuthStateChanged,
+  User
+} from 'firebase/auth';
+import {
+  getStorage,
+  Storage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject
+} from 'firebase/storage';
 
-// Your Firebase configuration object. 
-// This should be replaced with your actual Firebase project configuration.
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBVkNiY3B4yIdCGH4afN8xnrQGP4-U685Q",
   authDomain: "gen-lang-client-013063590.firebaseapp.com",
@@ -15,14 +56,17 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
+let app: FirebaseApp;
+if (!getApps().length) {
+  app = initializeApp(firebaseConfig);
+} else {
+  app = getApps()[0];
 }
 
 // Get Firebase services
-const db = firebase.firestore();
-const auth = firebase.auth();
-const storage = firebase.storage();
+const db = getFirestore(app);
+const auth = getAuth(app);
+const storage = getStorage(app);
 
 // Function to send email via Firestore extension
 const sendEmail = async (to: string | string[], subject: string, html: string, text?: string) => {
@@ -31,7 +75,7 @@ const sendEmail = async (to: string | string[], subject: string, html: string, t
     console.log('Recipients:', to);
     console.log('Subject:', subject);
 
-    const mailRef = db.collection('mail').doc();
+    const mailCollection = collection(db, 'mail');
     const emailData = {
       to: to,
       message: {
@@ -39,7 +83,7 @@ const sendEmail = async (to: string | string[], subject: string, html: string, t
         html: html,
         ...(text && { text: text })
       },
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      createdAt: serverTimestamp()
     };
 
     console.log('Email data to be saved:', {
@@ -48,12 +92,12 @@ const sendEmail = async (to: string | string[], subject: string, html: string, t
       hasHtml: !!emailData.message.html
     });
 
-    await mailRef.set(emailData);
+    const docRef = await addDoc(mailCollection, emailData);
 
-    console.log('✅ Email queued successfully with ID:', mailRef.id);
+    console.log('✅ Email queued successfully with ID:', docRef.id);
     console.log('📝 Check Firestore collection "mail" to see the document');
 
-    return mailRef.id;
+    return docRef.id;
   } catch (error: any) {
     console.error('❌ Error queuing email:', error);
     console.error('Error code:', error.code);
@@ -70,4 +114,62 @@ const sendEmail = async (to: string | string[], subject: string, html: string, t
   }
 };
 
-export { db, auth, storage, firebase, sendEmail };
+// Export Firebase services and utilities
+export {
+  app,
+  db,
+  auth,
+  storage,
+  sendEmail,
+  // Firestore functions
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  limit,
+  onSnapshot,
+  serverTimestamp,
+  Timestamp,
+  arrayUnion,
+  arrayRemove,
+  // Auth functions
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  sendPasswordResetEmail,
+  onAuthStateChanged,
+  // Storage functions
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+  // Types
+  type User,
+  type Firestore,
+  type Auth,
+  type Storage,
+  type QuerySnapshot,
+  type DocumentSnapshot,
+  type DocumentReference,
+  type CollectionReference,
+  type Query
+};
+
+// Legacy compatibility exports (for gradual migration)
+export const firebase = {
+  firestore: {
+    FieldValue: {
+      serverTimestamp,
+      arrayUnion,
+      arrayRemove
+    },
+    Timestamp
+  }
+};

@@ -1,12 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { firebase } from '../services/firebaseConfig';
+import { type User } from '../services/firebaseConfig';
 import { TrainingRequest } from '../types';
 import TrainingRequestList from '../components/TrainingRequestList';
+import AdvancedSearchFilter, { FilterState } from '../components/AdvancedSearchFilter';
 import { PartnerStatus } from '../App';
 
 interface RequestsPageProps {
   requests: TrainingRequest[];
-  user: firebase.User | null;
+  user: User | null;
   loading: boolean;
   onLoginRequired: () => void;
   partnerStatus: PartnerStatus;
@@ -15,6 +16,15 @@ interface RequestsPageProps {
 const RequestsPage: React.FC<RequestsPageProps> = ({ requests, user, loading, onLoginRequired, partnerStatus }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
+  const [advancedFilters, setAdvancedFilters] = useState<FilterState>({
+    trainingTypes: [],
+    provinces: [],
+    participantsMin: 0,
+    participantsMax: 1000,
+    urgent: false,
+    dateFrom: '',
+    dateTo: ''
+  });
 
   const showPendingBanner = user && partnerStatus === 'pending';
   const showRejectedBanner = user && partnerStatus === 'rejected';
@@ -34,6 +44,20 @@ const RequestsPage: React.FC<RequestsPageProps> = ({ requests, user, loading, on
       return null;
   };
 
+  // Helper to parse month from preferredTime like "T11/2024" or "Tháng 12 2024"
+  const parseMonth = (timeStr: string): { month: number; year: number } | null => {
+    if (!timeStr) return null;
+    const match = timeStr.match(/(?:T|Tháng)?\s*(\d{1,2})[/\s.,-]+(\d{4})/);
+    if (match) {
+      const month = parseInt(match[1], 10);
+      const year = parseInt(match[2], 10);
+      if (month >= 1 && month <= 12) {
+        return { month, year };
+      }
+    }
+    return null;
+  };
+
   const filteredAndSortedRequests = useMemo(() => {
     let processedRequests = [...requests];
 
@@ -48,7 +72,65 @@ const RequestsPage: React.FC<RequestsPageProps> = ({ requests, user, loading, on
         });
     }
 
-    // 2. Sorting
+    // 2. Advanced Filters
+    // Filter by training types
+    if (advancedFilters.trainingTypes.length > 0) {
+      processedRequests = processedRequests.filter(req =>
+        req.trainingDetails?.some(detail =>
+          advancedFilters.trainingTypes.includes(detail.type)
+        )
+      );
+    }
+
+    // Filter by provinces
+    if (advancedFilters.provinces.length > 0) {
+      processedRequests = processedRequests.filter(req =>
+        advancedFilters.provinces.some(province =>
+          req.location.includes(province)
+        )
+      );
+    }
+
+    // Filter by participants count
+    processedRequests = processedRequests.filter(req => {
+      const totalParticipants = req.trainingDetails?.reduce((sum, d) => sum + d.participants, 0) || 0;
+      return totalParticipants >= advancedFilters.participantsMin &&
+             totalParticipants <= advancedFilters.participantsMax;
+    });
+
+    // Filter by urgent status
+    if (advancedFilters.urgent) {
+      processedRequests = processedRequests.filter(req => req.urgent === true);
+    }
+
+    // Filter by date range
+    if (advancedFilters.dateFrom || advancedFilters.dateTo) {
+      processedRequests = processedRequests.filter(req => {
+        const reqDate = parseMonth(req.preferredTime);
+        if (!reqDate) return false;
+
+        // Convert to comparable format YYYYMM
+        const reqYYYYMM = reqDate.year * 100 + reqDate.month;
+
+        let matches = true;
+
+        if (advancedFilters.dateFrom) {
+          const [fromYear, fromMonth] = advancedFilters.dateFrom.split('-').map(Number);
+          const fromYYYYMM = fromYear * 100 + fromMonth;
+          matches = matches && reqYYYYMM >= fromYYYYMM;
+        }
+
+        if (advancedFilters.dateTo) {
+          const [toYear, toMonth] = advancedFilters.dateTo.split('-').map(Number);
+          const toYYYYMM = toYear * 100 + toMonth;
+          matches = matches && reqYYYYMM <= toYYYYMM;
+        }
+
+        return matches;
+      });
+    }
+
+    // 3. Sorting
     switch (sortBy) {
         case 'participants':
             processedRequests.sort((a, b) => {
@@ -77,7 +159,23 @@ const RequestsPage: React.FC<RequestsPageProps> = ({ requests, user, loading, on
     }
     
     return processedRequests;
-  }, [requests, searchQuery, sortBy]);
+  }, [requests, searchQuery, sortBy, advancedFilters]);
+
+  const handleFilterChange = (newFilters: FilterState) => {
+    setAdvancedFilters(newFilters);
+  };
+
+  const handleClearFilters = () => {
+    setAdvancedFilters({
+      trainingTypes: [],
+      provinces: [],
+      participantsMin: 0,
+      participantsMax: 1000,
+      urgent: false,
+      dateFrom: '',
+      dateTo: ''
+    });
+  };
 
   return (
     <div className="container mx-auto p-4 md:p-8">
@@ -90,8 +188,14 @@ const RequestsPage: React.FC<RequestsPageProps> = ({ requests, user, loading, on
           </p>
       </div>
 
+      {/* Advanced Search Filter */}
+      <AdvancedSearchFilter
+        onFilterChange={handleFilterChange}
+        onClear={handleClearFilters}
+      />
+
       {/* Filter and Sort Controls */}
-      <div className="flex flex-col md:flex-row gap-4 mb-8">
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="relative flex-grow">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                     <i className="fas fa-search text-gray-400"></i>
@@ -122,6 +226,13 @@ const RequestsPage: React.FC<RequestsPageProps> = ({ requests, user, loading, on
             </div>
         </div>
 
+      {/* Results Count */}
+      <div className="mb-4 text-sm text-gray-600">
+        Hiển thị <span className="font-semibold text-primary">{filteredAndSortedRequests.length}</span> yêu cầu
+        {filteredAndSortedRequests.length !== requests.length && (
+          <span> từ tổng số <span className="font-semibold">{requests.length}</span></span>
+        )}
+      </div>
 
       {showPendingBanner && (
         <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mb-8" role="alert">

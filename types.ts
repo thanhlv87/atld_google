@@ -48,6 +48,22 @@ export interface Document {
   downloadCount: number;
 }
 
+export interface Quote {
+  id: string;
+  requestId: string; // ID của training request
+  partnerId: string; // UID của partner
+  partnerEmail: string; // Email của partner
+  partnerName: string; // Tên công ty/partner (từ taxId hoặc email)
+  price: number; // Giá báo (VND)
+  currency: string; // Đơn vị tiền tệ (default: 'VND')
+  timeline: string; // Thời gian thực hiện (ví dụ: "3-5 ngày", "1 tuần")
+  notes: string; // Ghi chú, chi tiết về báo giá
+  attachments?: string[]; // URL của các file đính kèm (nếu có)
+  status: 'pending' | 'accepted' | 'rejected'; // Trạng thái báo giá
+  createdAt: firebase.firestore.Timestamp;
+  updatedAt?: firebase.firestore.Timestamp;
+}
+
 // Hằng số cho các nhóm đào tạo trong form
 export const TRAINING_GROUPS = [
     "Không áp dụng",
