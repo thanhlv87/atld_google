@@ -25,6 +25,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -46,6 +47,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
     // Validation
     if (!formData.price || !formData.timeline || !formData.notes) {
@@ -101,14 +103,21 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 
         await sendEmail(request.clientEmail, 'Bạn có báo giá mới từ đối tác đào tạo', emailHtml);
         console.log('✅ Email thông báo đã được gửi đến khách hàng');
+        setSuccess('Báo giá đã được gửi thành công! Khách hàng sẽ nhận được thông báo qua email.');
       } catch (emailError) {
         console.error('⚠️ Lỗi khi gửi email:', emailError);
         // Don't fail the whole operation if email fails
+        setSuccess('Báo giá đã được lưu thành công! (Lưu ý: Có lỗi khi gửi email thông báo)');
       }
 
-      alert('Báo giá đã được gửi thành công! Khách hàng sẽ nhận được thông báo qua email.');
+      // Reset form
+      setFormData({ price: '', timeline: '', notes: '' });
       onSuccess?.();
-      onClose();
+
+      // Auto close after 3 seconds to let user see the success message
+      setTimeout(() => {
+        onClose();
+      }, 3000);
     } catch (error) {
       console.error('❌ Lỗi khi gửi báo giá:', error);
       setError('Đã xảy ra lỗi khi gửi báo giá. Vui lòng thử lại.');
@@ -242,7 +251,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
           <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || !!success}
               className="flex-1 bg-gradient-to-r from-primary to-orange-600 text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {submitting ? (
@@ -263,9 +272,28 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
               disabled={submitting}
               className="flex-1 sm:flex-none bg-gray-200 text-gray-700 font-bold py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Hủy
+              {success ? 'Đóng' : 'Hủy'}
             </button>
           </div>
+
+          {/* Success message - hiển thị ngay dưới nút submit */}
+          {success && (
+            <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg relative animate-pulse" role="alert">
+              <div className="flex items-start">
+                <svg className="w-6 h-6 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                </svg>
+                <div>
+                  <p className="font-bold text-lg">Thành công!</p>
+                  <p className="text-sm mt-1">{success}</p>
+                  <p className="text-xs mt-2 opacity-75">
+                    <i className="fas fa-info-circle mr-1"></i>
+                    Cửa sổ này sẽ tự động đóng sau 3 giây...
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Info Box */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
