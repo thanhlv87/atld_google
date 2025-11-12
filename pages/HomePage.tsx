@@ -161,7 +161,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 <h3 className="text-2xl font-bold">Dành cho Doanh nghiệp</h3>
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid lg:grid-cols-4 gap-8">
               <ProcessStep number="1" title="Gửi yêu cầu" description="Điền form nhu cầu đào tạo chi tiết của doanh nghiệp." gradient="from-blue-500 to-blue-700" />
               <ProcessStep number="2" title="Nhận báo giá" description="Các đối tác uy tín gửi báo giá và chương trình phù hợp." gradient="from-blue-500 to-blue-700" />
               <ProcessStep number="3" title="So sánh & chọn" description="Lựa chọn đối tác có báo giá và năng lực phù hợp nhất." gradient="from-blue-500 to-blue-700" />
