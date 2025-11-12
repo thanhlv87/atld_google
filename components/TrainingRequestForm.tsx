@@ -174,12 +174,6 @@ const TrainingRequestForm: React.FC = () => {
     <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-200">
       <h3 className="text-2xl md:text-3xl font-bold text-neutral-dark mb-4 text-center">Tạo Yêu Cầu Đào Tạo Miễn Phí</h3>
       <p className="text-gray-600 mb-6 text-sm text-center">Thông tin liên hệ của bạn sẽ được bảo mật và chỉ hiển thị cho các đơn vị đào tạo sau khi họ đăng nhập.</p>
-      
-      {success && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative mb-4" role="alert">
-          <span className="block sm:inline">{success}</span>
-        </div>
-      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Contact Info */}
@@ -273,6 +267,21 @@ const TrainingRequestForm: React.FC = () => {
               </>
           ) : 'Gửi Yêu Cầu Ngay'}
         </button>
+
+        {/* Success message - hiển thị ngay dưới nút submit */}
+        {success && (
+          <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg relative animate-pulse" role="alert">
+            <div className="flex items-start">
+              <svg className="w-6 h-6 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+              </svg>
+              <div>
+                <p className="font-bold text-lg">Thành công!</p>
+                <p className="text-sm mt-1">{success}</p>
+              </div>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );
