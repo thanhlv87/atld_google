@@ -191,91 +191,134 @@ const trainingData: Record<string, {
     bgColor: 'from-red-500 to-rose-600',
     iconClass: 'fa-fire-extinguisher'
   },
-  'an-toan-thiet-bi-nang': {
-    title: 'Đào Tạo An Toàn Vận Hành Thiết Bị Nâng',
-    description: 'Khóa đào tạo vận hành thiết bị nâng an toàn (cần cẩu, xe nâng, thang máy công trình...)',
-    metaDescription: 'Đào tạo lái xe nâng, vận hành cần cẩu, thang máy công trình. Cấp chứng chỉ điều khiển thiết bị nâng hợp lệ toàn quốc.',
-    keywords: ['đào tạo xe nâng', 'lái xe nâng', 'vận hành cần cẩu', 'chứng chỉ điều khiển thiết bị nâng', 'an toàn thiết bị nâng'],
+  'an-toan-buc-xa': {
+    title: 'Đào Tạo An Toàn Bức Xạ',
+    description: 'Khóa đào tạo an toàn bức xạ chuyên nghiệp, trang bị kiến thức về phòng hộ và quản lý an toàn bức xạ',
+    metaDescription: 'Đào tạo an toàn bức xạ cho cán bộ, nhân viên làm việc trong môi trường bức xạ. Cấp chứng chỉ an toàn bức xạ theo quy định.',
+    keywords: ['đào tạo an toàn bức xạ', 'chứng chỉ an toàn bức xạ', 'phòng hộ bức xạ', 'kiểm soát bức xạ', 'an toàn hạt nhân'],
     benefits: [
-      'Vận hành thiết bị nâng an toàn',
-      'Kiểm tra và bảo dưỡng thiết bị',
-      'Xử lý tình huống khẩn cấp',
-      'Tăng hiệu quả công việc',
-      'Giảm nguy cơ tai nạn',
-      'Cấp chứng chỉ vận hành hợp lệ'
+      'Hiểu rõ nguy cơ và tác hại của bức xạ',
+      'Sử dụng thiết bị đo và phòng hộ bức xạ',
+      'Quản lý an toàn nguồn phóng xạ',
+      'Xử lý sự cố bức xạ an toàn',
+      'Tuân thủ quy định về an toàn bức xạ',
+      'Bảo vệ sức khỏe người lao động'
     ],
     targetAudience: [
-      'Lái xe nâng, xe cẩu',
-      'Công nhân vận hành thiết bị nâng',
-      'Kỹ thuật viên bảo trì',
-      'Quản đốc kho bãi',
-      'Doanh nghiệp có thiết bị nâng'
+      'Nhân viên y tế sử dụng thiết bị X-quang',
+      'Kỹ thuật viên phòng thí nghiệm',
+      'Cán bộ kiểm soát bức xạ',
+      'Quản lý cơ sở có nguồn phóng xạ',
+      'Doanh nghiệp sử dụng thiết bị bức xạ'
     ],
     content: [
-      'Cấu tạo thiết bị nâng',
-      'Nguyên lý hoạt động',
-      'Kỹ thuật vận hành an toàn',
-      'Tín hiệu và quy tắc an toàn',
-      'Kiểm tra trước khi vận hành',
-      'Bảo dưỡng định kỳ',
-      'Xử lý sự cố thường gặp',
-      'Thực hành vận hành thực tế'
+      'Kiến thức cơ bản về bức xạ ion hóa',
+      'Tác động của bức xạ lên con người',
+      'Nguyên tắc phòng hộ bức xạ (Thời gian, Khoảng cách, Che chắn)',
+      'Thiết bị đo và kiểm soát bức xạ',
+      'Quản lý nguồn phóng xạ an toàn',
+      'Quy định pháp luật về an toàn bức xạ',
+      'Xử lý sự cố bức xạ',
+      'Thực hành đo liều và kiểm soát'
     ],
     requirements: [
       'Trên 18 tuổi',
-      'Có giấy phép lái xe (ưu tiên)',
-      'Sức khỏe đủ tiêu chuẩn',
-      'Thị lực và thính lực tốt',
-      'Mang theo CMND/CCCD và giấy khám sức khỏe'
+      'Có kiến thức cơ bản về vật lý (ưu tiên)',
+      'Sức khỏe tốt',
+      'Không mang thai',
+      'Mang theo CMND/CCCD'
     ],
-    duration: '5-10 ngày (40-80 giờ)',
-    certificate: 'Chứng chỉ Vận hành Thiết bị Nâng theo Thông tư 27/2018/TT-BXD',
-    imageUrl: 'https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=800&h=400&fit=crop',
-    bgColor: 'from-purple-500 to-indigo-600',
-    iconClass: 'fa-shipping-fast'
+    duration: '3-5 ngày (24-40 giờ)',
+    certificate: 'Chứng chỉ An Toàn Bức Xạ theo Luật Năng lượng nguyên tử',
+    imageUrl: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&h=400&fit=crop',
+    bgColor: 'from-cyan-500 to-cyan-700',
+    iconClass: 'fa-radiation-alt'
   },
-  'an-toan-lam-viec-tren-cao': {
-    title: 'Đào Tạo An Toàn Làm Việc Trên Cao',
-    description: 'Khóa đào tạo an toàn làm việc trên cao, trang bị kỹ năng và kiến thức phòng ngừa tai nạn rơi ngã',
-    metaDescription: 'Đào tạo làm việc trên cao an toàn. Học sử dụng dây an toàn, giàn giáo. Cấp chứng chỉ làm việc trên cao hợp lệ.',
-    keywords: ['đào tạo làm việc trên cao', 'an toàn độ cao', 'chứng chỉ làm việc trên cao', 'dây an toàn', 'giàn giáo'],
+  'quan-trac-moi-truong': {
+    title: 'Đào Tạo Quan Trắc Môi Trường',
+    description: 'Khóa đào tạo quan trắc môi trường chuyên nghiệp, trang bị kỹ năng lấy mẫu, phân tích và đánh giá chất lượng môi trường',
+    metaDescription: 'Đào tạo quan trắc môi trường nước, không khí, đất. Học lấy mẫu, phân tích môi trường. Cấp chứng chỉ quan trắc môi trường hợp lệ.',
+    keywords: ['đào tạo quan trắc môi trường', 'lấy mẫu môi trường', 'phân tích môi trường', 'chứng chỉ quan trắc', 'giám sát môi trường'],
     benefits: [
-      'Nhận biết nguy hiểm khi làm việc trên cao',
-      'Sử dụng thiết bị bảo vệ chống rơi',
-      'Kỹ thuật leo trèo an toàn',
-      'Cứu hộ người bị rơi treo',
-      'Giảm thiểu tai nạn rơi ngã',
-      'Tuân thủ quy định an toàn'
+      'Nắm vững quy trình quan trắc môi trường',
+      'Kỹ năng lấy mẫu nước, khí, đất',
+      'Sử dụng thiết bị quan trắc hiện đại',
+      'Phân tích và đánh giá chất lượng môi trường',
+      'Lập báo cáo quan trắc môi trường',
+      'Đáp ứng yêu cầu pháp luật về môi trường'
     ],
     targetAudience: [
-      'Công nhân xây dựng',
-      'Thợ lắp dựng giàn giáo',
-      'Kỹ thuật viên bảo trì',
-      'Thợ sơn, làm mái',
-      'Người làm việc trên cao trên 2m'
+      'Cán bộ môi trường doanh nghiệp',
+      'Kỹ thuật viên phòng thí nghiệm',
+      'Nhân viên quan trắc môi trường',
+      'Quản lý hệ thống ISO 14001',
+      'Doanh nghiệp có yêu cầu quan trắc môi trường'
     ],
     content: [
-      'Quy định về làm việc trên cao',
-      'Nguy hiểm và phòng ngừa rơi ngã',
-      'Thiết bị bảo vệ chống rơi',
-      'Dây an toàn và cách sử dụng',
-      'Điểm neo và hệ thống neo',
-      'Giàn giáo và thang leo',
-      'Kỹ thuật cứu hộ trên cao',
-      'Thực hành làm việc trên cao'
+      'Luật Bảo vệ môi trường và các quy chuẩn',
+      'Các thông số môi trường cần quan trắc',
+      'Kỹ thuật lấy mẫu nước thải, nước mặt',
+      'Kỹ thuật lấy mẫu không khí, khí thải',
+      'Kỹ thuật lấy mẫu đất và trầm tích',
+      'Sử dụng thiết bị quan trắc môi trường',
+      'Bảo quản và vận chuyển mẫu',
+      'Lập báo cáo kết quả quan trắc'
     ],
     requirements: [
       'Trên 18 tuổi',
-      'Sức khỏe tốt, không sợ độ cao',
-      'Không có bệnh tim mạch, tiền đình',
-      'Thị lực tốt',
-      'Mang theo CMND/CCCD và giấy khám sức khỏe'
+      'Có kiến thức về môi trường hoặc hóa học (ưu tiên)',
+      'Sức khỏe tốt',
+      'Cẩn thận, tỉ mỉ trong công việc',
+      'Mang theo CMND/CCCD'
+    ],
+    duration: '3-5 ngày (24-40 giờ)',
+    certificate: 'Chứng chỉ Quan Trắc Môi Trường theo Luật Bảo vệ môi trường',
+    imageUrl: 'https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=800&h=400&fit=crop',
+    bgColor: 'from-green-500 to-green-700',
+    iconClass: 'fa-leaf'
+  },
+  'danh-gia-phan-loai-lao-dong': {
+    title: 'Đào Tạo Đánh Giá Phân Loại Lao Động',
+    description: 'Khóa đào tạo đánh giá và phân loại lao động theo quy định, giúp doanh nghiệp tuân thủ pháp luật lao động',
+    metaDescription: 'Đào tạo đánh giá phân loại lao động cho HR, quản lý nhân sự. Học về định mức lao động, đánh giá năng lực. Cấp chứng chỉ hợp lệ.',
+    keywords: ['đánh giá lao động', 'phân loại lao động', 'định mức lao động', 'đánh giá năng lực', 'quản lý nhân sự'],
+    benefits: [
+      'Nắm vững quy định về phân loại lao động',
+      'Kỹ năng đánh giá và phân loại công việc',
+      'Xây dựng định mức lao động khoa học',
+      'Đánh giá năng lực người lao động',
+      'Xây dựng thang bảng lương hiệu quả',
+      'Tuân thủ Bộ luật Lao động'
+    ],
+    targetAudience: [
+      'Nhân viên phòng Nhân sự',
+      'Quản lý nhân sự (HR Manager)',
+      'Trưởng phòng, trưởng bộ phận',
+      'Chuyên viên tổ chức lao động',
+      'Chủ doanh nghiệp, giám đốc'
+    ],
+    content: [
+      'Bộ luật Lao động về phân loại lao động',
+      'Nguyên tắc đánh giá và phân loại công việc',
+      'Phương pháp xây dựng định mức lao động',
+      'Kỹ thuật đánh giá năng lực nhân viên',
+      'Phân tích công việc (Job Analysis)',
+      'Bảng mô tả công việc (Job Description)',
+      'Xây dựng thang bảng lương',
+      'Thực hành đánh giá và phân loại'
+    ],
+    requirements: [
+      'Trên 21 tuổi',
+      'Có kinh nghiệm làm việc (ưu tiên)',
+      'Hiểu biết về quản lý nhân sự',
+      'Mang theo CMND/CCCD',
+      'Máy tính xách tay (nếu có)'
     ],
     duration: '2-3 ngày (16-24 giờ)',
-    certificate: 'Chứng chỉ Làm việc Trên cao theo Nghị định 44/2016/NĐ-CP',
-    imageUrl: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=400&fit=crop',
-    bgColor: 'from-sky-500 to-blue-600',
-    iconClass: 'fa-climbing'
+    certificate: 'Chứng chỉ Đánh Giá Phân Loại Lao Động',
+    imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=400&fit=crop',
+    bgColor: 'from-indigo-500 to-indigo-700',
+    iconClass: 'fa-clipboard-check'
   },
   'so-cap-cuu': {
     title: 'Đào Tạo Sơ Cấp Cứu',

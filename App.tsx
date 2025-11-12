@@ -26,8 +26,8 @@ const LoginModal = lazy(() => import('./components/LoginModal'));
 
 export type Page = 'home' | 'requests' | 'documents' | 'admin' |
   'training-an-toan-dien' | 'training-an-toan-xay-dung' | 'training-an-toan-hoa-chat' |
-  'training-pccc' | 'training-an-toan-thiet-bi-nang' | 'training-an-toan-lam-viec-tren-cao' |
-  'training-so-cap-cuu';
+  'training-pccc' | 'training-an-toan-buc-xa' | 'training-quan-trac-moi-truong' |
+  'training-danh-gia-phan-loai-lao-dong' | 'training-so-cap-cuu';
 export type PartnerStatus = 'pending' | 'approved' | 'rejected' | null;
 
 const App: React.FC = () => {

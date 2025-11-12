@@ -91,8 +91,9 @@ export const TRAINING_TYPES = [
     "An toàn xây dựng",
     "An toàn hóa chất",
     "Phòng cháy chữa cháy (PCCC)",
-    "An toàn vận hành thiết bị nâng",
-    "An toàn làm việc trên cao",
+    "An toàn bức xạ",
+    "Quan trắc môi trường",
+    "Đánh giá phân loại lao động",
     "Sơ cấp cứu",
     "Khác (Vui lòng ghi rõ)"
 ];
@@ -103,8 +104,9 @@ export const PARTNER_CAPABILITIES = [
     "An toàn xây dựng",
     "An toàn hóa chất",
     "Phòng cháy chữa cháy (PCCC)",
-    "An toàn vận hành thiết bị nâng",
-    "An toàn làm việc trên cao",
+    "An toàn bức xạ",
+    "Quan trắc môi trường",
+    "Đánh giá phân loại lao động",
     "Sơ cấp cứu",
     "Huấn luyện chung (Nhiều lĩnh vực)",
 ];
