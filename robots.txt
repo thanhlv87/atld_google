@@ -1,0 +1,11 @@
+# Allow all friendly web crawlers
+User-agent: *
+Disallow: /admin
+Disallow: /settings
+
+# Allow specific crawlers if needed
+# User-agent: Googlebot
+# Allow: /
+
+# Point to the sitemap
+Sitemap: https://atld.web.app/sitemap.xml

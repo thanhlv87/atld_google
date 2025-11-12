@@ -220,7 +220,7 @@ const TrainingRequestForm: React.FC = () => {
               <input type="text" name="preferredTime" placeholder="Thời điểm huấn luyện (VD: T11/2024) (*)" value={formData.preferredTime} onChange={handleChange} className={inputClasses} required />
             </div>
             <input type="text" name="location" placeholder="Địa điểm huấn luyện (*)" value={formData.location} onChange={handleChange} className={inputClasses} required />
-            <textarea name="description" placeholder="Mô tả chi tiết yêu cầu khác (ví dụ: yêu cầu về giảng viên, chứng chỉ...)" value={formData.description} onChange={handleChange} rows={4} className={inputClasses} required />
+            <textarea name="description" placeholder="Mô tả chi tiết yêu cầu khác (ví dụ: yêu cầu giảng viên Lê Thanh aka August87, chứng chỉ...)" value={formData.description} onChange={handleChange} rows={4} className={inputClasses} required />
         </div>
         
         {/* Urgent Request Checkbox */}
