@@ -1,5 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { db, storage, firebase } from '../services/firebaseConfig';
+import {
+  db,
+  storage,
+  collection,
+  addDoc,
+  doc,
+  updateDoc,
+  deleteDoc,
+  query,
+  orderBy,
+  getDocs,
+  serverTimestamp,
+  increment,
+  storageRef,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject
+} from '../services/firebaseConfig';
 import { Document } from '../types';
 
 interface DocumentsPageProps {
@@ -28,16 +45,18 @@ const DocumentUploadForm: React.FC<{ onUploadSuccess: () => void }> = ({ onUploa
         setError('');
         setUploading(true);
         try {
-            const storageRef = storage.ref(`documents/${Date.now()}_${file.name}`);
-            const uploadTask = await storageRef.put(file);
-            const downloadUrl = await uploadTask.ref.getDownloadURL();
+            const fileName = `${Date.now()}_${file.name}`;
+            const fileRef = storageRef(storage, `documents/${fileName}`);
+            const uploadResult = await uploadBytes(fileRef, file);
+            const downloadUrl = await getDownloadURL(uploadResult.ref);
 
-            await db.collection('documents').add({
+            const documentsCollection = collection(db, 'documents');
+            await addDoc(documentsCollection, {
                 title,
                 description,
                 downloadUrl,
-                fileName: uploadTask.ref.name,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                fileName: fileName,
+                createdAt: serverTimestamp(),
                 viewCount: 0,
                 downloadCount: 0,
             });
@@ -117,11 +136,12 @@ const DocumentUploadForm: React.FC<{ onUploadSuccess: () => void }> = ({ onUploa
     );
 };
 
-const DocumentItem: React.FC<{ doc: Document; isAdmin: boolean; onDelete: (id: string, fileName: string) => void; }> = ({ doc, isAdmin, onDelete }) => {
+const DocumentItem: React.FC<{ doc: Document; isAdmin: boolean; onDelete: (id: string, fileName: string) => void; }> = ({ doc: document, isAdmin, onDelete }) => {
     const handleView = async () => {
         try {
-            await db.collection('documents').doc(doc.id).update({
-                viewCount: firebase.firestore.FieldValue.increment(1)
+            const docRef = doc(db, 'documents', document.id);
+            await updateDoc(docRef, {
+                viewCount: increment(1)
             });
         } catch (error) {
             console.error("Error updating view count: ", error);
@@ -130,8 +150,9 @@ const DocumentItem: React.FC<{ doc: Document; isAdmin: boolean; onDelete: (id: s
 
     const handleDownload = async () => {
         try {
-            await db.collection('documents').doc(doc.id).update({
-                downloadCount: firebase.firestore.FieldValue.increment(1)
+            const docRef = doc(db, 'documents', document.id);
+            await updateDoc(docRef, {
+                downloadCount: increment(1)
             });
         } catch (error) {
             console.error("Error updating download count: ", error);
@@ -141,21 +162,21 @@ const DocumentItem: React.FC<{ doc: Document; isAdmin: boolean; onDelete: (id: s
     return (
         <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex flex-col h-full">
             <div className="flex-1">
-                <h3 className="text-lg font-bold text-neutral-dark mb-2">{doc.title}</h3>
-                <p className="text-gray-600 text-sm mb-4">{doc.description}</p>
+                <h3 className="text-lg font-bold text-neutral-dark mb-2">{document.title}</h3>
+                <p className="text-gray-600 text-sm mb-4">{document.description}</p>
             </div>
             <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
                 <div className="flex space-x-4 text-sm text-gray-500">
                     <span className="flex items-center">
-                        <i className="fas fa-eye mr-1"></i> {doc.viewCount}
+                        <i className="fas fa-eye mr-1"></i> {document.viewCount}
                     </span>
                     <span className="flex items-center">
-                        <i className="fas fa-download mr-1"></i> {doc.downloadCount}
+                        <i className="fas fa-download mr-1"></i> {document.downloadCount}
                     </span>
                 </div>
                 <div className="flex space-x-2 flex-shrink-0">
                     <a
-                        href={doc.downloadUrl}
+                        href={document.downloadUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:opacity-90 transition duration-300 text-sm"
@@ -164,7 +185,7 @@ const DocumentItem: React.FC<{ doc: Document; isAdmin: boolean; onDelete: (id: s
                         <i className="fas fa-download mr-1"></i>Tải
                     </a>
                     <a
-                        href={doc.downloadUrl}
+                        href={document.downloadUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:opacity-90 transition duration-300 text-sm"
@@ -187,8 +208,10 @@ const DocumentsPage: React.FC<DocumentsPageProps> = ({ isAdmin }) => {
   const fetchDocuments = async () => {
     setLoading(true);
     try {
-        const snapshot = await db.collection('documents').orderBy('createdAt', 'desc').get();
-        const docsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Document));
+        const documentsCollection = collection(db, 'documents');
+        const q = query(documentsCollection, orderBy('createdAt', 'desc'));
+        const snapshot = await getDocs(q);
+        const docsData = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() } as Document));
         setDocuments(docsData);
     } catch (error) {
         console.error("Error fetching documents: ", error);
@@ -206,11 +229,12 @@ const DocumentsPage: React.FC<DocumentsPageProps> = ({ isAdmin }) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa tài liệu này? Hành động này sẽ xóa cả tệp đính kèm.')) {
         try {
             // Delete file from Storage
-            const storageRef = storage.ref(`documents/${fileName}`);
-            await storageRef.delete();
+            const fileRef = storageRef(storage, `documents/${fileName}`);
+            await deleteObject(fileRef);
 
             // Delete document from Firestore
-            await db.collection('documents').doc(id).delete();
+            const docRef = doc(db, 'documents', id);
+            await deleteDoc(docRef);
             
             setDocuments(prev => prev.filter(doc => doc.id !== id));
         } catch (error: any) {

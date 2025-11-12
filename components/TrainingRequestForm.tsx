@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { db, firebase, sendEmail } from '../services/firebaseConfig';
+import { db, sendEmail, collection, addDoc, serverTimestamp, query, where, getDocs } from '../services/firebaseConfig';
 import { TRAINING_TYPES, TRAINING_GROUPS } from '../types';
 import { generatePartnerNotificationEmail } from '../utils/emailTemplates';
 
@@ -70,10 +70,11 @@ const TrainingRequestForm: React.FC = () => {
 
     setSubmitting(true);
     try {
-      const requestRef = await db.collection('trainingRequests').add({
+      const trainingRequestsCollection = collection(db, 'trainingRequests');
+      const requestRef = await addDoc(trainingRequestsCollection, {
         ...formData,
         trainingDetails: processedDetails,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        createdAt: serverTimestamp(),
         viewedBy: [],
         urgent: isUrgent,
       });
@@ -85,10 +86,13 @@ const TrainingRequestForm: React.FC = () => {
         const trainingTypes = processedDetails.map(detail => detail.type);
         console.log('🔍 Tìm đối tác phù hợp cho các loại đào tạo:', trainingTypes);
 
-        const partnersQuery = await db.collection('partners')
-          .where('status', '==', 'approved')
-          .where('subscribesToEmails', '==', true)
-          .get();
+        const partnersCollection = collection(db, 'partners');
+        const q = query(
+          partnersCollection,
+          where('status', '==', 'approved'),
+          where('subscribesToEmails', '==', true)
+        );
+        const partnersQuery = await getDocs(q);
 
         console.log('📊 Tìm thấy', partnersQuery.size, 'đối tác đã approved và đăng ký nhận email');
 

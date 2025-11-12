@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { db, firebase } from '../services/firebaseConfig';
+import { db, doc, updateDoc, arrayUnion, type User } from '../services/firebaseConfig';
 import { TrainingRequest } from '../types';
 import { PartnerStatus } from '../App';
 import html2canvas from 'html2canvas';
@@ -8,7 +8,7 @@ import QuoteForm from './QuoteForm';
 
 interface TrainingRequestCardProps {
   request: TrainingRequest;
-  user?: firebase.User | null;
+  user?: User | null;
   onLoginRequired?: () => void;
   isAdminView?: boolean;
   onDeleteRequest?: (id: string) => void;
@@ -49,9 +49,9 @@ const TrainingRequestCard: React.FC<TrainingRequestCardProps> = ({ request, user
     }
     setIsUnlocking(true);
     try {
-      const requestRef = db.collection('trainingRequests').doc(request.id);
-      await requestRef.update({
-        viewedBy: firebase.firestore.FieldValue.arrayUnion(user.uid)
+      const requestRef = doc(db, 'trainingRequests', request.id);
+      await updateDoc(requestRef, {
+        viewedBy: arrayUnion(user.uid)
       });
       setShowContact(true);
     } catch (error) {
