@@ -162,10 +162,10 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               </div>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              <ProcessStep number="1" title="Gửi yêu cầu" description="Điền form nhu cầu đào tạo chi tiết của doanh nghiệp." gradient="from-blue-500 to-blue-700" icon="fa-paper-plane" />
-              <ProcessStep number="2" title="Nhận báo giá" description="Các đối tác uy tín gửi báo giá và chương trình phù hợp." gradient="from-blue-500 to-blue-700" icon="fa-file-invoice-dollar" />
-              <ProcessStep number="3" title="So sánh & chọn" description="Lựa chọn đối tác có báo giá và năng lực phù hợp nhất." gradient="from-blue-500 to-blue-700" icon="fa-balance-scale" />
-              <ProcessStep number="4" title="Ký hợp đồng" description="Ký kết và triển khai chương trình đào tạo hiệu quả." gradient="from-blue-500 to-blue-700" icon="fa-file-signature" />
+              <ProcessStep number="1" title="Gửi yêu cầu" description="Điền form nhu cầu đào tạo chi tiết của doanh nghiệp." gradient="from-blue-500 to-blue-700" />
+              <ProcessStep number="2" title="Nhận báo giá" description="Các đối tác uy tín gửi báo giá và chương trình phù hợp." gradient="from-blue-500 to-blue-700" />
+              <ProcessStep number="3" title="So sánh & chọn" description="Lựa chọn đối tác có báo giá và năng lực phù hợp nhất." gradient="from-blue-500 to-blue-700" />
+              <ProcessStep number="4" title="Ký hợp đồng" description="Ký kết và triển khai chương trình đào tạo hiệu quả." gradient="from-blue-500 to-blue-700" />
             </div>
           </div>
 
@@ -177,10 +177,10 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               </div>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              <ProcessStep number="1" title="Đăng ký" description="Tạo tài khoản và trở thành đối tác của nền tảng." gradient="from-green-500 to-green-700" icon="fa-user-plus" />
-              <ProcessStep number="2" title="Nhận thông báo" description="Nhận thông báo về các yêu cầu đào tạo phù hợp." gradient="from-green-500 to-green-700" icon="fa-bell" />
-              <ProcessStep number="3" title="Gửi báo giá" description="Gửi chương trình và báo giá chi tiết cho khách hàng." gradient="from-green-500 to-green-700" icon="fa-paper-plane" />
-              <ProcessStep number="4" title="Triển khai" description="Thực hiện đào tạo chuyên nghiệp và nhận thanh toán." gradient="from-green-500 to-green-700" icon="fa-check-circle" />
+              <ProcessStep number="1" title="Đăng ký" description="Tạo tài khoản và trở thành đối tác của nền tảng." gradient="from-green-500 to-green-700" />
+              <ProcessStep number="2" title="Nhận thông báo" description="Nhận thông báo về các yêu cầu đào tạo phù hợp." gradient="from-green-500 to-green-700" />
+              <ProcessStep number="3" title="Gửi báo giá" description="Gửi chương trình và báo giá chi tiết cho khách hàng." gradient="from-green-500 to-green-700" />
+              <ProcessStep number="4" title="Triển khai" description="Thực hiện đào tạo chuyên nghiệp và nhận thanh toán." gradient="from-green-500 to-green-700" />
             </div>
           </div>
         </div>
