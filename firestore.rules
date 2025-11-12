@@ -14,7 +14,7 @@ service cloud.firestore {
     // === YÊU CẦU HUẤN LUYỆN ===
     match /trainingRequests/{requestId} {
       allow create: if true;  // Ai cũng tạo được (public form)
-      allow read: if isAuthenticated();  // Authenticated users đọc được TẤT CẢ
+      allow read: if true;  // AI CŨNG ĐỌC ĐƯỢC (thông tin liên hệ ẩn ở UI level)
       allow update: if isAuthenticated();  // Authenticated users update được
       allow delete: if isAdmin();  // Chỉ admin xóa được
     }
