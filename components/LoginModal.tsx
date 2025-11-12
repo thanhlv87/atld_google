@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { auth, db, firebase } from '../services/firebaseConfig';
+import {
+  auth,
+  db,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  doc,
+  setDoc,
+  serverTimestamp
+} from '../services/firebaseConfig';
 import { PARTNER_CAPABILITIES } from '../types';
 
 interface LoginModalProps {
@@ -50,17 +59,18 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
     setLoading(true);
     try {
       if (view === 'login') {
-        await auth.signInWithEmailAndPassword(email, password);
+        await signInWithEmailAndPassword(auth, email, password);
       } else {
         if (!registerData.phone.trim()) {
             setError('Vui lòng nhập số điện thoại.');
             setLoading(false);
             return;
         }
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         if (user) {
-            await db.collection('partners').doc(user.uid).set({
+            const partnerDocRef = doc(db, 'partners', user.uid);
+            await setDoc(partnerDocRef, {
                 uid: user.uid,
                 email: email,
                 taxId: registerData.taxId,
@@ -69,7 +79,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
                 notableClients: registerData.notableClients,
                 capabilities: registerData.capabilities,
                 subscribesToEmails: registerData.subscribesToEmails,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                createdAt: serverTimestamp(),
                 status: 'pending',
                 membership: 'free',
             });
@@ -101,7 +111,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
     setLoading(true);
 
     try {
-      await auth.sendPasswordResetEmail(email);
+      await sendPasswordResetEmail(auth, email);
       setSuccess('Link khôi phục mật khẩu đã được gửi. Vui lòng kiểm tra hộp thư của bạn (bao gồm cả mục spam).');
     } catch (err: any) {
         switch (err.code) {

@@ -142,6 +142,7 @@ export {
   // Auth functions
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signOut,
   signOut as firebaseSignOut,
   sendPasswordResetEmail,
   onAuthStateChanged,

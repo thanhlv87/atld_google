@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { auth, firebase } from '../services/firebaseConfig';
+import { auth, signOut, type User } from '../services/firebaseConfig';
 import { Page, PartnerStatus } from '../App';
 
 interface HeaderProps {
-  user: firebase.User | null;
+  user: User | null;
   isAdmin: boolean;
   onLoginClick: () => void;
   currentPage: Page;
@@ -48,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPag
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const handleLogout = async () => {
     try {
-      await auth.signOut();
+      await signOut(auth);
       onNavigate('home'); // Redirect to home on logout
     } catch (error) {
       console.error("Error signing out: ", error);

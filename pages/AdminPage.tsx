@@ -1,5 +1,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { db, firebase, sendEmail } from '../services/firebaseConfig';
+import {
+  db,
+  sendEmail,
+  collection,
+  doc,
+  getDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  Timestamp
+} from '../services/firebaseConfig';
 import { PartnerProfile, TrainingRequest } from '../types';
 import PartnerTable from '../components/PartnerTable';
 import TrainingRequestCard from '../components/TrainingRequestCard';
@@ -24,38 +36,40 @@ const AdminPage: React.FC = () => {
         setLoadError('');
         setLoading(true);
 
-        const partnersUnsubscribe = db.collection('partners')
-            .orderBy('createdAt', 'desc')
-            .onSnapshot(
-                (querySnapshot) => {
-                    const partnersData = querySnapshot.docs.map(doc => ({ 
-                        uid: doc.id, 
-                        ...doc.data(),
-                        // Ensure createdAt is a Firestore Timestamp
-                        createdAt: doc.data().createdAt || firebase.firestore.Timestamp.now()
-                    } as PartnerProfile));
-                    setPartners(partnersData);
-                    setLoading(false);
-                },
-                (err) => {
-                    console.error("Error fetching partners: ", err);
-                    setLoadError(prev => `${prev}\nKhông thể tải danh sách đối tác: ${err.message}`);
-                    setLoading(false);
-                }
-            );
+        const partnersCollection = collection(db, 'partners');
+        const partnersQuery = query(partnersCollection, orderBy('createdAt', 'desc'));
+        const partnersUnsubscribe = onSnapshot(
+            partnersQuery,
+            (querySnapshot) => {
+                const partnersData = querySnapshot.docs.map(docSnap => ({
+                    uid: docSnap.id,
+                    ...docSnap.data(),
+                    // Ensure createdAt is a Firestore Timestamp
+                    createdAt: docSnap.data().createdAt || Timestamp.now()
+                } as PartnerProfile));
+                setPartners(partnersData);
+                setLoading(false);
+            },
+            (err) => {
+                console.error("Error fetching partners: ", err);
+                setLoadError(prev => `${prev}\nKhông thể tải danh sách đối tác: ${err.message}`);
+                setLoading(false);
+            }
+        );
 
-        const requestsUnsubscribe = db.collection('trainingRequests')
-            .orderBy('createdAt', 'desc')
-            .onSnapshot(
-                (querySnapshot) => {
-                    const requestsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TrainingRequest));
-                    setRequests(requestsData);
-                },
-                (err) => {
-                    console.error("Error fetching requests: ", err);
-                    setLoadError(prev => `${prev}\nKhông thể tải danh sách yêu cầu: ${err.message}`);
-                }
-            );
+        const requestsCollection = collection(db, 'trainingRequests');
+        const requestsQuery = query(requestsCollection, orderBy('createdAt', 'desc'));
+        const requestsUnsubscribe = onSnapshot(
+            requestsQuery,
+            (querySnapshot) => {
+                const requestsData = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() } as TrainingRequest));
+                setRequests(requestsData);
+            },
+            (err) => {
+                console.error("Error fetching requests: ", err);
+                setLoadError(prev => `${prev}\nKhông thể tải danh sách yêu cầu: ${err.message}`);
+            }
+        );
         
         return () => {
             partnersUnsubscribe();
@@ -121,11 +135,12 @@ const AdminPage: React.FC = () => {
     const handleUpdatePartnerStatus = (uid: string, newStatus: 'approved' | 'rejected') => {
         setActionError(null);
         // Lấy thông tin đối tác để gửi email
-        db.collection('partners').doc(uid).get()
-        .then((doc) => {
-            if (doc.exists) {
-                const partner = doc.data() as PartnerProfile;
-                db.collection('partners').doc(uid).update({ status: newStatus })
+        const partnerDocRef = doc(db, 'partners', uid);
+        getDoc(partnerDocRef)
+        .then((docSnap) => {
+            if (docSnap.exists()) {
+                const partner = docSnap.data() as PartnerProfile;
+                updateDoc(partnerDocRef, { status: newStatus })
                 .then(() => {
                     // Gửi email thông báo cho đối tác về thay đổi trạng thái
                     const subject = newStatus === 'approved'
@@ -162,7 +177,8 @@ const AdminPage: React.FC = () => {
         .catch((err) => {
             console.error('Error fetching partner data:', err);
             // Nếu không lấy được thông tin đối tác, vẫn cập nhật trạng thái
-            db.collection('partners').doc(uid).update({ status: newStatus })
+            const partnerDocRef = doc(db, 'partners', uid);
+            updateDoc(partnerDocRef, { status: newStatus })
             .catch((err: any) => {
                 console.error('PERMISSION ERROR updating partner status:', err);
                 const errorMessage = `LỖI PHÂN QUYỀN: Không thể cập nhật đối tác. Vui lòng kiểm tra lại Security Rules trên Firebase để đảm bảo tài khoản Admin có quyền "update" collection "partners". Lỗi gốc: ${err.message}`;
@@ -173,7 +189,8 @@ const AdminPage: React.FC = () => {
 
     const handleDeletePartner = (uid: string) => {
         setActionError(null);
-        db.collection('partners').doc(uid).delete()
+        const partnerDocRef = doc(db, 'partners', uid);
+        deleteDoc(partnerDocRef)
             .catch((err: any) => {
                 console.error('PERMISSION ERROR deleting partner:', err);
                 const errorMessage = `LỖI PHÂN QUYỀN: Không thể xóa đối tác. Vui lòng kiểm tra lại Security Rules trên Firebase để đảm bảo tài khoản Admin có quyền "delete" collection "partners". Lỗi gốc: ${err.message}`;
@@ -183,7 +200,8 @@ const AdminPage: React.FC = () => {
     
     const handleDeleteRequest = (id: string) => {
         setActionError(null);
-        db.collection('trainingRequests').doc(id).delete()
+        const requestDocRef = doc(db, 'trainingRequests', id);
+        deleteDoc(requestDocRef)
             .catch((err: any) => {
                 console.error('PERMISSION ERROR deleting request:', err);
                 const errorMessage = `LỖI PHÂN QUYỀN: Không thể xóa yêu cầu. Vui lòng kiểm tra lại Security Rules trên Firebase để đảm bảo tài khoản Admin có quyền "delete" collection "trainingRequests". Lỗi gốc: ${err.message}`;
