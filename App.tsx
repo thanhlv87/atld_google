@@ -1,14 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { auth, db, firebase } from './services/firebaseConfig';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
+import {
+  auth,
+  db,
+  onAuthStateChanged,
+  collection,
+  doc,
+  getDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  type User
+} from './services/firebaseConfig';
 import { TrainingRequest } from './types';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import LoginModal from './components/LoginModal';
-import HomePage from './pages/HomePage';
-import RequestsPage from './pages/RequestsPage';
-import DocumentsPage from './pages/DocumentsPage';
-import AdminPage from './pages/AdminPage';
-import TrainingLandingPage from './pages/TrainingLandingPage';
+import LoadingSpinner from './components/LoadingSpinner';
+
+// Lazy load pages for code splitting - pages are loaded only when needed
+const HomePage = lazy(() => import('./pages/HomePage'));
+const RequestsPage = lazy(() => import('./pages/RequestsPage'));
+const DocumentsPage = lazy(() => import('./pages/DocumentsPage'));
+const AdminPage = lazy(() => import('./pages/AdminPage'));
+const TrainingLandingPage = lazy(() => import('./pages/TrainingLandingPage'));
+const LoginModal = lazy(() => import('./components/LoginModal'));
 
 export type Page = 'home' | 'requests' | 'documents' | 'admin' |
   'training-an-toan-dien' | 'training-an-toan-xay-dung' | 'training-an-toan-hoa-chat' |
@@ -17,7 +31,7 @@ export type Page = 'home' | 'requests' | 'documents' | 'admin' |
 export type PartnerStatus = 'pending' | 'approved' | 'rejected' | null;
 
 const App: React.FC = () => {
-  const [user, setUser] = useState<firebase.User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [partnerStatus, setPartnerStatus] = useState<PartnerStatus>(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
@@ -27,21 +41,23 @@ const App: React.FC = () => {
   const [page, setPage] = useState<Page>('home');
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       setIsAdmin(false);
       setPartnerStatus(null);
 
       if (currentUser) {
         // Check for admin privileges
-        const adminDoc = await db.collection('admins').doc(currentUser.uid).get();
-        if (adminDoc.exists) {
+        const adminDocRef = doc(db, 'admins', currentUser.uid);
+        const adminDoc = await getDoc(adminDocRef);
+        if (adminDoc.exists()) {
           setIsAdmin(true);
           setPage('admin'); // Auto-navigate to admin page on login
         } else {
           // If not admin, check for partner status
-          const partnerDoc = await db.collection('partners').doc(currentUser.uid).get();
-          if (partnerDoc.exists) {
+          const partnerDocRef = doc(db, 'partners', currentUser.uid);
+          const partnerDoc = await getDoc(partnerDocRef);
+          if (partnerDoc.exists()) {
             const partnerData = partnerDoc.data();
             setPartnerStatus(partnerData?.status || 'pending');
           }
@@ -55,18 +71,23 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const q = db.collection('trainingRequests').orderBy('createdAt', 'desc');
-    const unsubscribe = q.onSnapshot((querySnapshot) => {
-      const requests: TrainingRequest[] = [];
-      querySnapshot.forEach((doc) => {
-        requests.push({ id: doc.id, ...doc.data() } as TrainingRequest);
-      });
-      setTrainingRequests(requests);
-      setLoadingRequests(false);
-    }, (error) => {
-      console.error("Error fetching training requests: ", error);
-      setLoadingRequests(false);
-    });
+    const requestsCollection = collection(db, 'trainingRequests');
+    const q = query(requestsCollection, orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(
+      q,
+      (querySnapshot) => {
+        const requests: TrainingRequest[] = [];
+        querySnapshot.forEach((docSnap) => {
+          requests.push({ id: docSnap.id, ...docSnap.data() } as TrainingRequest);
+        });
+        setTrainingRequests(requests);
+        setLoadingRequests(false);
+      },
+      (error) => {
+        console.error("Error fetching training requests: ", error);
+        setLoadingRequests(false);
+      }
+    );
 
     return () => unsubscribe();
   }, []);
@@ -131,19 +152,25 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col font-sans">
-      <Header 
-        user={user} 
+      <Header
+        user={user}
         isAdmin={isAdmin}
-        onLoginClick={() => setLoginModalOpen(true)} 
+        onLoginClick={() => setLoginModalOpen(true)}
         currentPage={page}
         onNavigate={handleNavigate}
         partnerStatus={partnerStatus}
       />
       <main className="flex-grow">
-        {renderPage()}
+        <Suspense fallback={<LoadingSpinner size="fullscreen" message="Đang tải..." />}>
+          {renderPage()}
+        </Suspense>
       </main>
       <Footer />
-      {isLoginModalOpen && <LoginModal onClose={() => setLoginModalOpen(false)} />}
+      {isLoginModalOpen && (
+        <Suspense fallback={null}>
+          <LoginModal onClose={() => setLoginModalOpen(false)} />
+        </Suspense>
+      )}
     </div>
   );
 };
