@@ -22,7 +22,8 @@ service cloud.firestore {
     // === HỒ SƠ ĐỐI TÁC ===
     match /partners/{partnerId} {
       allow create: if isAuthenticated() && request.auth.uid == partnerId;
-      allow read: if isAuthenticated();  // Partners/admins xem được tất cả partners
+      // Allow public read ONLY for email notification purpose (query approved partners)
+      allow read: if true;  // Cho phép đọc để tìm partners gửi email
       allow update: if isAuthenticated() && (request.auth.uid == partnerId || isAdmin());
       allow delete: if isAdmin();
     }

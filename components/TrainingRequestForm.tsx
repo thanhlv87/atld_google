@@ -18,6 +18,7 @@ const TrainingRequestForm: React.FC = () => {
   const [formData, setFormData] = useState(initialFormState);
   const [trainingDetails, setTrainingDetails] = useState([initialDetailState]);
   const [isUrgent, setIsUrgent] = useState(false);
+  const [clientSubscribesToEmails, setClientSubscribesToEmails] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -77,6 +78,7 @@ const TrainingRequestForm: React.FC = () => {
         createdAt: serverTimestamp(),
         viewedBy: [],
         urgent: isUrgent,
+        clientSubscribesToEmails: clientSubscribesToEmails,
       });
 
       // Gửi email thông báo cho các đối tác phù hợp
@@ -156,6 +158,7 @@ const TrainingRequestForm: React.FC = () => {
       setFormData(initialFormState);
       setTrainingDetails([initialDetailState]);
       setIsUrgent(false);
+      setClientSubscribesToEmails(true);
     } catch (err) {
       console.error("Error adding document: ", err);
       setError('Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại.');
@@ -241,9 +244,22 @@ const TrainingRequestForm: React.FC = () => {
                     <span className="font-normal text-sm block text-gray-600">Đánh dấu nếu bạn cần triển khai huấn luyện trong vòng 7 ngày. Yêu cầu của bạn sẽ được ưu tiên hiển thị.</span>
                 </span>
             </label>
+
+            <label className="flex items-center space-x-3 cursor-pointer pt-2">
+                <input
+                    type="checkbox"
+                    checked={clientSubscribesToEmails}
+                    onChange={(e) => setClientSubscribesToEmails(e.target.checked)}
+                    className="h-5 w-5 text-primary focus:ring-primary border-gray-300 rounded"
+                />
+                <span className="font-semibold text-neutral-dark">
+                    Nhận thông báo qua email khi có báo giá mới
+                    <span className="font-normal text-sm block text-gray-600">Chúng tôi sẽ gửi email thông báo khi có đơn vị đào tạo gửi báo giá cho yêu cầu của bạn.</span>
+                </span>
+            </label>
         </div>
 
-        
+
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
         
         <button type="submit" disabled={submitting} className="w-full flex justify-center items-center bg-primary text-white font-bold py-3 rounded-lg hover:opacity-90 transition duration-300 disabled:bg-primary-dark disabled:opacity-75 disabled:cursor-wait">
