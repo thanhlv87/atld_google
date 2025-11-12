@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { db, firebase, sendEmail } from '../services/firebaseConfig';
+import { db, sendEmail, doc, getDoc, collection, addDoc, serverTimestamp } from '../services/firebaseConfig';
 import { TrainingRequest } from '../types';
 import { generateQuoteNotificationEmail } from '../utils/emailTemplates';
 
@@ -63,7 +63,8 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 
     try {
       // Get partner name
-      const partnerDoc = await db.collection('partners').doc(partnerUid).get();
+      const partnerDocRef = doc(db, 'partners', partnerUid);
+      const partnerDoc = await getDoc(partnerDocRef);
       const partnerData = partnerDoc.data();
       const partnerName = partnerData?.taxId || partnerEmail;
 
@@ -78,10 +79,11 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
         timeline: formData.timeline,
         notes: formData.notes,
         status: 'pending',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: serverTimestamp()
       };
 
-      const quoteRef = await db.collection('quotes').add(quoteData);
+      const quotesCollection = collection(db, 'quotes');
+      const quoteRef = await addDoc(quotesCollection, quoteData);
       console.log('✅ Báo giá đã được tạo với ID:', quoteRef.id);
 
       // Send email notification to client

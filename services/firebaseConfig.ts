@@ -18,6 +18,7 @@ import {
   onSnapshot,
   serverTimestamp,
   Timestamp,
+  increment,
   arrayUnion,
   arrayRemove,
   QuerySnapshot,
@@ -137,6 +138,7 @@ export {
   onSnapshot,
   serverTimestamp,
   Timestamp,
+  increment,
   arrayUnion,
   arrayRemove,
   // Auth functions
