@@ -2,68 +2,75 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Allow anyone to create training requests (public form)
+    // === HÀM HỖ TRỢ ===
+    function isAdmin() {
+      return exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // === YÊU CẦU HUẤN LUYỆN ===
     match /trainingRequests/{requestId} {
-      allow create: if true;
-      allow read, update, delete: if request.auth != null;
+      allow create: if true;  // Ai cũng tạo được (public form)
+      allow read: if isAuthenticated();  // Authenticated users đọc được TẤT CẢ
+      allow update: if isAuthenticated();  // Authenticated users update được
+      allow delete: if isAdmin();  // Chỉ admin xóa được
     }
 
-    // Allow anyone to create email documents (needed for trigger extension)
-    match /mail/{mailId} {
-      allow create: if true;
-      allow read, update, delete: if false; // Only extension can read/update
-    }
-
-    // Partners collection
+    // === HỒ SƠ ĐỐI TÁC ===
     match /partners/{partnerId} {
-      // Allow users to create their partner profile
-      allow create: if request.auth != null && request.auth.uid == partnerId;
-      // Allow partners to read and update their own profile
-      allow read, update: if request.auth != null && request.auth.uid == partnerId;
-      // Allow admins to read all partners (you can add admin logic here)
-      allow read: if request.auth != null;
+      allow create: if isAuthenticated() && request.auth.uid == partnerId;
+      allow read: if isAuthenticated();  // Partners/admins xem được tất cả partners
+      allow update: if isAuthenticated() && (request.auth.uid == partnerId || isAdmin());
+      allow delete: if isAdmin();
     }
 
-    // Users collection (if needed)
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Quotes collection
+    // === BÁO GIÁ ===
     match /quotes/{quoteId} {
-      // Allow authenticated partners to create quotes
-      allow create: if request.auth != null
+      // Partner tạo báo giá
+      allow create: if isAuthenticated()
                     && request.resource.data.partnerId == request.auth.uid;
 
-      // Allow partners to read and update their own quotes
-      allow read, update: if request.auth != null
+      // Partner xem và update báo giá của mình
+      allow read, update: if isAuthenticated()
                           && resource.data.partnerId == request.auth.uid;
 
-      // Allow admins to read all quotes (admins are authenticated)
-      allow read: if request.auth != null;
+      // Admin xem tất cả báo giá
+      allow read: if isAdmin();
 
-      // Allow partners to delete their own quotes
-      allow delete: if request.auth != null
+      // Partner xóa báo giá của mình
+      allow delete: if isAuthenticated()
                     && resource.data.partnerId == request.auth.uid;
     }
 
-    // Documents collection (for downloadable files)
-    match /documents/{documentId} {
-      // Anyone can read documents
-      allow read: if true;
-      // Only authenticated users (admins) can create/update/delete
-      allow create, update, delete: if request.auth != null;
+    // === TÀI LIỆU ===
+    match /documents/{docId} {
+      allow read: if true;  // Ai cũng đọc được
+      allow create, update, delete: if isAdmin();  // Chỉ admin quản lý
     }
 
-    // Admins collection
+    // === ADMIN COLLECTION ===
     match /admins/{adminId} {
-      // Only authenticated users can read (to check if they're admin)
-      allow read: if request.auth != null;
-      // No one can write (managed outside Firestore)
-      allow write: if false;
+      // Cho phép user kiểm tra xem mình có phải admin không
+      allow get: if isAuthenticated() && request.auth.uid == adminId;
+      // Không cho list, create, update, delete từ client
+      allow list, write: if false;
     }
 
-    // Default deny all other collections
+    // === EMAIL COLLECTION (cho Firebase Extension) ===
+    match /mail/{mailId} {
+      allow create: if true;  // Ai cũng tạo được (để send email)
+      allow read, update, delete: if false;  // Chỉ extension xử lý
+    }
+
+    // === USERS COLLECTION (optional) ===
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // === DEFAULT DENY ===
     match /{document=**} {
       allow read, write: if false;
     }
