@@ -10,7 +10,9 @@ import {
   query,
   orderBy,
   onSnapshot,
-  Timestamp
+  Timestamp,
+  auth,
+  type User
 } from '../services/firebaseConfig';
 import { PartnerProfile, TrainingRequest } from '../types';
 import PartnerTable from '../components/PartnerTable';
@@ -21,9 +23,13 @@ import ViewersModal from '../components/ViewersModal';
 import KPIStatCard from '../components/KPIStatCard';
 import GrowthChart from '../components/GrowthChart';
 import InfoPanel from '../components/InfoPanel';
+import BlogManagement from '../components/BlogManagement';
 
+type AdminTab = 'dashboard' | 'blog';
 
 const AdminPage: React.FC = () => {
+    const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [partners, setPartners] = useState<PartnerProfile[]>([]);
     const [requests, setRequests] = useState<TrainingRequest[]>([]);
     const [loading, setLoading] = useState(true);
@@ -31,6 +37,10 @@ const AdminPage: React.FC = () => {
     const [actionError, setActionError] = useState<string | null>(null);
     const [selectedPartner, setSelectedPartner] = useState<PartnerProfile | null>(null);
     const [viewingPartners, setViewingPartners] = useState<PartnerProfile[] | null>(null);
+
+    useEffect(() => {
+        setCurrentUser(auth.currentUser);
+    }, []);
 
     useEffect(() => {
         setLoadError('');
@@ -241,6 +251,34 @@ const AdminPage: React.FC = () => {
                     <p className="text-gray-600">Tổng quan tình hình hoạt động của hệ thống.</p>
                 </div>
 
+                {/* Tabs */}
+                <div className="mb-8 border-b border-gray-200">
+                    <nav className="flex gap-4">
+                        <button
+                            onClick={() => setActiveTab('dashboard')}
+                            className={`px-6 py-3 font-semibold transition-all ${
+                                activeTab === 'dashboard'
+                                    ? 'text-primary border-b-2 border-primary'
+                                    : 'text-gray-600 hover:text-gray-800'
+                            }`}
+                        >
+                            <i className="fas fa-tachometer-alt mr-2"></i>
+                            Dashboard
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('blog')}
+                            className={`px-6 py-3 font-semibold transition-all ${
+                                activeTab === 'blog'
+                                    ? 'text-primary border-b-2 border-primary'
+                                    : 'text-gray-600 hover:text-gray-800'
+                            }`}
+                        >
+                            <i className="fas fa-newspaper mr-2"></i>
+                            Quản lý Blog
+                        </button>
+                    </nav>
+                </div>
+
                 {actionError && (
                     <div className="bg-red-100 border-l-4 border-red-500 text-red-800 p-4 rounded-md mb-8 relative" role="alert">
                         <strong className="font-bold">Đã xảy ra lỗi!</strong>
@@ -251,8 +289,11 @@ const AdminPage: React.FC = () => {
                     </div>
                 )}
 
-                {/* --- Start of Dashboard --- */}
-                <section className="mb-12">
+                {/* Tab Content */}
+                {activeTab === 'dashboard' && (
+                    <>
+                        {/* --- Start of Dashboard --- */}
+                        <section className="mb-12">
                     {/* KPI Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                         <KPIStatCard icon="fa-file-alt" title="Tổng số yêu cầu" value={dashboardData.totalRequests.toString()} details="Tất cả thời gian" />
@@ -322,6 +363,13 @@ const AdminPage: React.FC = () => {
                         )}
                     </section>
                 </div>
+                    </>
+                )}
+
+                {/* Blog Management Tab */}
+                {activeTab === 'blog' && currentUser && (
+                    <BlogManagement user={currentUser} />
+                )}
             </div>
             {selectedPartner && (
                 <PartnerDetailModal 
