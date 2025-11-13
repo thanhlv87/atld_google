@@ -1,0 +1,47 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // === HÀM HỖ TRỢ ===
+    function isAdmin() {
+      return request.auth != null &&
+             firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
+    }
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // === BLOG COVER IMAGES ===
+    match /blog-covers/{imageId} {
+      // Anyone can read blog cover images (public)
+      allow read: if true;
+
+      // Only admins can upload/update/delete blog covers
+      allow create, update, delete: if isAdmin();
+    }
+
+    // === DOCUMENT UPLOADS ===
+    match /documents/{documentId} {
+      // Anyone can read/download documents
+      allow read: if true;
+
+      // Only admins can upload/update/delete documents
+      allow create, update, delete: if isAdmin();
+    }
+
+    // === QUOTE ATTACHMENTS ===
+    match /quote-attachments/{attachmentId} {
+      // Only authenticated partners can upload attachments
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated();
+    }
+
+    // === DEFAULT DENY ===
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
