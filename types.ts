@@ -65,6 +65,56 @@ export interface Quote {
   updatedAt?: firebase.firestore.Timestamp;
 }
 
+// Chat System Types
+export interface ChatRoom {
+  id: string;
+  requestId: string; // ID của training request liên quan
+  clientId: string; // UID của client (hoặc email nếu không có account)
+  partnerId: string; // UID của partner
+  clientName: string;
+  partnerName: string;
+  lastMessage: string;
+  lastMessageTime: firebase.firestore.Timestamp;
+  unreadCount: {
+    client: number;
+    partner: number;
+  };
+  createdAt: firebase.firestore.Timestamp;
+}
+
+export interface ChatMessage {
+  id: string;
+  roomId: string;
+  senderId: string; // UID của người gửi
+  senderName: string;
+  senderRole: 'client' | 'partner' | 'admin';
+  message: string;
+  read: boolean;
+  createdAt: firebase.firestore.Timestamp;
+}
+
+// Blog System Types
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string; // URL-friendly version of title
+  excerpt: string; // Short summary for card display
+  content: string; // Full content (HTML or Markdown)
+  coverImage: string; // URL của ảnh bìa
+  category: string; // Danh mục: "An toàn lao động", "Luật lệ", "Case study", etc.
+  tags: string[]; // Các tag liên quan
+  author: {
+    uid: string;
+    name: string;
+    email: string;
+  };
+  published: boolean; // True nếu đã publish, false nếu còn draft
+  viewCount: number;
+  createdAt: firebase.firestore.Timestamp;
+  updatedAt: firebase.firestore.Timestamp;
+  publishedAt?: firebase.firestore.Timestamp;
+}
+
 // Hằng số cho các nhóm đào tạo trong form
 export const TRAINING_GROUPS = [
     "Không áp dụng",

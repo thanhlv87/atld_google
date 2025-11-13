@@ -87,6 +87,14 @@ const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPag
           <nav className="hidden md:flex items-center space-x-4">
             <NavLink page="home" currentPage={currentPage} onNavigate={onNavigate}>Trang Chủ</NavLink>
             <NavLink page="requests" currentPage={currentPage} onNavigate={onNavigate}>Danh Sách Yêu Cầu</NavLink>
+            <NavLink page="blog" currentPage={currentPage} onNavigate={onNavigate}>
+              <i className="fas fa-newspaper mr-1"></i>Blog
+            </NavLink>
+            {user && (
+              <NavLink page="chat" currentPage={currentPage} onNavigate={onNavigate}>
+                <i className="fas fa-comments mr-1"></i>Tin nhắn
+              </NavLink>
+            )}
             <NavLink page="documents" currentPage={currentPage} onNavigate={onNavigate}>Tài Liệu</NavLink>
             {isAdmin && (
               <NavLink page="admin" currentPage={currentPage} onNavigate={onNavigate}>
@@ -207,6 +215,14 @@ const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPag
             <NavLink page="requests" currentPage={currentPage} onNavigate={onNavigate} mobile onClick={closeMobileMenu}>
               <i className="fas fa-list mr-3"></i>Danh Sách Yêu Cầu
             </NavLink>
+            <NavLink page="blog" currentPage={currentPage} onNavigate={onNavigate} mobile onClick={closeMobileMenu}>
+              <i className="fas fa-newspaper mr-3"></i>Blog
+            </NavLink>
+            {user && (
+              <NavLink page="chat" currentPage={currentPage} onNavigate={onNavigate} mobile onClick={closeMobileMenu}>
+                <i className="fas fa-comments mr-3"></i>Tin nhắn
+              </NavLink>
+            )}
             <NavLink page="documents" currentPage={currentPage} onNavigate={onNavigate} mobile onClick={closeMobileMenu}>
               <i className="fas fa-file-alt mr-3"></i>Tài Liệu
             </NavLink>

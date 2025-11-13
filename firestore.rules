@@ -71,6 +71,52 @@ service cloud.firestore {
       allow read, write: if isAuthenticated() && request.auth.uid == userId;
     }
 
+    // === CHAT ROOMS ===
+    match /chatRooms/{roomId} {
+      // Users can read rooms they are part of (client or partner)
+      allow read: if isAuthenticated() &&
+                  (resource.data.clientId == request.auth.uid ||
+                   resource.data.partnerId == request.auth.uid ||
+                   isAdmin());
+
+      // Only authenticated users can create rooms
+      allow create: if isAuthenticated();
+
+      // Only participants can update room (last message, unread count)
+      allow update: if isAuthenticated() &&
+                    (resource.data.clientId == request.auth.uid ||
+                     resource.data.partnerId == request.auth.uid ||
+                     isAdmin());
+
+      // Only admin can delete rooms
+      allow delete: if isAdmin();
+    }
+
+    // === CHAT MESSAGES ===
+    match /chatMessages/{messageId} {
+      // Users can read messages in rooms they are part of
+      allow read: if isAuthenticated();
+
+      // Authenticated users can create messages
+      allow create: if isAuthenticated() &&
+                    request.resource.data.senderId == request.auth.uid;
+
+      // Only message sender can update (e.g., mark as read)
+      allow update: if isAuthenticated();
+
+      // Only admin can delete messages
+      allow delete: if isAdmin();
+    }
+
+    // === BLOG POSTS ===
+    match /blogPosts/{postId} {
+      // Anyone can read published posts
+      allow read: if resource.data.published == true || isAdmin();
+
+      // Only admins can create, update, delete posts
+      allow create, update, delete: if isAdmin();
+    }
+
     // === DEFAULT DENY ===
     match /{document=**} {
       allow read, write: if false;

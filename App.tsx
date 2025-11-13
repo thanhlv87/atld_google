@@ -22,9 +22,12 @@ const RequestsPage = lazy(() => import('./pages/RequestsPage'));
 const DocumentsPage = lazy(() => import('./pages/DocumentsPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const TrainingLandingPage = lazy(() => import('./pages/TrainingLandingPage'));
+const ChatPage = lazy(() => import('./pages/ChatPage'));
+const BlogPage = lazy(() => import('./pages/BlogPage'));
+const BlogDetailPage = lazy(() => import('./pages/BlogDetailPage'));
 const LoginModal = lazy(() => import('./components/LoginModal'));
 
-export type Page = 'home' | 'requests' | 'documents' | 'admin' |
+export type Page = 'home' | 'requests' | 'documents' | 'admin' | 'chat' | 'blog' | 'blog-detail' |
   'training-an-toan-dien' | 'training-an-toan-xay-dung' | 'training-an-toan-hoa-chat' |
   'training-pccc' | 'training-an-toan-buc-xa' | 'training-quan-trac-moi-truong' |
   'training-danh-gia-phan-loai-lao-dong' | 'training-so-cap-cuu';
@@ -39,6 +42,7 @@ const App: React.FC = () => {
   const [trainingRequests, setTrainingRequests] = useState<TrainingRequest[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(true);
   const [page, setPage] = useState<Page>('home');
+  const [blogPostId, setBlogPostId] = useState<string>('');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -92,13 +96,16 @@ const App: React.FC = () => {
     return () => unsubscribe();
   }, []);
   
-  const handleNavigate = (newPage: Page) => {
+  const handleNavigate = (newPage: Page, postId?: string) => {
     // Prevent non-admins from accessing admin page
     if (newPage === 'admin' && !isAdmin) {
       setPage('home');
       return;
     }
     setPage(newPage);
+    if (postId) {
+      setBlogPostId(postId);
+    }
   }
 
   const handleCreateRequestClick = () => {
@@ -145,6 +152,19 @@ const App: React.FC = () => {
         return <DocumentsPage isAdmin={isAdmin} />;
       case 'admin':
         return isAdmin ? <AdminPage /> : <HomePage onNavigate={handleNavigate} />;
+      case 'chat':
+        return (
+          <ChatPage
+            user={user}
+            isAdmin={isAdmin}
+            partnerStatus={partnerStatus}
+            onLoginRequired={() => setLoginModalOpen(true)}
+          />
+        );
+      case 'blog':
+        return <BlogPage onNavigate={handleNavigate} />;
+      case 'blog-detail':
+        return <BlogDetailPage postId={blogPostId} onNavigate={handleNavigate} />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }
