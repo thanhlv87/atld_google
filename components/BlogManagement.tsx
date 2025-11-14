@@ -128,7 +128,9 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
     setUploading(true);
     try {
       const imageUrl = await uploadImage();
-      if (!imageUrl) {
+
+      // Check image: required for new post, optional for editing
+      if (!imageUrl && !editingPost) {
         alert('Vui lòng chọn ảnh bìa');
         setUploading(false);
         return;
@@ -142,7 +144,7 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
         slug,
         excerpt: excerpt.trim(),
         content: content.trim(),
-        coverImage: imageUrl,
+        coverImage: imageUrl || coverImageUrl, // Use new image or keep existing
         category,
         tags: tagsArray,
         author: {
