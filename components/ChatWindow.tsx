@@ -9,11 +9,12 @@ import {
   addDoc,
   updateDoc,
   doc,
+  getDoc,
   serverTimestamp,
   Timestamp,
   type User
 } from '../services/firebaseConfig';
-import { ChatMessage, ChatRoom } from '../types';
+import { ChatMessage, ChatRoom, TrainingRequest } from '../types';
 import LoadingSpinner from './LoadingSpinner';
 
 interface ChatWindowProps {
@@ -28,7 +29,29 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [request, setRequest] = useState<TrainingRequest | null>(null);
+  const [showRequestCard, setShowRequestCard] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Fetch training request
+  useEffect(() => {
+    const fetchRequest = async () => {
+      if (!room.requestId) return;
+
+      try {
+        const requestRef = doc(db, 'trainingRequests', room.requestId);
+        const requestDoc = await getDoc(requestRef);
+
+        if (requestDoc.exists()) {
+          setRequest({ id: requestDoc.id, ...requestDoc.data() } as TrainingRequest);
+        }
+      } catch (error) {
+        console.error('Error fetching request:', error);
+      }
+    };
+
+    fetchRequest();
+  }, [room.requestId]);
 
   useEffect(() => {
     if (!room?.id) return;
@@ -126,13 +149,114 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
     <div className="flex flex-col h-full bg-white rounded-lg shadow-lg">
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-orange-500 text-white px-6 py-4 rounded-t-lg">
-        <h3 className="font-bold text-lg">
-          {userRole === 'partner' ? room.clientName : room.partnerName}
-        </h3>
-        <p className="text-sm text-white/80">
-          Yêu cầu đào tạo #{room.requestId.slice(0, 8)}
-        </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="font-bold text-lg">
+              {userRole === 'partner' ? room.clientName : room.partnerName}
+            </h3>
+            <p className="text-sm text-white/80">
+              Yêu cầu đào tạo #{room.requestId.slice(0, 8)}
+            </p>
+          </div>
+          {request && (
+            <button
+              onClick={() => setShowRequestCard(!showRequestCard)}
+              className="text-white hover:bg-white/20 rounded-full p-2 transition-colors"
+              title={showRequestCard ? 'Ẩn chi tiết yêu cầu' : 'Hiển thị chi tiết yêu cầu'}
+            >
+              <i className={`fas ${showRequestCard ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Request Preview Card */}
+      {request && showRequestCard && (
+        <div className="bg-blue-50 border-b border-blue-200 p-4">
+          <div className="flex justify-between items-start mb-2">
+            <h4 className="font-bold text-gray-800 flex items-center gap-2">
+              <i className="fas fa-clipboard-list text-primary"></i>
+              Chi Tiết Yêu Cầu
+            </h4>
+            <button
+              onClick={() => setShowRequestCard(false)}
+              className="text-gray-500 hover:text-gray-700 transition-colors"
+              title="Đóng"
+            >
+              <i className="fas fa-times"></i>
+            </button>
+          </div>
+
+          <div className="bg-white rounded-lg p-4 space-y-2 text-sm">
+            {/* Training Details */}
+            <div>
+              <span className="font-semibold text-gray-700">Nội dung đào tạo:</span>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {request.trainingDetails.map((detail, idx) => (
+                  <span
+                    key={idx}
+                    className="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-medium"
+                  >
+                    {detail.type} - {detail.group} ({detail.participants} người)
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Location & Time */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <span className="font-semibold text-gray-700">
+                  <i className="fas fa-map-marker-alt text-primary mr-1"></i>
+                  Địa điểm:
+                </span>
+                <p className="text-gray-600">{request.location}</p>
+              </div>
+              <div>
+                <span className="font-semibold text-gray-700">
+                  <i className="fas fa-calendar text-primary mr-1"></i>
+                  Thời điểm:
+                </span>
+                <p className="text-gray-600">{request.preferredTime}</p>
+              </div>
+            </div>
+
+            {/* Duration */}
+            <div>
+              <span className="font-semibold text-gray-700">
+                <i className="fas fa-clock text-primary mr-1"></i>
+                Thời gian:
+              </span>
+              <span className="text-gray-600 ml-1">{request.trainingDuration}</span>
+            </div>
+
+            {/* Description */}
+            {request.description && (
+              <div>
+                <span className="font-semibold text-gray-700">
+                  <i className="fas fa-info-circle text-primary mr-1"></i>
+                  Mô tả:
+                </span>
+                <p className="text-gray-600 mt-1 italic">{request.description}</p>
+              </div>
+            )}
+
+            {/* Contact Info (only for admin/partner) */}
+            {(userRole === 'admin' || userRole === 'partner') && (
+              <div className="pt-2 border-t border-gray-200">
+                <span className="font-semibold text-gray-700">
+                  <i className="fas fa-user text-primary mr-1"></i>
+                  Thông tin liên hệ:
+                </span>
+                <div className="mt-1 text-gray-600">
+                  <p>📧 {request.clientEmail}</p>
+                  <p>📞 {request.clientPhone}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
