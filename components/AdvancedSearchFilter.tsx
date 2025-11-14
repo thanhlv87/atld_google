@@ -106,7 +106,7 @@ const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({ onFilterCha
   };
 
   const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+    const selectedOptions = Array.from(e.target.selectedOptions, (option: HTMLOptionElement) => option.value);
     const newFilters = { ...filters, provinces: selectedOptions };
     setFilters(newFilters);
     onFilterChange(newFilters);
@@ -430,7 +430,7 @@ const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({ onFilterCha
       </div>
 
       {/* Custom Scrollbar Styles */}
-      <style jsx>{`
+      <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }

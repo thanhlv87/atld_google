@@ -1,12 +1,12 @@
 import React from 'react';
-import { firebase } from '../services/firebaseConfig';
+import { type User } from '../services/firebaseConfig';
 import { TrainingRequest } from '../types';
 import TrainingRequestCard from './TrainingRequestCard';
 import { PartnerStatus } from '../App';
 
 interface TrainingRequestListProps {
   requests: TrainingRequest[];
-  user: firebase.User | null;
+  user: User | null;
   loading: boolean;
   onLoginRequired: () => void;
   partnerStatus: PartnerStatus;

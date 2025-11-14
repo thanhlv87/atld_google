@@ -1,5 +1,4 @@
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/firestore';
+import { Timestamp } from './services/firebaseConfig';
 
 // Cấu trúc cho một mục đào tạo chi tiết
 export interface TrainingDetail {
@@ -18,7 +17,7 @@ export interface TrainingRequest {
   preferredTime: string; // Thời điểm huấn luyện dự kiến
   description: string;
   location: string;
-  createdAt: firebase.firestore.Timestamp;
+  createdAt: Timestamp;
   viewedBy: string[]; // Array of user UIDs who have viewed the contact info
   urgent: boolean; // True if the request is urgent
   clientSubscribesToEmails: boolean; // True if client wants to receive email notifications
@@ -35,7 +34,7 @@ export interface PartnerProfile {
     subscribesToEmails: boolean;
     status: 'pending' | 'approved' | 'rejected';
     membership: 'free' | 'premium';
-    createdAt: firebase.firestore.Timestamp;
+    createdAt: Timestamp;
 }
 
 export interface Document {
@@ -44,7 +43,7 @@ export interface Document {
   description: string;
   downloadUrl: string;
   fileName: string;
-  createdAt: firebase.firestore.Timestamp;
+  createdAt: Timestamp;
   viewCount: number;
   downloadCount: number;
 }
@@ -61,8 +60,8 @@ export interface Quote {
   notes: string; // Ghi chú, chi tiết về báo giá
   attachments?: string[]; // URL của các file đính kèm (nếu có)
   status: 'pending' | 'accepted' | 'rejected'; // Trạng thái báo giá
-  createdAt: firebase.firestore.Timestamp;
-  updatedAt?: firebase.firestore.Timestamp;
+  createdAt: Timestamp;
+  updatedAt?: Timestamp;
 }
 
 // Chat System Types
@@ -74,12 +73,12 @@ export interface ChatRoom {
   clientName: string;
   partnerName: string;
   lastMessage: string;
-  lastMessageTime: firebase.firestore.Timestamp;
+  lastMessageTime: Timestamp;
   unreadCount: {
     client: number;
     partner: number;
   };
-  createdAt: firebase.firestore.Timestamp;
+  createdAt: Timestamp;
 }
 
 export interface ChatMessage {
@@ -90,7 +89,7 @@ export interface ChatMessage {
   senderRole: 'client' | 'partner' | 'admin';
   message: string;
   read: boolean;
-  createdAt: firebase.firestore.Timestamp;
+  createdAt: Timestamp;
   // File attachments
   attachment?: {
     url: string;
@@ -117,9 +116,9 @@ export interface BlogPost {
   };
   published: boolean; // True nếu đã publish, false nếu còn draft
   viewCount: number;
-  createdAt: firebase.firestore.Timestamp;
-  updatedAt: firebase.firestore.Timestamp;
-  publishedAt?: firebase.firestore.Timestamp;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  publishedAt?: Timestamp;
 }
 
 // Hằng số cho các nhóm đào tạo trong form

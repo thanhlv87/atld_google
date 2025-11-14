@@ -320,7 +320,6 @@ const BlogDetailPage: React.FC = () => {
                   <BlogCard
                     key={relatedPost.id}
                     post={relatedPost}
-                    onClick={() => navigate(`/blog/${relatedPost.id}`)}
                   />
                 ))}
               </div>

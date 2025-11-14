@@ -83,10 +83,6 @@ const BlogPage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handlePostClick = (postId: string) => {
-    navigate(`/blog/${postId}`);
-  };
-
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-12">
@@ -179,7 +175,6 @@ const BlogPage: React.FC = () => {
                 <BlogCard
                   key={post.id}
                   post={post}
-                  onClick={() => handlePostClick(post.id)}
                 />
               ))}
             </div>

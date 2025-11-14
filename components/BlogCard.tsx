@@ -1,14 +1,14 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { BlogPost } from '../types';
 import { Timestamp } from '../services/firebaseConfig';
 import LazyImage from './LazyImage';
 
 interface BlogCardProps {
   post: BlogPost;
-  onClick: () => void;
 }
 
-const BlogCard: React.FC<BlogCardProps> = ({ post, onClick }) => {
+const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
   const formatDate = (timestamp: Timestamp) => {
     if (!timestamp) return '';
     return timestamp.toDate().toLocaleDateString('vi-VN', {
@@ -19,9 +19,9 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, onClick }) => {
   };
 
   return (
-    <div
-      onClick={onClick}
-      className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group"
+    <Link
+      to={`/blog/${post.id}`}
+      className="block bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group"
     >
       {/* Cover Image - Square Ratio */}
       <div className="relative w-full aspect-square overflow-hidden bg-gray-200">
@@ -83,7 +83,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, onClick }) => {
           </button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

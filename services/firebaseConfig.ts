@@ -39,11 +39,11 @@ import {
 } from 'firebase/auth';
 import {
   getStorage,
-  Storage,
   ref,
   uploadBytes,
   getDownloadURL,
-  deleteObject
+  deleteObject,
+  type FirebaseStorage
 } from 'firebase/storage';
 
 // Firebase configuration
@@ -157,7 +157,7 @@ export {
   type User,
   type Firestore,
   type Auth,
-  type Storage,
+  type FirebaseStorage as Storage,
   type QuerySnapshot,
   type DocumentSnapshot,
   type DocumentReference,

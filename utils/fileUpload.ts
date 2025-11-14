@@ -1,4 +1,4 @@
-import { storage, ref, uploadBytes, getDownloadURL } from '../services/firebaseConfig';
+import { storage, storageRef, uploadBytes, getDownloadURL } from '../services/firebaseConfig';
 
 /**
  * Upload file to Firebase Storage
@@ -15,13 +15,13 @@ export const uploadFile = async (
   const timestamp = Date.now();
   const filename = `${userId}_${timestamp}_${file.name}`;
   const filePath = `${folder}/${filename}`;
-  const storageRef = ref(storage, filePath);
+  const fileRef = storageRef(storage, filePath);
 
   // Upload file
-  await uploadBytes(storageRef, file);
+  await uploadBytes(fileRef, file);
 
   // Get download URL
-  const downloadURL = await getDownloadURL(storageRef);
+  const downloadURL = await getDownloadURL(fileRef);
   return downloadURL;
 };
 
