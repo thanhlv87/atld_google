@@ -146,9 +146,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
   }
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-lg shadow-lg">
+    <div className="flex flex-col h-full bg-white rounded-lg shadow-lg overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-orange-500 text-white px-6 py-4 rounded-t-lg">
+      <div className="flex-shrink-0 bg-gradient-to-r from-primary to-orange-500 text-white px-6 py-4">
         <div className="flex justify-between items-center">
           <div>
             <h3 className="font-bold text-lg">
@@ -172,7 +172,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
 
       {/* Request Preview Card */}
       {request && showRequestCard && (
-        <div className="bg-blue-50 border-b border-blue-200 p-4">
+        <div className="flex-shrink-0 bg-blue-50 border-b border-blue-200 p-4 max-h-[40vh] overflow-y-auto">
           <div className="flex justify-between items-start mb-2">
             <h4 className="font-bold text-gray-800 flex items-center gap-2">
               <i className="fas fa-clipboard-list text-primary"></i>
@@ -259,7 +259,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
       )}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
         {messages.length === 0 ? (
           <div className="text-center text-gray-400 py-12">
             <i className="fas fa-comments text-4xl mb-3"></i>
@@ -303,7 +303,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSendMessage} className="border-t p-4 bg-gray-50 rounded-b-lg">
+      <form onSubmit={handleSendMessage} className="flex-shrink-0 border-t p-4 bg-gray-50">
         <div className="flex gap-2">
           <input
             type="text"

@@ -114,8 +114,8 @@ const ChatPage: React.FC<ChatPageProps> = ({ user, isAdmin, partnerStatus, onLog
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
+    <div className="container mx-auto px-4 py-8 h-full flex flex-col">
+      <div className="mb-6 flex-shrink-0">
         <h1 className="text-3xl font-bold text-gray-800">
           <i className="fas fa-comments text-primary mr-3"></i>
           Tin nhắn
@@ -129,19 +129,21 @@ const ChatPage: React.FC<ChatPageProps> = ({ user, isAdmin, partnerStatus, onLog
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-250px)]">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
         {/* Chat List */}
-        <div className="lg:col-span-1 bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-primary to-orange-500 text-white px-6 py-4">
+        <div className="lg:col-span-1 bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
+          <div className="bg-gradient-to-r from-primary to-orange-500 text-white px-6 py-4 flex-shrink-0">
             <h3 className="font-bold text-lg">Cuộc trò chuyện</h3>
             <p className="text-sm text-white/80">{rooms.length} cuộc trò chuyện</p>
           </div>
-          <ChatList
-            rooms={rooms}
-            selectedRoomId={selectedRoom?.id || null}
-            onSelectRoom={setSelectedRoom}
-            userRole={userRole}
-          />
+          <div className="flex-1 overflow-y-auto">
+            <ChatList
+              rooms={rooms}
+              selectedRoomId={selectedRoom?.id || null}
+              onSelectRoom={setSelectedRoom}
+              userRole={userRole}
+            />
+          </div>
         </div>
 
         {/* Chat Window */}
