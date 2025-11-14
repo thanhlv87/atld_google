@@ -23,12 +23,12 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, onClick }) => {
       onClick={onClick}
       className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group"
     >
-      {/* Cover Image */}
-      <div className="relative h-48 overflow-hidden bg-gray-200">
+      {/* Cover Image - Square Ratio */}
+      <div className="relative w-full aspect-square overflow-hidden bg-gray-200">
         <LazyImage
           src={post.coverImage}
           alt={post.title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
         />
         <div className="absolute top-4 left-4">
           <span className="bg-gradient-to-r from-primary to-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
