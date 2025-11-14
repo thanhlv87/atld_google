@@ -4,6 +4,7 @@ import { TrainingRequest } from '../types';
 import TrainingRequestList from '../components/TrainingRequestList';
 import AdvancedSearchFilter, { FilterState } from '../components/AdvancedSearchFilter';
 import { PartnerStatus } from '../App';
+import { getOrCreateAdminPartnerChatRoom } from '../utils/chatHelpers';
 
 interface RequestsPageProps {
   requests: TrainingRequest[];
@@ -11,9 +12,10 @@ interface RequestsPageProps {
   loading: boolean;
   onLoginRequired: () => void;
   partnerStatus: PartnerStatus;
+  onNavigate?: (page: string) => void;
 }
 
-const RequestsPage: React.FC<RequestsPageProps> = ({ requests, user, loading, onLoginRequired, partnerStatus }) => {
+const RequestsPage: React.FC<RequestsPageProps> = ({ requests, user, loading, onLoginRequired, partnerStatus, onNavigate }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [advancedFilters, setAdvancedFilters] = useState<FilterState>({
@@ -177,6 +179,29 @@ const RequestsPage: React.FC<RequestsPageProps> = ({ requests, user, loading, on
     });
   };
 
+  const handleChatClick = async (request: TrainingRequest) => {
+    if (!user) {
+      onLoginRequired();
+      return;
+    }
+
+    try {
+      // Tạo hoặc lấy phòng chat với admin
+      await getOrCreateAdminPartnerChatRoom(
+        request,
+        user.uid,
+        user.displayName || user.email || 'Partner',
+        user.email || ''
+      );
+
+      // Navigate to chat page
+      onNavigate?.('chat');
+    } catch (error) {
+      console.error('Error creating chat room:', error);
+      alert('Không thể tạo phòng chat. Vui lòng thử lại.');
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 md:p-8">
       <div className="text-center mb-10">
@@ -248,13 +273,14 @@ const RequestsPage: React.FC<RequestsPageProps> = ({ requests, user, loading, on
         </div>
       )}
 
-      <TrainingRequestList 
+      <TrainingRequestList
         requests={filteredAndSortedRequests}
-        user={user} 
+        user={user}
         loading={loading}
         onLoginRequired={onLoginRequired}
         partnerStatus={partnerStatus}
         searchQuery={searchQuery}
+        onChatClick={handleChatClick}
       />
     </div>
   );

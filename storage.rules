@@ -1,7 +1,13 @@
 rules_version = '2';
 
 service firebase.storage {
-  match /b/{bucket}/o {
+match /b/{bucket}/o {
+
+    // Thư mục documents - TẤT CẢ người dùng đã đăng nhập đều có thể upload
+    match /documents/{fileName} {
+      allow read: if true;  // Public read - ai cũng có thể đọc/download
+      allow write: if request.auth != null;  // Chỉ cần đăng nhập là upload được
+    }
 
     // === HÀM HỖ TRỢ ===
     function isAdmin() {
@@ -9,12 +15,13 @@ service firebase.storage {
              firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
     }
 
-    function isAuthenticated() {
+			function isAuthenticated() {
       return request.auth != null;
     }
 
     // === BLOG COVER IMAGES ===
     match /blog-covers/{imageId} {
+
       // Anyone can read blog cover images (public)
       allow read: if true;
 
@@ -24,15 +31,18 @@ service firebase.storage {
 
     // === DOCUMENT UPLOADS ===
     match /documents/{documentId} {
-      // Anyone can read/download documents
+
+    // Anyone can read/download documents
       allow read: if true;
 
-      // Only admins can upload/update/delete documents
-      allow create, update, delete: if isAdmin();
+    // Only admins can upload/update/delete documents
+     allow create, update, delete: if isAdmin();
+
     }
 
     // === QUOTE ATTACHMENTS ===
     match /quote-attachments/{attachmentId} {
+
       // Only authenticated partners can upload attachments
       allow read: if isAuthenticated();
       allow create: if isAuthenticated();
@@ -43,5 +53,7 @@ service firebase.storage {
     match /{allPaths=**} {
       allow read, write: if false;
     }
+
   }
+
 }

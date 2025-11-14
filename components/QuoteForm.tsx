@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { db, sendEmail, doc, getDoc, collection, addDoc, serverTimestamp } from '../services/firebaseConfig';
 import { TrainingRequest } from '../types';
 import { generateQuoteNotificationEmail } from '../utils/emailTemplates';
+import { getOrCreateAdminPartnerChatRoom, sendQuoteNotificationToAdminChat } from '../utils/chatHelpers';
 
 interface QuoteFormProps {
   request: TrainingRequest;
@@ -87,6 +88,26 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
       const quotesCollection = collection(db, 'quotes');
       const quoteRef = await addDoc(quotesCollection, quoteData);
       console.log('✅ Báo giá đã được tạo với ID:', quoteRef.id);
+
+      // Tạo phòng chat với admin (nếu chưa có) và gửi thông báo
+      try {
+        const chatRoomId = await getOrCreateAdminPartnerChatRoom(
+          request,
+          partnerUid,
+          partnerName,
+          partnerEmail
+        );
+        await sendQuoteNotificationToAdminChat(
+          chatRoomId,
+          partnerUid,
+          partnerName,
+          priceNumber
+        );
+        console.log('✅ Đã tạo/cập nhật phòng chat với admin:', chatRoomId);
+      } catch (chatError) {
+        console.error('⚠️ Không thể tạo phòng chat:', chatError);
+        // Không fail toàn bộ operation nếu chat bị lỗi
+      }
 
       // Send email notification to client
       try {

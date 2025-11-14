@@ -11,9 +11,10 @@ interface TrainingRequestListProps {
   onLoginRequired: () => void;
   partnerStatus: PartnerStatus;
   searchQuery?: string;
+  onChatClick?: (request: TrainingRequest) => void;
 }
 
-const TrainingRequestList: React.FC<TrainingRequestListProps> = ({ requests, user, loading, onLoginRequired, partnerStatus, searchQuery }) => {
+const TrainingRequestList: React.FC<TrainingRequestListProps> = ({ requests, user, loading, onLoginRequired, partnerStatus, searchQuery, onChatClick }) => {
   const hasActiveSearch = searchQuery && searchQuery.trim() !== '';
 
   return (
@@ -31,6 +32,7 @@ const TrainingRequestList: React.FC<TrainingRequestListProps> = ({ requests, use
               user={user}
               onLoginRequired={onLoginRequired}
               partnerStatus={partnerStatus}
+              onChatClick={onChatClick}
             />
           ))}
         </div>

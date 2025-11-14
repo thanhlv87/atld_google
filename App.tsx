@@ -146,6 +146,7 @@ const App: React.FC = () => {
             loading={loadingRequests || loadingAuth}
             onLoginRequired={() => setLoginModalOpen(true)}
             partnerStatus={partnerStatus}
+            onNavigate={handleNavigate}
           />
         );
       case 'documents':

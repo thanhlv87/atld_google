@@ -14,6 +14,7 @@ interface TrainingRequestCardProps {
   onDeleteRequest?: (id: string) => void;
   onShowViewers?: (request: TrainingRequest) => void;
   partnerStatus?: PartnerStatus;
+  onChatClick?: (request: TrainingRequest) => void;
 }
 
 const InfoIcon: React.FC<{className?: string}> = ({className}) => (
@@ -22,7 +23,7 @@ const InfoIcon: React.FC<{className?: string}> = ({className}) => (
     </svg>
 );
 
-const TrainingRequestCard: React.FC<TrainingRequestCardProps> = ({ request, user, onLoginRequired, isAdminView = false, onDeleteRequest, onShowViewers, partnerStatus }) => {
+const TrainingRequestCard: React.FC<TrainingRequestCardProps> = ({ request, user, onLoginRequired, isAdminView = false, onDeleteRequest, onShowViewers, partnerStatus, onChatClick }) => {
   const [showContact, setShowContact] = useState(isAdminView);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -189,13 +190,22 @@ const TrainingRequestCard: React.FC<TrainingRequestCardProps> = ({ request, user
                 <p><strong>SĐT:</strong> <a href={`tel:${request.clientPhone}`} className="text-accent hover:underline">{request.clientPhone}</a></p>
             </div>
             {!isAdminView && user && (
-              <button
-                onClick={() => setShowQuoteForm(true)}
-                className="w-full mt-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold py-2.5 rounded-lg hover:opacity-90 transition-all text-base flex items-center justify-center"
-              >
-                <i className="fas fa-paper-plane mr-2"></i>
-                Gửi Báo Giá
-              </button>
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={() => setShowQuoteForm(true)}
+                  className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold py-2.5 rounded-lg hover:opacity-90 transition-all text-base flex items-center justify-center"
+                >
+                  <i className="fas fa-paper-plane mr-2"></i>
+                  Gửi Báo Giá
+                </button>
+                <button
+                  onClick={() => onChatClick?.(request)}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-2.5 rounded-lg hover:opacity-90 transition-all text-base flex items-center justify-center"
+                >
+                  <i className="fas fa-comments mr-2"></i>
+                  Chat với Admin
+                </button>
+              </div>
             )}
           </>
         ) : (
