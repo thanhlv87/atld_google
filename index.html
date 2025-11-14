@@ -5,7 +5,16 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/thanhlv87/pic/refs/heads/main/connected.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#FF6B35" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="SafetyConnect" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/thanhlv87/pic/refs/heads/main/connected.png" />
+
     <!-- SEO Meta Tags -->
     <title>SafetyConnect - Nền Tảng Huấn Luyện An Toàn Lao Động</title>
     <meta name="description" content="Một ứng dụng web kết nối khách hàng có nhu cầu huấn luyện an toàn lao động với các công ty đào tạo chuyên nghiệp. Khách hàng có thể đăng yêu cầu, và các công ty đào tạo đã xác thực có thể xem thông tin liên hệ để báo giá." />
@@ -97,5 +106,20 @@
   <body class="bg-neutral-light">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
   </body>
 </html>

@@ -45,6 +45,47 @@ const BlogDetailPage: React.FC<BlogDetailPageProps> = ({ postId, onNavigate }) =
         const postData = { id: postDoc.id, ...postDoc.data() } as BlogPost;
         setPost(postData);
 
+        // Update document title and meta tags
+        document.title = `${postData.title} | SafetyConnect`;
+
+        // Update meta description
+        const metaDescription = document.querySelector('meta[name="description"]');
+        if (metaDescription) {
+          metaDescription.setAttribute('content', postData.excerpt);
+        }
+
+        // Update Open Graph tags
+        const ogTitle = document.querySelector('meta[property="og:title"]');
+        if (ogTitle) {
+          ogTitle.setAttribute('content', `${postData.title} | SafetyConnect`);
+        }
+
+        const ogDescription = document.querySelector('meta[property="og:description"]');
+        if (ogDescription) {
+          ogDescription.setAttribute('content', postData.excerpt);
+        }
+
+        const ogImage = document.querySelector('meta[property="og:image"]');
+        if (ogImage && postData.coverImage) {
+          ogImage.setAttribute('content', postData.coverImage);
+        }
+
+        // Update Twitter Card tags
+        const twitterTitle = document.querySelector('meta[property="twitter:title"]');
+        if (twitterTitle) {
+          twitterTitle.setAttribute('content', `${postData.title} | SafetyConnect`);
+        }
+
+        const twitterDescription = document.querySelector('meta[property="twitter:description"]');
+        if (twitterDescription) {
+          twitterDescription.setAttribute('content', postData.excerpt);
+        }
+
+        const twitterImage = document.querySelector('meta[property="twitter:image"]');
+        if (twitterImage && postData.coverImage) {
+          twitterImage.setAttribute('content', postData.coverImage);
+        }
+
         // Increment view count (silently fail if not authorized)
         try {
           await updateDoc(postRef, {
@@ -187,6 +228,49 @@ const BlogDetailPage: React.FC<BlogDetailPageProps> = ({ postId, onNavigate }) =
               className="prose prose-lg max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-a:text-primary prose-strong:text-gray-800 prose-ul:text-gray-700 prose-ol:text-gray-700"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
+          </div>
+
+          {/* Social Sharing */}
+          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+              <i className="fas fa-share-alt text-primary"></i>
+              Chia sẻ bài viết
+            </h3>
+            <div className="flex flex-wrap gap-3">
+              {/* Facebook Share */}
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition-colors"
+              >
+                <i className="fab fa-facebook-f"></i>
+                Facebook
+              </a>
+
+              {/* Zalo Share */}
+              <a
+                href={`https://chat.zalo.me/?url=${encodeURIComponent(window.location.href)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors"
+              >
+                <i className="fas fa-comment-dots"></i>
+                Zalo
+              </a>
+
+              {/* Copy Link */}
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  alert('Đã sao chép link!');
+                }}
+                className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-full hover:bg-gray-700 transition-colors"
+              >
+                <i className="fas fa-link"></i>
+                Sao chép link
+              </button>
+            </div>
           </div>
 
           {/* Tags */}
