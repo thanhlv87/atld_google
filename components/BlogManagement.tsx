@@ -39,7 +39,7 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
   const [tags, setTags] = useState('');
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
   const [coverImageUrl, setCoverImageUrl] = useState('');
-  const [published, setPublished] = useState(false);
+  const [published, setPublished] = useState(true);
 
   const categories = [
     'An toàn lao động',
