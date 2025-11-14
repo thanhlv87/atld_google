@@ -1,26 +1,32 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { auth, signOut, type User } from '../services/firebaseConfig';
-import { Page, PartnerStatus } from '../App';
+import { PartnerStatus } from '../App';
 
 interface HeaderProps {
   user: User | null;
   isAdmin: boolean;
   onLoginClick: () => void;
-  currentPage: Page;
-  onNavigate: (page: Page) => void;
+  currentPage: string;
   partnerStatus: PartnerStatus;
   unreadCount?: number;
 }
 
 const NavLink: React.FC<{
-  page: Page;
-  currentPage: Page;
-  onNavigate: (page: Page) => void;
+  to: string;
+  currentPage: string;
   children: React.ReactNode;
   mobile?: boolean;
   onClick?: () => void;
-}> = ({ page, currentPage, onNavigate, children, mobile = false, onClick }) => {
-  const isActive = currentPage === page;
+}> = ({ to, currentPage, children, mobile = false, onClick }) => {
+  // Determine if this link is active
+  const getPageFromPath = (path: string): string => {
+    if (path === '/') return 'home';
+    return path.slice(1); // remove leading slash
+  };
+
+  const isActive = currentPage === getPageFromPath(to);
+
   const classes = mobile
     ? `block w-full text-left px-4 py-3 text-base font-medium transition-colors duration-300 ${
         isActive
@@ -33,24 +39,21 @@ const NavLink: React.FC<{
           : 'text-neutral-dark hover:text-primary'
       }`;
 
-  const handleClick = () => {
-    onNavigate(page);
-    onClick?.();
-  };
-
   return (
-    <a onClick={handleClick} className={classes}>
+    <Link to={to} onClick={onClick} className={classes}>
       {children}
-    </a>
+    </Link>
   );
 };
 
-const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPage, onNavigate, partnerStatus, unreadCount = 0 }) => {
+const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPage, partnerStatus, unreadCount = 0 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      onNavigate('home'); // Redirect to home on logout
+      navigate('/'); // Redirect to home on logout
     } catch (error) {
       console.error("Error signing out: ", error);
       alert("Đã xảy ra lỗi khi đăng xuất.");
@@ -65,7 +68,7 @@ const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPag
     if (currentPage === 'home') {
         scrollToForm();
     } else {
-        onNavigate('home');
+        navigate('/');
         // Wait for the home page to render before scrolling
         setTimeout(scrollToForm, 100);
     }
@@ -77,22 +80,22 @@ const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPag
     <>
       <header className="bg-white shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div
-            onClick={() => onNavigate('home')}
+          <Link
+            to="/"
             className="text-2xl font-bold text-primary cursor-pointer"
           >
             SafetyConnect
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-4">
-            <NavLink page="home" currentPage={currentPage} onNavigate={onNavigate}>Trang Chủ</NavLink>
-            <NavLink page="requests" currentPage={currentPage} onNavigate={onNavigate}>Danh Sách Yêu Cầu</NavLink>
-            <NavLink page="blog" currentPage={currentPage} onNavigate={onNavigate}>
+            <NavLink to="/" currentPage={currentPage}>Trang Chủ</NavLink>
+            <NavLink to="/requests" currentPage={currentPage}>Danh Sách Yêu Cầu</NavLink>
+            <NavLink to="/blog" currentPage={currentPage}>
               <i className="fas fa-newspaper mr-1"></i>Blog
             </NavLink>
             {user && (
-              <NavLink page="chat" currentPage={currentPage} onNavigate={onNavigate}>
+              <NavLink to="/chat" currentPage={currentPage}>
                 <span className="relative inline-flex items-center">
                   <i className="fas fa-comments mr-1"></i>Tin nhắn
                   {unreadCount > 0 && (
@@ -103,9 +106,9 @@ const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPag
                 </span>
               </NavLink>
             )}
-            <NavLink page="documents" currentPage={currentPage} onNavigate={onNavigate}>Tài Liệu</NavLink>
+            <NavLink to="/documents" currentPage={currentPage}>Tài Liệu</NavLink>
             {isAdmin && (
-              <NavLink page="admin" currentPage={currentPage} onNavigate={onNavigate}>
+              <NavLink to="/admin" currentPage={currentPage}>
                   <span className="font-bold text-red-600">
                       <i className="fas fa-user-shield mr-1"></i> Quản Trị
                   </span>
@@ -217,17 +220,17 @@ const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPag
 
           {/* Navigation Links */}
           <nav className="flex-1 py-4 overflow-y-auto">
-            <NavLink page="home" currentPage={currentPage} onNavigate={onNavigate} mobile onClick={closeMobileMenu}>
+            <NavLink to="/" currentPage={currentPage} mobile onClick={closeMobileMenu}>
               <i className="fas fa-home mr-3"></i>Trang Chủ
             </NavLink>
-            <NavLink page="requests" currentPage={currentPage} onNavigate={onNavigate} mobile onClick={closeMobileMenu}>
+            <NavLink to="/requests" currentPage={currentPage} mobile onClick={closeMobileMenu}>
               <i className="fas fa-list mr-3"></i>Danh Sách Yêu Cầu
             </NavLink>
-            <NavLink page="blog" currentPage={currentPage} onNavigate={onNavigate} mobile onClick={closeMobileMenu}>
+            <NavLink to="/blog" currentPage={currentPage} mobile onClick={closeMobileMenu}>
               <i className="fas fa-newspaper mr-3"></i>Blog
             </NavLink>
             {user && (
-              <NavLink page="chat" currentPage={currentPage} onNavigate={onNavigate} mobile onClick={closeMobileMenu}>
+              <NavLink to="/chat" currentPage={currentPage} mobile onClick={closeMobileMenu}>
                 <span className="relative inline-flex items-center w-full">
                   <i className="fas fa-comments mr-3"></i>Tin nhắn
                   {unreadCount > 0 && (
@@ -238,11 +241,11 @@ const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPag
                 </span>
               </NavLink>
             )}
-            <NavLink page="documents" currentPage={currentPage} onNavigate={onNavigate} mobile onClick={closeMobileMenu}>
+            <NavLink to="/documents" currentPage={currentPage} mobile onClick={closeMobileMenu}>
               <i className="fas fa-file-alt mr-3"></i>Tài Liệu
             </NavLink>
             {isAdmin && (
-              <NavLink page="admin" currentPage={currentPage} onNavigate={onNavigate} mobile onClick={closeMobileMenu}>
+              <NavLink to="/admin" currentPage={currentPage} mobile onClick={closeMobileMenu}>
                 <i className="fas fa-user-shield mr-3 text-red-600"></i>
                 <span className="font-bold text-red-600">Quản Trị</span>
               </NavLink>

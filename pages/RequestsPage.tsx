@@ -1,21 +1,14 @@
-import React, { useState, useMemo } from 'react';
-import { type User } from '../services/firebaseConfig';
+import React, { useState, useMemo, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TrainingRequest } from '../types';
 import TrainingRequestList from '../components/TrainingRequestList';
 import AdvancedSearchFilter, { FilterState } from '../components/AdvancedSearchFilter';
-import { PartnerStatus } from '../App';
+import { AppContext } from '../App';
 import { getOrCreateAdminPartnerChatRoom } from '../utils/chatHelpers';
 
-interface RequestsPageProps {
-  requests: TrainingRequest[];
-  user: User | null;
-  loading: boolean;
-  onLoginRequired: () => void;
-  partnerStatus: PartnerStatus;
-  onNavigate?: (page: string) => void;
-}
-
-const RequestsPage: React.FC<RequestsPageProps> = ({ requests, user, loading, onLoginRequired, partnerStatus, onNavigate }) => {
+const RequestsPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { user, partnerStatus, trainingRequests: requests, loadingRequests: loading, onLoginRequired } = useContext(AppContext);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [advancedFilters, setAdvancedFilters] = useState<FilterState>({
@@ -195,7 +188,7 @@ const RequestsPage: React.FC<RequestsPageProps> = ({ requests, user, loading, on
       );
 
       // Navigate to chat page
-      onNavigate?.('chat');
+      navigate('/chat');
     } catch (error) {
       console.error('Error creating chat room:', error);
       alert('Không thể tạo phòng chat. Vui lòng thử lại.');

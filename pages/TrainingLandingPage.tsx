@@ -1,11 +1,7 @@
 import React, { useEffect } from 'react';
-import { Page } from '../App';
+import { useNavigate, useParams } from 'react-router-dom';
 
-interface TrainingLandingPageProps {
-  trainingType: string;
-  onNavigate: (page: Page) => void;
-  onCreateRequestClick: () => void;
-}
+export type TrainingTypeKey = 'an-toan-dien' | 'an-toan-xay-dung' | 'an-toan-hoa-chat' | 'pccc' | 'an-toan-buc-xa' | 'quan-trac-moi-truong' | 'danh-gia-phan-loai-lao-dong' | 'so-cap-cuu';
 
 // Dữ liệu chi tiết cho từng loại đào tạo
 const trainingData: Record<string, {
@@ -364,14 +360,16 @@ const trainingData: Record<string, {
   }
 };
 
-const TrainingLandingPage: React.FC<TrainingLandingPageProps> = ({
-  trainingType,
-  onNavigate,
-  onCreateRequestClick
-}) => {
+const TrainingLandingPage: React.FC = () => {
+  const navigate = useNavigate();
+  const params = useParams<{ type: string }>();
+  const trainingType = (params.type || '') as TrainingTypeKey;
+
   const data = trainingData[trainingType];
 
   useEffect(() => {
+    if (!data) return;
+
     // Update page title and meta description for SEO
     document.title = `${data.title} - SafetyConnect`;
 
@@ -393,7 +391,7 @@ const TrainingLandingPage: React.FC<TrainingLandingPageProps> = ({
     return (
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-red-600">Không tìm thấy trang</h1>
-        <button onClick={() => onNavigate('home')} className="mt-4 text-primary hover:underline">
+        <button onClick={() => navigate('/')} className="mt-4 text-primary hover:underline">
           ← Quay về trang chủ
         </button>
       </div>
@@ -411,7 +409,7 @@ const TrainingLandingPage: React.FC<TrainingLandingPageProps> = ({
         </div>
         <div className="container mx-auto px-4 relative z-10">
           <button
-            onClick={() => onNavigate('home')}
+            onClick={() => navigate('/')}
             className="mb-4 text-white hover:text-gray-200 transition-colors flex items-center"
           >
             <i className="fas fa-arrow-left mr-2"></i>
@@ -426,14 +424,14 @@ const TrainingLandingPage: React.FC<TrainingLandingPageProps> = ({
           </div>
           <div className="flex flex-wrap gap-4 mt-8">
             <button
-              onClick={onCreateRequestClick}
+              onClick={() => navigate('/requests')}
               className="bg-white text-primary px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition-all shadow-lg transform hover:scale-105"
             >
               <i className="fas fa-paper-plane mr-2"></i>
               Tạo Yêu Cầu Ngay
             </button>
             <button
-              onClick={() => onNavigate('requests')}
+              onClick={() => navigate('/requests')}
               className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-bold hover:bg-white hover:text-primary transition-all"
             >
               <i className="fas fa-list mr-2"></i>
@@ -545,14 +543,14 @@ const TrainingLandingPage: React.FC<TrainingLandingPageProps> = ({
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <button
-              onClick={onCreateRequestClick}
+              onClick={() => navigate('/requests')}
               className="bg-white text-primary px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition-all shadow-lg text-lg transform hover:scale-105"
             >
               <i className="fas fa-rocket mr-2"></i>
               Tạo Yêu Cầu Miễn Phí
             </button>
             <button
-              onClick={() => onNavigate('requests')}
+              onClick={() => navigate('/requests')}
               className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-white hover:text-primary transition-all text-lg"
             >
               <i className="fas fa-search mr-2"></i>

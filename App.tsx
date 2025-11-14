@@ -1,4 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import {
   auth,
   db,
@@ -17,22 +18,30 @@ import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
 import { useUnreadMessages } from './hooks/useUnreadMessages';
 
-// Lazy load pages for code splitting - pages are loaded only when needed
-const HomePage = lazy(() => import('./pages/HomePage'));
-const RequestsPage = lazy(() => import('./pages/RequestsPage'));
-const DocumentsPage = lazy(() => import('./pages/DocumentsPage'));
-const AdminPage = lazy(() => import('./pages/AdminPage'));
-const TrainingLandingPage = lazy(() => import('./pages/TrainingLandingPage'));
-const ChatPage = lazy(() => import('./pages/ChatPage'));
-const BlogPage = lazy(() => import('./pages/BlogPage'));
-const BlogDetailPage = lazy(() => import('./pages/BlogDetailPage'));
 const LoginModal = lazy(() => import('./components/LoginModal'));
 
-export type Page = 'home' | 'requests' | 'documents' | 'admin' | 'chat' | 'blog' | 'blog-detail' |
-  'training-an-toan-dien' | 'training-an-toan-xay-dung' | 'training-an-toan-hoa-chat' |
-  'training-pccc' | 'training-an-toan-buc-xa' | 'training-quan-trac-moi-truong' |
-  'training-danh-gia-phan-loai-lao-dong' | 'training-so-cap-cuu';
 export type PartnerStatus = 'pending' | 'approved' | 'rejected' | null;
+
+// Create a context to share auth and app state
+export const AppContext = React.createContext<{
+  user: User | null;
+  isAdmin: boolean;
+  partnerStatus: PartnerStatus;
+  trainingRequests: TrainingRequest[];
+  loadingAuth: boolean;
+  loadingRequests: boolean;
+  unreadCount: number;
+  onLoginRequired: () => void;
+}>({
+  user: null,
+  isAdmin: false,
+  partnerStatus: null,
+  trainingRequests: [],
+  loadingAuth: true,
+  loadingRequests: true,
+  unreadCount: 0,
+  onLoginRequired: () => {}
+});
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -42,8 +51,7 @@ const App: React.FC = () => {
   const [isLoginModalOpen, setLoginModalOpen] = useState(false);
   const [trainingRequests, setTrainingRequests] = useState<TrainingRequest[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(true);
-  const [page, setPage] = useState<Page>('home');
-  const [blogPostId, setBlogPostId] = useState<string>('');
+  const location = useLocation();
 
   // Get unread messages count
   const unreadCount = useUnreadMessages(user, isAdmin, partnerStatus);
@@ -60,7 +68,6 @@ const App: React.FC = () => {
         const adminDoc = await getDoc(adminDocRef);
         if (adminDoc.exists()) {
           setIsAdmin(true);
-          setPage('admin'); // Auto-navigate to admin page on login
         } else {
           // If not admin, check for partner status
           const partnerDocRef = doc(db, 'partners', currentUser.uid);
@@ -99,105 +106,57 @@ const App: React.FC = () => {
 
     return () => unsubscribe();
   }, []);
-  
-  const handleNavigate = (newPage: Page, postId?: string) => {
-    // Prevent non-admins from accessing admin page
-    if (newPage === 'admin' && !isAdmin) {
-      setPage('home');
-      return;
-    }
-    setPage(newPage);
-    if (postId) {
-      setBlogPostId(postId);
-    }
-  }
 
-  const handleCreateRequestClick = () => {
-    const scrollToForm = () => {
-      document.getElementById('create-request-form')?.scrollIntoView({ behavior: 'smooth' });
-    };
-
-    if (page === 'home') {
-      scrollToForm();
-    } else {
-      setPage('home');
-      // Wait for the home page to render before scrolling
-      setTimeout(scrollToForm, 100);
-    }
+  // Get current page from location
+  const getCurrentPage = (): string => {
+    const pathname = location.pathname;
+    if (pathname === '/') return 'home';
+    if (pathname.startsWith('/blog/')) return 'blog-detail';
+    if (pathname.startsWith('/blog')) return 'blog';
+    if (pathname.startsWith('/requests')) return 'requests';
+    if (pathname.startsWith('/documents')) return 'documents';
+    if (pathname.startsWith('/chat')) return 'chat';
+    if (pathname.startsWith('/admin')) return 'admin';
+    if (pathname.startsWith('/training-')) return pathname.slice(1);
+    return 'home';
   };
 
-  const renderPage = () => {
-    // Check if it's a training landing page
-    if (page.startsWith('training-')) {
-      const trainingType = page.replace('training-', '');
-      return (
-        <TrainingLandingPage
-          trainingType={trainingType}
-          onNavigate={handleNavigate}
-          onCreateRequestClick={handleCreateRequestClick}
-        />
-      );
-    }
-
-    switch (page) {
-      case 'home':
-        return <HomePage onNavigate={handleNavigate} />;
-      case 'requests':
-        return (
-          <RequestsPage
-            requests={trainingRequests}
-            user={user}
-            loading={loadingRequests || loadingAuth}
-            onLoginRequired={() => setLoginModalOpen(true)}
-            partnerStatus={partnerStatus}
-            onNavigate={handleNavigate}
-          />
-        );
-      case 'documents':
-        return <DocumentsPage isAdmin={isAdmin} />;
-      case 'admin':
-        return isAdmin ? <AdminPage /> : <HomePage onNavigate={handleNavigate} />;
-      case 'chat':
-        return (
-          <ChatPage
-            user={user}
-            isAdmin={isAdmin}
-            partnerStatus={partnerStatus}
-            onLoginRequired={() => setLoginModalOpen(true)}
-          />
-        );
-      case 'blog':
-        return <BlogPage onNavigate={handleNavigate} />;
-      case 'blog-detail':
-        return <BlogDetailPage postId={blogPostId} onNavigate={handleNavigate} />;
-      default:
-        return <HomePage onNavigate={handleNavigate} />;
-    }
+  // Context value for child pages
+  const contextValue = {
+    user,
+    isAdmin,
+    partnerStatus,
+    trainingRequests,
+    loadingAuth,
+    loadingRequests,
+    unreadCount,
+    onLoginRequired: () => setLoginModalOpen(true)
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans">
-      <Header
-        user={user}
-        isAdmin={isAdmin}
-        onLoginClick={() => setLoginModalOpen(true)}
-        currentPage={page}
-        onNavigate={handleNavigate}
-        partnerStatus={partnerStatus}
-        unreadCount={unreadCount}
-      />
-      <main className="flex-grow">
-        <Suspense fallback={<LoadingSpinner size="fullscreen" message="Đang tải..." />}>
-          {renderPage()}
-        </Suspense>
-      </main>
-      <Footer />
-      {isLoginModalOpen && (
-        <Suspense fallback={null}>
-          <LoginModal onClose={() => setLoginModalOpen(false)} />
-        </Suspense>
-      )}
-    </div>
+    <AppContext.Provider value={contextValue}>
+      <div className="min-h-screen flex flex-col font-sans">
+        <Header
+          user={user}
+          isAdmin={isAdmin}
+          onLoginClick={() => setLoginModalOpen(true)}
+          currentPage={getCurrentPage()}
+          partnerStatus={partnerStatus}
+          unreadCount={unreadCount}
+        />
+        <main className="flex-grow">
+          <Suspense fallback={<LoadingSpinner size="fullscreen" message="Đang tải..." />}>
+            <Outlet />
+          </Suspense>
+        </main>
+        <Footer />
+        {isLoginModalOpen && (
+          <Suspense fallback={null}>
+            <LoginModal onClose={() => setLoginModalOpen(false)} />
+          </Suspense>
+        )}
+      </div>
+    </AppContext.Provider>
   );
 };
 

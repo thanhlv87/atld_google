@@ -1,26 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   db,
   collection,
   query,
   where,
   orderBy,
-  onSnapshot,
-  type User
+  onSnapshot
 } from '../services/firebaseConfig';
 import { ChatRoom } from '../types';
 import ChatList from '../components/ChatList';
 import ChatWindow from '../components/ChatWindow';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { AppContext } from '../App';
 
-interface ChatPageProps {
-  user: User | null;
-  isAdmin: boolean;
-  partnerStatus: 'pending' | 'approved' | 'rejected' | null;
-  onLoginRequired: () => void;
-}
-
-const ChatPage: React.FC<ChatPageProps> = ({ user, isAdmin, partnerStatus, onLoginRequired }) => {
+const ChatPage: React.FC = () => {
+  const { user, isAdmin, partnerStatus, onLoginRequired } = useContext(AppContext);
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<ChatRoom | null>(null);
   const [loading, setLoading] = useState(true);

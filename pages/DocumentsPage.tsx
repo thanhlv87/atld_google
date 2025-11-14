@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   db,
   storage,
@@ -18,10 +18,7 @@ import {
   deleteObject
 } from '../services/firebaseConfig';
 import { Document } from '../types';
-
-interface DocumentsPageProps {
-  isAdmin: boolean;
-}
+import { AppContext } from '../App';
 
 const DocumentUploadForm: React.FC<{ onUploadSuccess: () => void }> = ({ onUploadSuccess }) => {
     const [title, setTitle] = useState('');
@@ -200,7 +197,8 @@ const DocumentItem: React.FC<{ doc: Document; isAdmin: boolean; onDelete: (id: s
 };
 
 
-const DocumentsPage: React.FC<DocumentsPageProps> = ({ isAdmin }) => {
+const DocumentsPage: React.FC = () => {
+  const { isAdmin } = useContext(AppContext);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState('');

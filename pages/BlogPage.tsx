@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   db,
   collection,
@@ -12,15 +13,11 @@ import {
 import { BlogPost } from '../types';
 import BlogCard from '../components/BlogCard';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { Page } from '../App';
-
-interface BlogPageProps {
-  onNavigate: (page: Page, postId?: string) => void;
-}
 
 const POSTS_PER_PAGE = 10;
 
-const BlogPage: React.FC<BlogPageProps> = ({ onNavigate }) => {
+const BlogPage: React.FC = () => {
+  const navigate = useNavigate();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,7 +84,7 @@ const BlogPage: React.FC<BlogPageProps> = ({ onNavigate }) => {
   };
 
   const handlePostClick = (postId: string) => {
-    onNavigate('blog-detail' as Page, postId);
+    navigate(`/blog/${postId}`);
   };
 
   if (loading) {

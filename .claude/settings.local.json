@@ -5,7 +5,8 @@
       "Bash(git commit -m \"$(cat <<''EOF''\nfeat: Change blog card cover image to square aspect ratio\n\n- Update BlogCard component to use aspect-square for 1:1 ratio\n- Change from fixed height (h-48) to responsive square ratio\n- Add absolute positioning to LazyImage for proper fill\n- Improve visual consistency across all blog cards\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git push)",
       "Bash(npm run dev:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

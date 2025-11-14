@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   db,
   doc,
@@ -15,15 +16,29 @@ import {
 import { BlogPost } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import BlogCard from '../components/BlogCard';
-import { Page } from '../App';
 import LazyImage from '../components/LazyImage';
 
-interface BlogDetailPageProps {
-  postId: string;
-  onNavigate: (page: Page, postId?: string) => void;
-}
+const BlogDetailPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { postId } = useParams<{ postId: string }>();
 
-const BlogDetailPage: React.FC<BlogDetailPageProps> = ({ postId, onNavigate }) => {
+  if (!postId) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-2xl mx-auto text-center bg-white rounded-lg shadow-lg p-12">
+          <i className="fas fa-exclamation-triangle text-5xl text-red-500 mb-4"></i>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Lỗi</h2>
+          <p className="text-gray-600 mb-6">Không tìm thấy bài viết</p>
+          <button
+            onClick={() => navigate('/blog')}
+            className="bg-gradient-to-r from-primary to-orange-500 text-white px-6 py-3 rounded-full hover:shadow-lg transition-all"
+          >
+            Quay lại Blog
+          </button>
+        </div>
+      </div>
+    );
+  }
   const [post, setPost] = useState<BlogPost | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -149,7 +164,7 @@ const BlogDetailPage: React.FC<BlogDetailPageProps> = ({ postId, onNavigate }) =
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Lỗi</h2>
           <p className="text-gray-600 mb-6">{error}</p>
           <button
-            onClick={() => onNavigate('blog' as Page)}
+            onClick={() => navigate('/blog')}
             className="bg-gradient-to-r from-primary to-orange-500 text-white px-6 py-3 rounded-full hover:shadow-lg transition-all"
           >
             Quay lại Blog
@@ -165,7 +180,7 @@ const BlogDetailPage: React.FC<BlogDetailPageProps> = ({ postId, onNavigate }) =
       <div className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <button
-            onClick={() => onNavigate('blog' as Page)}
+            onClick={() => navigate('/blog')}
             className="text-primary hover:text-orange-500 font-semibold flex items-center gap-2 transition-colors"
           >
             <i className="fas fa-arrow-left"></i>
@@ -305,7 +320,7 @@ const BlogDetailPage: React.FC<BlogDetailPageProps> = ({ postId, onNavigate }) =
                   <BlogCard
                     key={relatedPost.id}
                     post={relatedPost}
-                    onClick={() => onNavigate('blog-detail' as Page, relatedPost.id)}
+                    onClick={() => navigate(`/blog/${relatedPost.id}`)}
                   />
                 ))}
               </div>

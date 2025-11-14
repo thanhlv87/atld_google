@@ -1,10 +1,6 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import TrainingRequestForm from '../components/TrainingRequestForm';
-import { Page } from '../App';
-
-interface HomePageProps {
-  onNavigate: (page: Page) => void;
-}
 
 const StatCard: React.FC<{ value: string; label: string; icon: string; gradient: string }> = ({ value, label, icon, gradient }) => (
   <div className={`relative overflow-hidden bg-gradient-to-br ${gradient} rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group`}>
@@ -63,7 +59,9 @@ const CourseCard: React.FC<{ icon: string; title: string; onClick?: () => void; 
 );
 
 
-const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
+const HomePage: React.FC = () => {
+  const navigate = useNavigate();
+
   const scrollToForm = () => {
     document.getElementById('create-request-form')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -109,7 +107,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               Tạo Yêu Cầu Miễn Phí
             </button>
             <button
-              onClick={() => onNavigate('requests')}
+              onClick={() => navigate('/requests')}
               className="group border-2 border-white/50 backdrop-blur-sm bg-white/10 text-white font-bold py-4 px-10 rounded-xl hover:bg-white hover:text-primary hover:scale-105 transition-all duration-300 flex items-center gap-2"
             >
               <i className="fas fa-list-ul group-hover:scale-110 transition-transform"></i>
@@ -212,14 +210,14 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   <p className="text-gray-600 text-lg">Nhấn vào từng khóa để xem thông tin chi tiết</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
-                  <CourseCard icon="fa-bolt" title="An toàn Điện" onClick={() => onNavigate('training-an-toan-dien')} gradient="from-yellow-500 to-yellow-700" />
-                  <CourseCard icon="fa-hard-hat" title="An toàn Xây dựng" onClick={() => onNavigate('training-an-toan-xay-dung')} gradient="from-orange-500 to-orange-700" />
-                  <CourseCard icon="fa-flask" title="An toàn Hóa chất" onClick={() => onNavigate('training-an-toan-hoa-chat')} gradient="from-purple-500 to-purple-700" />
-                  <CourseCard icon="fa-fire-extinguisher" title="PCCC" onClick={() => onNavigate('training-pccc')} gradient="from-red-500 to-red-700" />
-                  <CourseCard icon="fa-radiation-alt" title="An toàn Bức xạ" onClick={() => onNavigate('training-an-toan-buc-xa')} gradient="from-cyan-500 to-cyan-700" />  
+                  <CourseCard icon="fa-bolt" title="An toàn Điện" onClick={() => navigate('/training-an-toan-dien')} gradient="from-yellow-500 to-yellow-700" />
+                  <CourseCard icon="fa-hard-hat" title="An toàn Xây dựng" onClick={() => navigate('/training-an-toan-xay-dung')} gradient="from-orange-500 to-orange-700" />
+                  <CourseCard icon="fa-flask" title="An toàn Hóa chất" onClick={() => navigate('/training-an-toan-hoa-chat')} gradient="from-purple-500 to-purple-700" />
+                  <CourseCard icon="fa-fire-extinguisher" title="PCCC" onClick={() => navigate('/training-pccc')} gradient="from-red-500 to-red-700" />
+                  <CourseCard icon="fa-radiation-alt" title="An toàn Bức xạ" onClick={() => navigate('/training-an-toan-buc-xa')} gradient="from-cyan-500 to-cyan-700" />  
                   <CourseCard icon="fa-leaf" title="Quan trắc Môi trường" gradient="from-green-500 to-green-700"/> 
                   <CourseCard icon="fa-clipboard-check" title="Đánh giá Phân loại Lao động " gradient="from-indigo-500 to-indigo-700" /> 
-                  <CourseCard icon="fa-medkit" title="Sơ Cấp Cứu" onClick={() => onNavigate('training-so-cap-cuu')} gradient="from-pink-500 to-pink-700" />
+                  <CourseCard icon="fa-medkit" title="Sơ Cấp Cứu" onClick={() => navigate('/training-so-cap-cuu')} gradient="from-pink-500 to-pink-700" />
               </div>
           </div>
       </section>
