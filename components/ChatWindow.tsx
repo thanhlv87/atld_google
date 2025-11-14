@@ -16,6 +16,7 @@ import {
 } from '../services/firebaseConfig';
 import { ChatMessage, ChatRoom, TrainingRequest } from '../types';
 import LoadingSpinner from './LoadingSpinner';
+import { uploadFile, validateFile, getFileType, formatFileSize } from '../utils/fileUpload';
 
 interface ChatWindowProps {
   room: ChatRoom;
@@ -31,7 +32,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
   const [sending, setSending] = useState(false);
   const [request, setRequest] = useState<TrainingRequest | null>(null);
   const [showRequestCard, setShowRequestCard] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch training request
   useEffect(() => {
@@ -86,38 +90,82 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
     return () => unsubscribe();
   }, [room?.id, currentUser.uid]);
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const error = validateFile(file);
+    if (error) {
+      alert(error);
+      e.target.value = '';
+      return;
+    }
+
+    setSelectedFile(file);
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || sending) return;
+    if ((!newMessage.trim() && !selectedFile) || sending) return;
 
     setSending(true);
+    setUploading(!!selectedFile);
+
     try {
+      let attachment = undefined;
+
+      // Upload file if selected
+      if (selectedFile) {
+        const downloadURL = await uploadFile(selectedFile, 'chat-attachments', currentUser.uid);
+        attachment = {
+          url: downloadURL,
+          name: selectedFile.name,
+          type: getFileType(selectedFile.type),
+          size: selectedFile.size
+        };
+      }
+
+      const messageText = newMessage.trim() || (selectedFile ? `📎 ${selectedFile.name}` : '');
+
       // Add message to chatMessages collection
       await addDoc(collection(db, 'chatMessages'), {
         roomId: room.id,
         senderId: currentUser.uid,
         senderName: userName,
         senderRole: userRole,
-        message: newMessage.trim(),
+        message: messageText,
         read: false,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
+        ...(attachment && { attachment })
       });
 
       // Update room's last message
       const roomRef = doc(db, 'chatRooms', room.id);
       const unreadField = userRole === 'client' ? 'unreadCount.partner' : 'unreadCount.client';
       await updateDoc(roomRef, {
-        lastMessage: newMessage.trim(),
+        lastMessage: messageText,
         lastMessageTime: serverTimestamp(),
         [unreadField]: (userRole === 'client' ? room.unreadCount.partner : room.unreadCount.client) + 1
       });
 
       setNewMessage('');
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       alert('Không thể gửi tin nhắn. Vui lòng thử lại.');
     } finally {
       setSending(false);
+      setUploading(false);
     }
   };
 
@@ -288,6 +336,41 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
                         : 'bg-gray-100 text-gray-800 rounded-bl-none'
                     }`}
                   >
+                    {msg.attachment && (
+                      <div className="mb-2">
+                        {msg.attachment.type === 'image' ? (
+                          <a href={msg.attachment.url} target="_blank" rel="noopener noreferrer">
+                            <img
+                              src={msg.attachment.url}
+                              alt={msg.attachment.name}
+                              className="max-w-full rounded-lg max-h-64 object-contain cursor-pointer hover:opacity-90"
+                            />
+                          </a>
+                        ) : (
+                          <a
+                            href={msg.attachment.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`flex items-center gap-2 p-2 rounded ${
+                              isOwn ? 'bg-white/20' : 'bg-gray-200'
+                            } hover:opacity-80 transition-opacity`}
+                          >
+                            <i className={`fas ${
+                              msg.attachment.type === 'pdf' ? 'fa-file-pdf text-red-500' : 'fa-file text-blue-500'
+                            } text-2xl`}></i>
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-sm font-medium truncate ${isOwn ? 'text-white' : 'text-gray-800'}`}>
+                                {msg.attachment.name}
+                              </p>
+                              <p className={`text-xs ${isOwn ? 'text-white/80' : 'text-gray-500'}`}>
+                                {formatFileSize(msg.attachment.size)}
+                              </p>
+                            </div>
+                            <i className={`fas fa-download ${isOwn ? 'text-white' : 'text-gray-600'}`}></i>
+                          </a>
+                        )}
+                      </div>
+                    )}
                     <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
                   </div>
                   <p className={`text-xs text-gray-400 mt-1 px-3 ${isOwn ? 'text-right' : 'text-left'}`}>
@@ -304,22 +387,70 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
 
       {/* Input */}
       <form onSubmit={handleSendMessage} className="flex-shrink-0 border-t p-4 bg-gray-50">
+        {/* File preview */}
+        {selectedFile && (
+          <div className="mb-2 flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+            <i className={`fas ${
+              selectedFile.type.startsWith('image/') ? 'fa-image' :
+              selectedFile.type === 'application/pdf' ? 'fa-file-pdf' : 'fa-file'
+            } text-blue-500`}></i>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-800 truncate">{selectedFile.name}</p>
+              <p className="text-xs text-gray-500">{formatFileSize(selectedFile.size)}</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleRemoveFile}
+              className="text-red-500 hover:text-red-700 transition-colors"
+              disabled={sending}
+            >
+              <i className="fas fa-times"></i>
+            </button>
+          </div>
+        )}
+
         <div className="flex gap-2">
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+            onChange={handleFileSelect}
+            className="hidden"
+            disabled={sending}
+          />
+
+          {/* File upload button */}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="text-gray-600 hover:text-primary px-3 py-3 rounded-full hover:bg-gray-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={sending || uploading}
+            title="Đính kèm file"
+          >
+            <i className="fas fa-paperclip text-xl"></i>
+          </button>
+
+          {/* Text input */}
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Nhập tin nhắn..."
+            placeholder={uploading ? "Đang tải file..." : "Nhập tin nhắn..."}
             className="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary"
             disabled={sending}
           />
+
+          {/* Send button */}
           <button
             type="submit"
-            disabled={!newMessage.trim() || sending}
+            disabled={(!newMessage.trim() && !selectedFile) || sending}
             className="bg-gradient-to-r from-primary to-orange-500 text-white px-6 py-3 rounded-full hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {sending ? (
               <LoadingSpinner size="small" />
+            ) : uploading ? (
+              <i className="fas fa-spinner fa-spin"></i>
             ) : (
               <i className="fas fa-paper-plane"></i>
             )}
