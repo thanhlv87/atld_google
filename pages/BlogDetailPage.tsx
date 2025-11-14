@@ -45,10 +45,15 @@ const BlogDetailPage: React.FC<BlogDetailPageProps> = ({ postId, onNavigate }) =
         const postData = { id: postDoc.id, ...postDoc.data() } as BlogPost;
         setPost(postData);
 
-        // Increment view count
-        await updateDoc(postRef, {
-          viewCount: increment(1)
-        });
+        // Increment view count (silently fail if not authorized)
+        try {
+          await updateDoc(postRef, {
+            viewCount: increment(1)
+          });
+        } catch (error) {
+          // Ignore permission errors for view count
+          console.log('Could not update view count (expected for non-admin users)');
+        }
 
         // Fetch related posts (same category, limit 3)
         const relatedQuery = query(
