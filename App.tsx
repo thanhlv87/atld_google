@@ -15,6 +15,7 @@ import { TrainingRequest } from './types';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
+import { useUnreadMessages } from './hooks/useUnreadMessages';
 
 // Lazy load pages for code splitting - pages are loaded only when needed
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -43,6 +44,9 @@ const App: React.FC = () => {
   const [loadingRequests, setLoadingRequests] = useState(true);
   const [page, setPage] = useState<Page>('home');
   const [blogPostId, setBlogPostId] = useState<string>('');
+
+  // Get unread messages count
+  const unreadCount = useUnreadMessages(user, isAdmin, partnerStatus);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -180,6 +184,7 @@ const App: React.FC = () => {
         currentPage={page}
         onNavigate={handleNavigate}
         partnerStatus={partnerStatus}
+        unreadCount={unreadCount}
       />
       <main className="flex-grow">
         <Suspense fallback={<LoadingSpinner size="fullscreen" message="Đang tải..." />}>

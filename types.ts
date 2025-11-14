@@ -91,6 +91,13 @@ export interface ChatMessage {
   message: string;
   read: boolean;
   createdAt: firebase.firestore.Timestamp;
+  // File attachments
+  attachment?: {
+    url: string;
+    name: string;
+    type: string; // 'image' | 'document' | 'pdf'
+    size: number; // file size in bytes
+  };
 }
 
 // Blog System Types

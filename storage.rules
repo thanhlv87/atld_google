@@ -49,6 +49,15 @@ match /b/{bucket}/o {
       allow update, delete: if isAuthenticated();
     }
 
+    // === CHAT ATTACHMENTS ===
+    match /chat-attachments/{fileName} {
+      // Authenticated users can read and upload chat attachments
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      // Users can only delete their own uploads (filename contains their uid)
+      allow delete: if isAuthenticated() && request.auth.uid != null;
+    }
+
     // === DEFAULT DENY ===
     match /{allPaths=**} {
       allow read, write: if false;

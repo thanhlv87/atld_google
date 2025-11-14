@@ -9,6 +9,7 @@ interface HeaderProps {
   currentPage: Page;
   onNavigate: (page: Page) => void;
   partnerStatus: PartnerStatus;
+  unreadCount?: number;
 }
 
 const NavLink: React.FC<{
@@ -44,7 +45,7 @@ const NavLink: React.FC<{
   );
 };
 
-const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPage, onNavigate, partnerStatus }) => {
+const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPage, onNavigate, partnerStatus, unreadCount = 0 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const handleLogout = async () => {
     try {
@@ -92,7 +93,14 @@ const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPag
             </NavLink>
             {user && (
               <NavLink page="chat" currentPage={currentPage} onNavigate={onNavigate}>
-                <i className="fas fa-comments mr-1"></i>Tin nhắn
+                <span className="relative inline-flex items-center">
+                  <i className="fas fa-comments mr-1"></i>Tin nhắn
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </span>
               </NavLink>
             )}
             <NavLink page="documents" currentPage={currentPage} onNavigate={onNavigate}>Tài Liệu</NavLink>
@@ -220,7 +228,14 @@ const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPag
             </NavLink>
             {user && (
               <NavLink page="chat" currentPage={currentPage} onNavigate={onNavigate} mobile onClick={closeMobileMenu}>
-                <i className="fas fa-comments mr-3"></i>Tin nhắn
+                <span className="relative inline-flex items-center w-full">
+                  <i className="fas fa-comments mr-3"></i>Tin nhắn
+                  {unreadCount > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </span>
               </NavLink>
             )}
             <NavLink page="documents" currentPage={currentPage} onNavigate={onNavigate} mobile onClick={closeMobileMenu}>
