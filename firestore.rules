@@ -1,17 +1,18 @@
 rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
 
+service cloud.firestore {
+
+  match /databases/{database}/documents {
     // === HÀM HỖ TRỢ ===
     function isAdmin() {
       return exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
-
     function isAuthenticated() {
       return request.auth != null;
     }
 
     // === YÊU CẦU HUẤN LUYỆN ===
+
     match /trainingRequests/{requestId} {
       allow create: if true;  // Ai cũng tạo được (public form)
       allow read: if true;  // AI CŨNG ĐỌC ĐƯỢC (thông tin liên hệ ẩn ở UI level)
@@ -20,9 +21,11 @@ service cloud.firestore {
     }
 
     // === HỒ SƠ ĐỐI TÁC ===
+
     match /partners/{partnerId} {
       allow create: if isAuthenticated() && request.auth.uid == partnerId;
-      // Allow public read ONLY for email notification purpose (query approved partners)
+
+// Allow public read ONLY for email notification purpose (query approved partners)
       allow read: if true;  // Cho phép đọc để tìm partners gửi email
       allow update: if isAuthenticated() && (request.auth.uid == partnerId || isAdmin());
       allow delete: if isAdmin();
@@ -30,7 +33,8 @@ service cloud.firestore {
 
     // === BÁO GIÁ ===
     match /quotes/{quoteId} {
-      // Partner tạo báo giá
+
+// Partner tạo báo giá
       allow create: if isAuthenticated()
                     && request.resource.data.partnerId == request.auth.uid;
 
@@ -54,8 +58,10 @@ service cloud.firestore {
 
     // === ADMIN COLLECTION ===
     match /admins/{adminId} {
+
       // Cho phép user kiểm tra xem mình có phải admin không
       allow get: if isAuthenticated() && request.auth.uid == adminId;
+
       // Không cho list, create, update, delete từ client
       allow list, write: if false;
     }
@@ -71,7 +77,7 @@ service cloud.firestore {
       allow read, write: if isAuthenticated() && request.auth.uid == userId;
     }
 
-    // === CHAT ROOMS ===
+ // === CHAT ROOMS ===
     match /chatRooms/{roomId} {
       // Users can read rooms they are part of (client or partner)
       allow read: if isAuthenticated() &&
@@ -111,15 +117,20 @@ service cloud.firestore {
     // === BLOG POSTS ===
     match /blogPosts/{postId} {
       // Anyone can read published posts
-      allow read: if resource.data.published == true || isAdmin();
+      allow read: if resource.data.published == true || (request.auth != null && isAdmin());
 
       // Only admins can create, update, delete posts
       allow create, update, delete: if isAdmin();
     }
 
     // === DEFAULT DENY ===
+
     match /{document=**} {
+
       allow read, write: if false;
+
     }
+
   }
+
 }
