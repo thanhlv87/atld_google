@@ -15,8 +15,16 @@ service cloud.firestore {
 
     match /trainingRequests/{requestId} {
       allow create: if true;  // Ai cũng tạo được (public form)
-      allow read: if true;  // AI CŨNG ĐỌC ĐƯỢC (thông tin liên hệ ẩn ở UI level)
-      allow update: if isAuthenticated();  // Authenticated users update được
+
+      // Chỉ cho phép authenticated users và admins đọc để bảo vệ thông tin cá nhân
+      allow read: if isAuthenticated() || isAdmin();
+
+      // Authenticated users có thể update viewedBy array
+      allow update: if isAuthenticated() && (
+        // Chỉ cho phép update viewedBy field
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewedBy'])
+      ) || isAdmin();  // Admin update tất cả
+
       allow delete: if isAdmin();  // Chỉ admin xóa được
     }
 
@@ -100,15 +108,25 @@ service cloud.firestore {
 
     // === CHAT MESSAGES ===
     match /chatMessages/{messageId} {
-      // Users can read messages in rooms they are part of
-      allow read: if isAuthenticated();
+      // Users can ONLY read messages from rooms they are participants of
+      allow read: if isAuthenticated() && (
+        // Check if message belongs to a room where user is client or partner
+        exists(/databases/$(database)/documents/chatRooms/$(resource.data.roomId)) &&
+        (get(/databases/$(database)/documents/chatRooms/$(resource.data.roomId)).data.clientId == request.auth.uid ||
+         get(/databases/$(database)/documents/chatRooms/$(resource.data.roomId)).data.partnerId == request.auth.uid ||
+         isAdmin())
+      );
 
-      // Authenticated users can create messages
+      // Authenticated users can create messages only in rooms they participate
       allow create: if isAuthenticated() &&
-                    request.resource.data.senderId == request.auth.uid;
+                    request.resource.data.senderId == request.auth.uid &&
+                    (get(/databases/$(database)/documents/chatRooms/$(request.resource.data.roomId)).data.clientId == request.auth.uid ||
+                     get(/databases/$(database)/documents/chatRooms/$(request.resource.data.roomId)).data.partnerId == request.auth.uid);
 
-      // Only message sender can update (e.g., mark as read)
-      allow update: if isAuthenticated();
+      // Only message sender or admin can update
+      allow update: if isAuthenticated() && (
+        resource.data.senderId == request.auth.uid || isAdmin()
+      );
 
       // Only admin can delete messages
       allow delete: if isAdmin();
