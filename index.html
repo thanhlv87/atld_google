@@ -23,6 +23,13 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://atld.web.app/" />
 
+    <!-- Resource Hints for Performance -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="https://aistudiocdn.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://atld.web.app/" />
@@ -47,8 +54,25 @@
     </script>
 
     <!-- Other links -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome - Load asynchronously to avoid render blocking -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"></noscript>
+
+    <!-- Critical CSS - Inline for immediate rendering -->
+    <style>
+      /* Critical styles to prevent layout shift */
+      body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background-color: #f8fafc; }
+      #root { min-height: 100vh; display: flex; flex-direction: column; }
+      /* Prevent layout shift for hero section */
+      .hero-placeholder { min-height: 400px; background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); }
+      /* Loading spinner */
+      .loading { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #ea580c; border-radius: 50%; animation: spin 1s linear infinite; margin: 100px auto; }
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+
+    <!-- Tailwind CSS - Preload for better performance -->
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <script src="https://cdn.tailwindcss.com" defer></script>
     <script>
       tailwind.config = {
         theme: {
