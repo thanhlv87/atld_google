@@ -87,7 +87,6 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 
       const quotesCollection = collection(db, 'quotes');
       const quoteRef = await addDoc(quotesCollection, quoteData);
-      console.log('✅ Báo giá đã được tạo với ID:', quoteRef.id);
 
       // Tạo phòng chat với admin (nếu chưa có) và gửi thông báo
       try {
@@ -103,9 +102,8 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
           partnerName,
           priceNumber
         );
-        console.log('✅ Đã tạo/cập nhật phòng chat với admin:', chatRoomId);
       } catch (chatError) {
-        console.error('⚠️ Không thể tạo phòng chat:', chatError);
+        console.error('Error creating chat room:', chatError);
         // Không fail toàn bộ operation nếu chat bị lỗi
       }
 
@@ -123,10 +121,9 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
         });
 
         await sendEmail(request.clientEmail, 'Bạn có báo giá mới từ đối tác đào tạo', emailHtml);
-        console.log('✅ Email thông báo đã được gửi đến khách hàng');
         setSuccess('Báo giá đã được gửi thành công! Khách hàng sẽ nhận được thông báo qua email.');
       } catch (emailError) {
-        console.error('⚠️ Lỗi khi gửi email:', emailError);
+        console.error('Error sending email:', emailError);
         // Don't fail the whole operation if email fails
         setSuccess('Báo giá đã được lưu thành công! (Lưu ý: Có lỗi khi gửi email thông báo)');
       }
@@ -140,7 +137,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
         onClose();
       }, 3000);
     } catch (error) {
-      console.error('❌ Lỗi khi gửi báo giá:', error);
+      console.error('Error submitting quote:', error);
       setError('Đã xảy ra lỗi khi gửi báo giá. Vui lòng thử lại.');
     } finally {
       setSubmitting(false);

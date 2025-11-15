@@ -58,7 +58,6 @@ export const getOrCreateAdminPartnerChatRoom = async (
   };
 
   const roomRef = await addDoc(chatRoomsRef, roomData);
-  console.log('✅ Phòng chat admin-partner đã được tạo:', roomRef.id);
 
   // Gửi tin nhắn đầu tiên
   await addDoc(collection(db, 'chatMessages'), {

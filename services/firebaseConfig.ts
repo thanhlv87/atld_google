@@ -72,10 +72,6 @@ const storage = getStorage(app);
 // Function to send email via Firestore extension
 const sendEmail = async (to: string | string[], subject: string, html: string, text?: string) => {
   try {
-    console.log('📧 Creating email document in Firestore...');
-    console.log('Recipients:', to);
-    console.log('Subject:', subject);
-
     const mailCollection = collection(db, 'mail');
     const emailData = {
       to: to,
@@ -87,28 +83,15 @@ const sendEmail = async (to: string | string[], subject: string, html: string, t
       createdAt: serverTimestamp()
     };
 
-    console.log('Email data to be saved:', {
-      to: emailData.to,
-      subject: emailData.message.subject,
-      hasHtml: !!emailData.message.html
-    });
-
     const docRef = await addDoc(mailCollection, emailData);
-
-    console.log('✅ Email queued successfully with ID:', docRef.id);
-    console.log('📝 Check Firestore collection "mail" to see the document');
-
     return docRef.id;
   } catch (error: any) {
-    console.error('❌ Error queuing email:', error);
-    console.error('Error code:', error.code);
-    console.error('Error message:', error.message);
+    console.error('Error queuing email:', error);
 
     if (error.code === 'permission-denied') {
-      console.error('⚠️ PERMISSION DENIED: Firestore rules may not allow writing to "mail" collection');
-      console.error('👉 Please check and deploy firestore.rules file');
+      console.error('PERMISSION DENIED: Firestore rules may not allow writing to "mail" collection');
     } else if (error.code === 'unauthenticated') {
-      console.error('⚠️ UNAUTHENTICATED: User may need to be signed in');
+      console.error('UNAUTHENTICATED: User may need to be signed in');
     }
 
     throw error;

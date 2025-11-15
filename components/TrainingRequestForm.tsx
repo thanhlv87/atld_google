@@ -86,7 +86,6 @@ const TrainingRequestForm: React.FC = () => {
       try {
         // Lấy danh sách đối tác có năng lực phù hợp
         const trainingTypes = processedDetails.map(detail => detail.type);
-        console.log('🔍 Tìm đối tác phù hợp cho các loại đào tạo:', trainingTypes);
 
         const partnersCollection = collection(db, 'partners');
         const q = query(
@@ -95,8 +94,6 @@ const TrainingRequestForm: React.FC = () => {
           where('subscribesToEmails', '==', true)
         );
         const partnersQuery = await getDocs(q);
-
-        console.log('📊 Tìm thấy', partnersQuery.size, 'đối tác đã approved và đăng ký nhận email');
 
         const matchingPartners = [];
         partnersQuery.forEach(doc => {
@@ -107,18 +104,13 @@ const TrainingRequestForm: React.FC = () => {
           );
           if (hasMatchingCapability) {
             matchingPartners.push(partner);
-            console.log('✅ Đối tác phù hợp:', partner.email, '- Capabilities:', partner.capabilities);
           }
         });
-
-        console.log('📧 Số lượng đối tác phù hợp sẽ nhận email:', matchingPartners.length);
 
         // Gửi email thông báo cho các đối tác phù hợp
         if (matchingPartners.length > 0) {
           const partnerEmails = matchingPartners.map(partner => partner.email);
           const trainingTypesText = trainingTypes.join(', ');
-
-          console.log('📬 Đang queue email cho:', partnerEmails);
 
           // Generate beautiful HTML email template
           const emailHtml = generatePartnerNotificationEmail(
@@ -135,21 +127,18 @@ const TrainingRequestForm: React.FC = () => {
             isUrgent
           );
 
-          const emailId = await sendEmail(
+          await sendEmail(
             partnerEmails,
             `🎯 Yêu cầu đào tạo mới: ${trainingTypesText}`,
             emailHtml
           );
 
-          console.log('✅ Email đã được queue thành công với ID:', emailId);
           emailNotificationMessage = ` Đã gửi thông báo đến ${matchingPartners.length} đơn vị đào tạo phù hợp.`;
         } else {
-          console.log('⚠️ Không tìm thấy đối tác phù hợp với yêu cầu này');
           emailNotificationMessage = ' Lưu ý: Hiện chưa có đơn vị đào tạo nào phù hợp trong hệ thống, nhưng yêu cầu của bạn đã được lưu lại.';
         }
       } catch (emailErr) {
-        console.error("❌ Error sending notification emails: ", emailErr);
-        console.error("Error details:", emailErr);
+        console.error("Error sending notification emails:", emailErr);
         // Không throw lỗi này để không ảnh hưởng đến việc tạo yêu cầu
         emailNotificationMessage = ' (Lưu ý: Có lỗi khi gửi email thông báo, nhưng yêu cầu của bạn đã được lưu thành công)';
       }
