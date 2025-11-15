@@ -56,21 +56,35 @@ function formatTrainingRequestMessage(data) {
     'so-cap-cuu': '🏥 Sơ Cấp Cứu'
   };
 
-  const trainingName = trainingTypeMap[trainingType] || trainingType;
-  const date = createdAt ? new Date(createdAt.seconds * 1000).toLocaleString('vi-VN') : 'N/A';
+  const trainingName = trainingTypeMap[trainingType] || trainingType || 'Không xác định';
+
+  // Handle both Firestore Timestamp and regular date
+  let date = 'N/A';
+  if (createdAt) {
+    if (createdAt.toDate) {
+      // Firestore Timestamp object
+      date = createdAt.toDate().toLocaleString('vi-VN');
+    } else if (createdAt.seconds) {
+      // Timestamp as object with seconds
+      date = new Date(createdAt.seconds * 1000).toLocaleString('vi-VN');
+    } else if (createdAt instanceof Date) {
+      // Regular Date object
+      date = createdAt.toLocaleString('vi-VN');
+    }
+  }
 
   return `
 🔔 <b>YÊU CẦU ĐÀO TẠO MỚI</b>
 
 ${trainingName}
 
-👤 <b>Người liên hệ:</b> ${clientName}
-🏢 <b>Công ty:</b> ${companyName}
-📧 <b>Email:</b> ${email}
-📱 <b>Điện thoại:</b> ${phone}
-📍 <b>Địa điểm:</b> ${location}
-👥 <b>Số học viên:</b> ${numberOfTrainees} người
-📅 <b>Dự kiến bắt đầu:</b> ${expectedStartDate}
+👤 <b>Người liên hệ:</b> ${clientName || 'Chưa cập nhật'}
+🏢 <b>Công ty:</b> ${companyName || 'Chưa cập nhật'}
+📧 <b>Email:</b> ${email || 'Chưa cập nhật'}
+📱 <b>Điện thoại:</b> ${phone || 'Chưa cập nhật'}
+📍 <b>Địa điểm:</b> ${location || 'Chưa cập nhật'}
+👥 <b>Số học viên:</b> ${numberOfTrainees || 'Chưa cập nhật'} người
+📅 <b>Dự kiến bắt đầu:</b> ${expectedStartDate || 'Chưa cập nhật'}
 ${additionalInfo ? `\n💬 <b>Ghi chú:</b> ${additionalInfo}` : ''}
 
 ⏰ <b>Thời gian:</b> ${date}
@@ -93,6 +107,7 @@ exports.notifyNewTrainingRequest = onDocumentCreated('trainingRequests/{requestI
   const requestId = event.params.requestId;
 
   console.log('New training request created:', requestId);
+  console.log('Request data:', JSON.stringify(requestData, null, 2));
 
   // Check if Telegram Chat ID is configured
   if (!TELEGRAM_CHAT_ID) {
