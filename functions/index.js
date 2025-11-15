@@ -1,12 +1,13 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+const { onDocumentCreated } = require('firebase-functions/v2/firestore');
+const { onCall } = require('firebase-functions/v2/https');
+const { initializeApp } = require('firebase-admin/app');
 const axios = require('axios');
 
-admin.initializeApp();
+initializeApp();
 
 // Telegram Bot Configuration
 const TELEGRAM_BOT_TOKEN = '8474740440:AAFmqXZVe0tMLX1KVkuvrV1x-cLPTIo_CSI';
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || ''; // Set this in Firebase config
+const TELEGRAM_CHAT_ID = '-4801062641'; // Your Telegram Chat ID
 
 /**
  * Send message to Telegram
@@ -81,39 +82,41 @@ ${additionalInfo ? `\n💬 <b>Ghi chú:</b> ${additionalInfo}` : ''}
 /**
  * Cloud Function: Triggered when a new training request is created
  */
-exports.notifyNewTrainingRequest = functions.firestore
-  .document('trainingRequests/{requestId}')
-  .onCreate(async (snap, context) => {
-    const requestData = snap.data();
-    const requestId = context.params.requestId;
+exports.notifyNewTrainingRequest = onDocumentCreated('trainingRequests/{requestId}', async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) {
+    console.log('No data associated with the event');
+    return;
+  }
 
-    console.log('New training request created:', requestId);
+  const requestData = snapshot.data();
+  const requestId = event.params.requestId;
 
-    // Check if Telegram Chat ID is configured
-    if (!TELEGRAM_CHAT_ID) {
-      console.warn('TELEGRAM_CHAT_ID not configured. Skipping notification.');
-      return null;
-    }
+  console.log('New training request created:', requestId);
 
-    try {
-      const message = formatTrainingRequestMessage(requestData);
-      await sendTelegramMessage(message);
-      console.log('Notification sent for request:', requestId);
-      return null;
-    } catch (error) {
-      console.error('Error in notifyNewTrainingRequest:', error);
-      // Don't throw error to avoid function retry
-      return null;
-    }
-  });
+  // Check if Telegram Chat ID is configured
+  if (!TELEGRAM_CHAT_ID) {
+    console.warn('TELEGRAM_CHAT_ID not configured. Skipping notification.');
+    return;
+  }
+
+  try {
+    const message = formatTrainingRequestMessage(requestData);
+    await sendTelegramMessage(message);
+    console.log('Notification sent for request:', requestId);
+  } catch (error) {
+    console.error('Error in notifyNewTrainingRequest:', error);
+    // Don't throw error to avoid function retry
+  }
+});
 
 /**
  * Callable function: Test Telegram notification
  */
-exports.testTelegramNotification = functions.https.onCall(async (data, context) => {
-  // Only allow admins to test
-  if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+exports.testTelegramNotification = onCall(async (request) => {
+  // Only allow authenticated users
+  if (!request.auth) {
+    throw new Error('User must be authenticated');
   }
 
   const testMessage = `
@@ -123,6 +126,8 @@ exports.testTelegramNotification = functions.https.onCall(async (data, context) 
 
 ✅ Bot đang hoạt động bình thường!
 
+👤 <b>Tested by:</b> ${request.auth.token.email || 'Unknown'}
+
 ⏰ ${new Date().toLocaleString('vi-VN')}
   `.trim();
 
@@ -131,6 +136,6 @@ exports.testTelegramNotification = functions.https.onCall(async (data, context) 
     return { success: true, message: 'Test notification sent successfully' };
   } catch (error) {
     console.error('Test notification failed:', error);
-    throw new functions.https.HttpsError('internal', 'Failed to send test notification');
+    throw new Error('Failed to send test notification: ' + error.message);
   }
 });
