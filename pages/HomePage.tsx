@@ -214,9 +214,9 @@ const HomePage: React.FC = () => {
                   <CourseCard icon="fa-hard-hat" title="An toàn Xây dựng" onClick={() => navigate('/training-an-toan-xay-dung')} gradient="from-orange-500 to-orange-700" />
                   <CourseCard icon="fa-flask" title="An toàn Hóa chất" onClick={() => navigate('/training-an-toan-hoa-chat')} gradient="from-purple-500 to-purple-700" />
                   <CourseCard icon="fa-fire-extinguisher" title="PCCC" onClick={() => navigate('/training-pccc')} gradient="from-red-500 to-red-700" />
-                  <CourseCard icon="fa-radiation-alt" title="An toàn Bức xạ" onClick={() => navigate('/training-an-toan-buc-xa')} gradient="from-cyan-500 to-cyan-700" />  
-                  <CourseCard icon="fa-leaf" title="Quan trắc Môi trường" gradient="from-green-500 to-green-700"/> 
-                  <CourseCard icon="fa-clipboard-check" title="Đánh giá Phân loại Lao động " gradient="from-indigo-500 to-indigo-700" /> 
+                  <CourseCard icon="fa-radiation-alt" title="An toàn Bức xạ" onClick={() => navigate('/training-an-toan-buc-xa')} gradient="from-cyan-500 to-cyan-700" />
+                  <CourseCard icon="fa-leaf" title="Quan trắc Môi trường" onClick={() => navigate('/training-quan-trac-moi-truong')} gradient="from-green-500 to-green-700"/>
+                  <CourseCard icon="fa-clipboard-check" title="Đánh giá Phân loại Lao động" onClick={() => navigate('/training-danh-gia-phan-loai-lao-dong')} gradient="from-indigo-500 to-indigo-700" />
                   <CourseCard icon="fa-medkit" title="Sơ Cấp Cứu" onClick={() => navigate('/training-so-cap-cuu')} gradient="from-pink-500 to-pink-700" />
               </div>
           </div>
