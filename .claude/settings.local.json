@@ -10,7 +10,8 @@
       "Bash(npx tsc:*)",
       "Bash(npm install:*)",
       "Bash(firebase deploy:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(firebase init:*)"
     ],
     "deny": [],
     "ask": []
