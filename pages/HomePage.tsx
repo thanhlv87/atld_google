@@ -210,14 +210,14 @@ const HomePage: React.FC = () => {
                   <p className="text-gray-600 text-lg">Nhấn vào từng khóa để xem thông tin chi tiết</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
-                  <CourseCard icon="fa-bolt" title="An toàn Điện" onClick={() => navigate('/training-an-toan-dien')} gradient="from-yellow-500 to-yellow-700" />
-                  <CourseCard icon="fa-hard-hat" title="An toàn Xây dựng" onClick={() => navigate('/training-an-toan-xay-dung')} gradient="from-orange-500 to-orange-700" />
-                  <CourseCard icon="fa-flask" title="An toàn Hóa chất" onClick={() => navigate('/training-an-toan-hoa-chat')} gradient="from-purple-500 to-purple-700" />
-                  <CourseCard icon="fa-fire-extinguisher" title="PCCC" onClick={() => navigate('/training-pccc')} gradient="from-red-500 to-red-700" />
-                  <CourseCard icon="fa-radiation-alt" title="An toàn Bức xạ" onClick={() => navigate('/training-an-toan-buc-xa')} gradient="from-cyan-500 to-cyan-700" />
-                  <CourseCard icon="fa-leaf" title="Quan trắc Môi trường" onClick={() => navigate('/training-quan-trac-moi-truong')} gradient="from-green-500 to-green-700"/>
-                  <CourseCard icon="fa-clipboard-check" title="Đánh giá Phân loại Lao động" onClick={() => navigate('/training-danh-gia-phan-loai-lao-dong')} gradient="from-indigo-500 to-indigo-700" />
-                  <CourseCard icon="fa-medkit" title="Sơ Cấp Cứu" onClick={() => navigate('/training-so-cap-cuu')} gradient="from-pink-500 to-pink-700" />
+                  <CourseCard icon="fa-bolt" title="An toàn Điện" onClick={() => navigate('/training/an-toan-dien')} gradient="from-yellow-500 to-yellow-700" />
+                  <CourseCard icon="fa-hard-hat" title="An toàn Xây dựng" onClick={() => navigate('/training/an-toan-xay-dung')} gradient="from-orange-500 to-orange-700" />
+                  <CourseCard icon="fa-flask" title="An toàn Hóa chất" onClick={() => navigate('/training/an-toan-hoa-chat')} gradient="from-purple-500 to-purple-700" />
+                  <CourseCard icon="fa-fire-extinguisher" title="PCCC" onClick={() => navigate('/training/pccc')} gradient="from-red-500 to-red-700" />
+                  <CourseCard icon="fa-radiation-alt" title="An toàn Bức xạ" onClick={() => navigate('/training/an-toan-buc-xa')} gradient="from-cyan-500 to-cyan-700" />
+                  <CourseCard icon="fa-leaf" title="Quan trắc Môi trường" onClick={() => navigate('/training/quan-trac-moi-truong')} gradient="from-green-500 to-green-700"/>
+                  <CourseCard icon="fa-clipboard-check" title="Đánh giá Phân loại Lao động" onClick={() => navigate('/training/danh-gia-phan-loai-lao-dong')} gradient="from-indigo-500 to-indigo-700" />
+                  <CourseCard icon="fa-medkit" title="Sơ Cấp Cứu" onClick={() => navigate('/training/so-cap-cuu')} gradient="from-pink-500 to-pink-700" />
               </div>
           </div>
       </section>

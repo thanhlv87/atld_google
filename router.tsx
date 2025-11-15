@@ -47,7 +47,7 @@ export const router = createBrowserRouter([
       },
       // Training landing pages - using dynamic route with param
       {
-        path: 'training-:type',
+        path: 'training/:type',
         element: <TrainingLandingPage />
       },
       // Catch-all redirect to home
