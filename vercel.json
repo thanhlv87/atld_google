@@ -1,0 +1,15 @@
+{
+  "rewrites": [
+    {
+      "source": "/blog/:postId",
+      "destination": "/api/og?postId=:postId",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp)"
+        }
+      ]
+    }
+  ]
+}

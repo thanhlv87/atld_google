@@ -80,6 +80,10 @@
       ],
       "rewrites": [
         {
+          "source": "/blog/*",
+          "function": "blogMetaTags"
+        },
+        {
           "source": "**",
           "destination": "/index.html"
         }

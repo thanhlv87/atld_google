@@ -19,6 +19,7 @@ import {
 } from '../services/firebaseConfig';
 import { BlogPost } from '../types';
 import LoadingSpinner from './LoadingSpinner';
+import AIBlogWriter from './AIBlogWriter';
 
 interface BlogManagementProps {
   user: User;
@@ -28,8 +29,10 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [showAIWriter, setShowAIWriter] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   // Form fields
   const [title, setTitle] = useState('');
@@ -77,6 +80,30 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
     setPublished(false);
     setEditingPost(null);
     setShowForm(false);
+  };
+
+  const handleAIGenerate = (data: {
+    title: string;
+    excerpt: string;
+    content: string;
+    tags: string[];
+    suggestedCategory: string;
+  }) => {
+    // Fill form with AI-generated content
+    setTitle(data.title);
+    setExcerpt(data.excerpt);
+    setContent(data.content);
+    setCategory(data.suggestedCategory);
+    setTags(data.tags.join(', '));
+
+    // Show form and hide AI writer
+    setShowForm(true);
+    setShowAIWriter(false);
+
+    // Scroll to form
+    setTimeout(() => {
+      document.getElementById('blog-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   const handleEdit = (post: BlogPost) => {
@@ -209,18 +236,44 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
           <i className="fas fa-newspaper text-primary mr-2"></i>
           Quản lý Blog
         </h2>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-gradient-to-r from-primary to-orange-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all flex items-center gap-2"
-        >
-          <i className={`fas ${showForm ? 'fa-times' : 'fa-plus'}`}></i>
-          {showForm ? 'Đóng' : 'Tạo bài viết'}
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => {
+              setShowAIWriter(!showAIWriter);
+              if (!showAIWriter) {
+                setShowForm(false);
+                resetForm();
+              }
+            }}
+            className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all flex items-center gap-2"
+          >
+            <i className={`fas ${showAIWriter ? 'fa-times' : 'fa-magic'}`}></i>
+            {showAIWriter ? 'Đóng AI' : 'Viết bằng AI'}
+          </button>
+          <button
+            onClick={() => {
+              setShowForm(!showForm);
+              if (!showForm) {
+                setShowAIWriter(false);
+                resetForm();
+              }
+            }}
+            className="bg-gradient-to-r from-primary to-orange-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all flex items-center gap-2"
+          >
+            <i className={`fas ${showForm ? 'fa-times' : 'fa-plus'}`}></i>
+            {showForm ? 'Đóng' : 'Tạo thủ công'}
+          </button>
+        </div>
       </div>
+
+      {/* AI Writer */}
+      {showAIWriter && (
+        <AIBlogWriter onGenerate={handleAIGenerate} />
+      )}
 
       {/* Form */}
       {showForm && (
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div id="blog-form" className="bg-white rounded-lg shadow-lg p-6">
           <h3 className="text-xl font-bold text-gray-800 mb-4">
             {editingPost ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}
           </h3>
@@ -349,6 +402,14 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
               </button>
               <button
                 type="button"
+                onClick={() => setShowPreview(true)}
+                className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-all flex items-center gap-2"
+              >
+                <i className="fas fa-eye"></i>
+                Xem trước
+              </button>
+              <button
+                type="button"
                 onClick={resetForm}
                 className="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-all"
               >
@@ -448,6 +509,119 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
           </div>
         )}
       </div>
+
+      {/* Preview Modal */}
+      {showPreview && (
+        <div
+          className="fixed inset-0 bg-black/70 z-[9999] overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowPreview(false);
+          }}
+        >
+          <div className="min-h-screen flex items-start justify-center p-4 py-8">
+            <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full">
+              {/* Preview Header - Sticky */}
+              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-lg z-10 shadow-sm">
+                <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                  <i className="fas fa-eye text-blue-500"></i>
+                  Xem trước bài viết
+                </h3>
+                <button
+                  onClick={() => setShowPreview(false)}
+                  className="text-gray-500 hover:text-gray-700 text-2xl leading-none transition-colors"
+                  type="button"
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+              </div>
+
+              {/* Preview Content */}
+              <div className="p-6 max-h-[calc(100vh-8rem)] overflow-y-auto">
+              {/* Cover Image Preview */}
+              {(coverImageFile || coverImageUrl) && (
+                <div className="relative h-96 bg-gray-900 rounded-lg overflow-hidden mb-6">
+                  <img
+                    src={coverImageFile ? URL.createObjectURL(coverImageFile) : coverImageUrl}
+                    alt="Cover preview"
+                    className="w-full h-full object-cover opacity-80"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 right-0 p-8">
+                    <span className="inline-block bg-gradient-to-r from-primary to-orange-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
+                      {category}
+                    </span>
+                    <h1 className="text-4xl font-bold text-white mb-4">
+                      {title || 'Tiêu đề bài viết'}
+                    </h1>
+                    <div className="flex flex-wrap items-center gap-4 text-white/90">
+                      <div className="flex items-center gap-2">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-orange-500 flex items-center justify-center text-white font-bold">
+                          {user.displayName?.charAt(0).toUpperCase() || 'A'}
+                        </div>
+                        <span>{user.displayName || user.email || 'Admin'}</span>
+                      </div>
+                      <span>•</span>
+                      <span>
+                        <i className="fas fa-calendar-alt mr-2"></i>
+                        {new Date().toLocaleDateString('vi-VN')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Excerpt Preview */}
+              {excerpt && (
+                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                  <p className="text-xl text-gray-700 italic border-l-4 border-primary pl-6">
+                    {excerpt}
+                  </p>
+                </div>
+              )}
+
+              {/* Content Preview */}
+              <div className="bg-white rounded-lg border border-gray-200 p-8">
+                <div
+                  className="prose prose-lg max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-a:text-primary prose-strong:text-gray-800 prose-ul:text-gray-700 prose-ol:text-gray-700"
+                  dangerouslySetInnerHTML={{ __html: content || '<p class="text-gray-400 italic">Chưa có nội dung</p>' }}
+                />
+              </div>
+
+              {/* Tags Preview */}
+              {tags && (
+                <div className="bg-white rounded-lg border border-gray-200 p-6 mt-6">
+                  <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <i className="fas fa-tags text-primary"></i>
+                    Tags
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {tags.split(',').map((tag, index) => (
+                      <span
+                        key={index}
+                        className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm"
+                      >
+                        #{tag.trim()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+              {/* Preview Footer */}
+              <div className="border-t border-gray-200 px-6 py-4 flex justify-end gap-3 rounded-b-lg bg-gray-50">
+                <button
+                  onClick={() => setShowPreview(false)}
+                  className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition-all"
+                  type="button"
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
