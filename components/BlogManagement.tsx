@@ -512,24 +512,31 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
 
       {/* Preview Modal */}
       {showPreview && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full my-8">
-            {/* Preview Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-lg z-10">
-              <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                <i className="fas fa-eye text-blue-500"></i>
-                Xem trước bài viết
-              </h3>
-              <button
-                onClick={() => setShowPreview(false)}
-                className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
-              >
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
+        <div
+          className="fixed inset-0 bg-black/70 z-[9999] overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowPreview(false);
+          }}
+        >
+          <div className="min-h-screen flex items-start justify-center p-4 py-8">
+            <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full">
+              {/* Preview Header - Sticky */}
+              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-lg z-10 shadow-sm">
+                <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                  <i className="fas fa-eye text-blue-500"></i>
+                  Xem trước bài viết
+                </h3>
+                <button
+                  onClick={() => setShowPreview(false)}
+                  className="text-gray-500 hover:text-gray-700 text-2xl leading-none transition-colors"
+                  type="button"
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+              </div>
 
-            {/* Preview Content */}
-            <div className="p-6">
+              {/* Preview Content */}
+              <div className="p-6 max-h-[calc(100vh-8rem)] overflow-y-auto">
               {/* Cover Image Preview */}
               {(coverImageFile || coverImageUrl) && (
                 <div className="relative h-96 bg-gray-900 rounded-lg overflow-hidden mb-6">
@@ -601,14 +608,16 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
               )}
             </div>
 
-            {/* Preview Footer */}
-            <div className="border-t border-gray-200 px-6 py-4 flex justify-end gap-3 rounded-b-lg bg-gray-50">
-              <button
-                onClick={() => setShowPreview(false)}
-                className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition-all"
-              >
-                Đóng
-              </button>
+              {/* Preview Footer */}
+              <div className="border-t border-gray-200 px-6 py-4 flex justify-end gap-3 rounded-b-lg bg-gray-50">
+                <button
+                  onClick={() => setShowPreview(false)}
+                  className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition-all"
+                  type="button"
+                >
+                  Đóng
+                </button>
+              </div>
             </div>
           </div>
         </div>
