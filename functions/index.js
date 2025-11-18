@@ -1,11 +1,13 @@
 const { onDocumentCreated } = require('firebase-functions/v2/firestore');
-const { onCall } = require('firebase-functions/v2/https');
+const { onCall, onRequest } = require('firebase-functions/v2/https');
 const { initializeApp } = require('firebase-admin/app');
+const { getFirestore } = require('firebase-admin/firestore');
 const { defineSecret } = require('firebase-functions/params');
 const axios = require('axios');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 initializeApp();
+const db = getFirestore();
 
 // Gemini AI Configuration
 // Get your API key from: https://aistudio.google.com/app/apikey
@@ -334,5 +336,72 @@ Trả về dưới dạng JSON array: ["tag1", "tag2", "tag3", ...]`;
   } catch (error) {
     console.error('Error improving content:', error);
     throw new Error('Failed to improve content: ' + error.message);
+  }
+});
+
+/**
+ * SEO-friendly Blog Post Meta Tags for Social Media Crawlers
+ * Serves HTML with proper OG tags for Facebook, Twitter, etc.
+ */
+exports.blogMetaTags = onRequest(async (req, res) => {
+  const postId = req.path.split('/').pop();
+  
+  if (!postId) {
+    res.redirect(302, 'https://atld.web.app/');
+    return;
+  }
+
+  try {
+    const postDoc = await db.collection('blogPosts').doc(postId).get();
+    
+    if (!postDoc.exists) {
+      res.redirect(302, 'https://atld.web.app/');
+      return;
+    }
+
+    const post = postDoc.data();
+    const url = `https://atld.web.app/blog/${postId}`;
+    
+    const html = `
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Primary Meta Tags -->
+  <title>${post.title} | SafetyConnect</title>
+  <meta name="title" content="${post.title} | SafetyConnect" />
+  <meta name="description" content="${post.excerpt}" />
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="${url}" />
+  <meta property="og:title" content="${post.title}" />
+  <meta property="og:description" content="${post.excerpt}" />
+  <meta property="og:image" content="${post.coverImage}" />
+  <meta property="og:site_name" content="SafetyConnect" />
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="${url}" />
+  <meta property="twitter:title" content="${post.title}" />
+  <meta property="twitter:description" content="${post.excerpt}" />
+  <meta property="twitter:image" content="${post.coverImage}" />
+  
+  <!-- Redirect to actual page -->
+  <meta http-equiv="refresh" content="0; url=${url}" />
+  <script>window.location.href = "${url}";</script>
+</head>
+<body>
+  <p>Redirecting to <a href="${url}">${post.title}</a>...</p>
+</body>
+</html>`;
+    
+    res.set('Cache-Control', 'public, max-age=600, s-maxage=1200');
+    res.send(html);
+  } catch (error) {
+    console.error('Error fetching blog post:', error);
+    res.redirect(302, 'https://atld.web.app/');
   }
 });
