@@ -17,6 +17,7 @@
   "license": "ISC",
   "description": "Firebase Cloud Functions for SafetyConnect - Telegram notifications",
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "axios": "^1.13.2",
     "firebase-admin": "^13.6.0",
     "firebase-functions": "^7.0.0"

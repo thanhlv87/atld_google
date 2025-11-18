@@ -19,6 +19,7 @@ import {
 } from '../services/firebaseConfig';
 import { BlogPost } from '../types';
 import LoadingSpinner from './LoadingSpinner';
+import AIBlogWriter from './AIBlogWriter';
 
 interface BlogManagementProps {
   user: User;
@@ -28,6 +29,7 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [showAIWriter, setShowAIWriter] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -77,6 +79,30 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
     setPublished(false);
     setEditingPost(null);
     setShowForm(false);
+  };
+
+  const handleAIGenerate = (data: {
+    title: string;
+    excerpt: string;
+    content: string;
+    tags: string[];
+    suggestedCategory: string;
+  }) => {
+    // Fill form with AI-generated content
+    setTitle(data.title);
+    setExcerpt(data.excerpt);
+    setContent(data.content);
+    setCategory(data.suggestedCategory);
+    setTags(data.tags.join(', '));
+
+    // Show form and hide AI writer
+    setShowForm(true);
+    setShowAIWriter(false);
+
+    // Scroll to form
+    setTimeout(() => {
+      document.getElementById('blog-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   const handleEdit = (post: BlogPost) => {
@@ -209,18 +235,44 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
           <i className="fas fa-newspaper text-primary mr-2"></i>
           Quản lý Blog
         </h2>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-gradient-to-r from-primary to-orange-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all flex items-center gap-2"
-        >
-          <i className={`fas ${showForm ? 'fa-times' : 'fa-plus'}`}></i>
-          {showForm ? 'Đóng' : 'Tạo bài viết'}
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => {
+              setShowAIWriter(!showAIWriter);
+              if (!showAIWriter) {
+                setShowForm(false);
+                resetForm();
+              }
+            }}
+            className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all flex items-center gap-2"
+          >
+            <i className={`fas ${showAIWriter ? 'fa-times' : 'fa-magic'}`}></i>
+            {showAIWriter ? 'Đóng AI' : 'Viết bằng AI'}
+          </button>
+          <button
+            onClick={() => {
+              setShowForm(!showForm);
+              if (!showForm) {
+                setShowAIWriter(false);
+                resetForm();
+              }
+            }}
+            className="bg-gradient-to-r from-primary to-orange-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all flex items-center gap-2"
+          >
+            <i className={`fas ${showForm ? 'fa-times' : 'fa-plus'}`}></i>
+            {showForm ? 'Đóng' : 'Tạo thủ công'}
+          </button>
+        </div>
       </div>
+
+      {/* AI Writer */}
+      {showAIWriter && (
+        <AIBlogWriter onGenerate={handleAIGenerate} />
+      )}
 
       {/* Form */}
       {showForm && (
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div id="blog-form" className="bg-white rounded-lg shadow-lg p-6">
           <h3 className="text-xl font-bold text-gray-800 mb-4">
             {editingPost ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}
           </h3>
