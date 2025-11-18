@@ -87,7 +87,7 @@ const AIBlogWriter: React.FC<AIBlogWriterProps> = ({ onGenerate }) => {
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 
       const prompt = `Bạn là một chuyên gia về An toàn Lao động tại Việt Nam. Hãy viết một bài blog chuyên nghiệp, chi tiết và hữu ích về chủ đề sau:
 
