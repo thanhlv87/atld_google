@@ -186,7 +186,7 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
                 onChange={(e) => setCommentText(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 rows={3}
-                placeholder={isAdmin ? "Viết bình luận của bạn (admin có thể đính kèm ảnh)..." : "Viết bình luận của bạn..."}
+                placeholder="Viết bình luận của bạn (có thể đính kèm ảnh)..."
               />
 
               {/* Image Preview */}
@@ -212,21 +212,19 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
               )}
 
               <div className="flex items-center gap-3 mt-3">
-                {/* Image Upload - Only for admin */}
-                {isAdmin && (
-                  <label className="cursor-pointer text-gray-600 hover:text-primary transition-colors">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImageSelect}
-                      className="hidden"
-                      disabled={submitting}
-                    />
-                    <i className="fas fa-image mr-2"></i>
-                    Thêm ảnh ({imageFiles.length}/5)
-                  </label>
-                )}
+                {/* Image Upload - All users can upload */}
+                <label className="cursor-pointer text-gray-600 hover:text-primary transition-colors">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageSelect}
+                    className="hidden"
+                    disabled={submitting}
+                  />
+                  <i className="fas fa-image mr-2"></i>
+                  Thêm ảnh ({imageFiles.length}/5)
+                </label>
 
                 <button
                   type="submit"

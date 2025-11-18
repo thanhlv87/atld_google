@@ -19,6 +19,20 @@ self.addEventListener('install', (event) => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
+  // Skip cross-origin requests and external APIs
+  const url = new URL(event.request.url);
+  const isExternal = url.origin !== self.location.origin;
+  const isFirebase = url.hostname.includes('firebase') ||
+                     url.hostname.includes('googleapis.com') ||
+                     url.hostname.includes('aistudiocdn.com') ||
+                     url.hostname.includes('cdnjs.cloudflare.com') ||
+                     url.hostname.includes('cdn.tailwindcss.com');
+
+  // Don't handle external requests or Firebase/CDN
+  if (isExternal || isFirebase) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -44,7 +58,10 @@ self.addEventListener('fetch', (event) => {
 
             return response;
           }
-        );
+        ).catch(() => {
+          // Return cached version if network fails
+          return caches.match(event.request);
+        });
       })
   );
 });
