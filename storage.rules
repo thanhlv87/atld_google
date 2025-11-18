@@ -32,6 +32,22 @@ match /b/{bucket}/o {
       allow create, update, delete: if isAdmin();
     }
 
+    // === BLOG COMMENT IMAGES ===
+    match /blog-comments/{postId}/{imageId} {
+
+      // Anyone can read comment images (public)
+      allow read: if true;
+
+      // Authenticated users can upload images for comments
+      // Validate image type and size (max 5MB per image)
+      allow create: if isAuthenticated() &&
+                      validFileSize(5) &&
+                      validFileType('image/.*');
+
+      // Only uploader or admin can delete
+      allow delete: if isAuthenticated() || isAdmin();
+    }
+
     // === DOCUMENT UPLOADS ===
     match /documents/{documentId} {
       // Anyone can read/download documents
