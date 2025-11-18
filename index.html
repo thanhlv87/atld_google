@@ -6,6 +6,42 @@
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/thanhlv87/pic/refs/heads/main/connected.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval'
+        https://cdn.tailwindcss.com
+        https://aistudiocdn.com
+        https://www.googletagmanager.com
+        https://cdnjs.cloudflare.com
+        https://apis.google.com
+        https://www.gstatic.com
+        https://*.firebaseapp.com
+        https://*.googleapis.com;
+      style-src 'self' 'unsafe-inline'
+        https://cdnjs.cloudflare.com
+        https://cdn.tailwindcss.com;
+      img-src 'self' data: https: blob:;
+      font-src 'self' data:
+        https://cdnjs.cloudflare.com;
+      connect-src 'self'
+        https://*.firebaseio.com
+        https://*.googleapis.com
+        https://firestore.googleapis.com
+        https://*.cloudfunctions.net
+        https://identitytoolkit.googleapis.com
+        https://securetoken.googleapis.com
+        https://*.firebaseapp.com
+        https://generativelanguage.googleapis.com
+        wss://*.firebaseio.com;
+      frame-src 'self'
+        https://*.firebaseapp.com
+        https://accounts.google.com;
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+    ">
+
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#FF6B35" />
     <meta name="mobile-web-app-capable" content="yes" />
