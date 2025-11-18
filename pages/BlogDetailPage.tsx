@@ -29,7 +29,11 @@ const BlogDetailPage: React.FC = () => {
   const [error, setError] = useState('');
   const [currentUser, setCurrentUser] = useState(auth.currentUser);
 
+  // Debug logging
+  console.log('[BlogDetailPage] Render - postId:', postId, 'loading:', loading, 'error:', error);
+
   useEffect(() => {
+    console.log('[BlogDetailPage] fetchPost useEffect triggered - postId:', postId);
     const fetchPost = async () => {
       try {
         // Check if postId exists
@@ -193,7 +197,9 @@ const BlogDetailPage: React.FC = () => {
 
   // Monitor auth state changes
   useEffect(() => {
+    console.log('[BlogDetailPage] auth useEffect triggered');
     const unsubscribe = auth.onAuthStateChanged((user) => {
+      console.log('[BlogDetailPage] auth state changed:', user?.email || 'not logged in');
       setCurrentUser(user);
     });
 
