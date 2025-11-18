@@ -200,7 +200,13 @@ const BlogDetailPage: React.FC = () => {
     console.log('[BlogDetailPage] auth useEffect triggered');
     const unsubscribe = auth.onAuthStateChanged((user) => {
       console.log('[BlogDetailPage] auth state changed:', user?.email || 'not logged in');
-      setCurrentUser(user);
+      // Only update if the user actually changed
+      setCurrentUser((prevUser) => {
+        if (prevUser?.uid !== user?.uid) {
+          return user;
+        }
+        return prevUser;
+      });
     });
 
     return () => unsubscribe();
