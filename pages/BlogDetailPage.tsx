@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   db,
+  auth,
   doc,
   getDoc,
   updateDoc,
@@ -17,6 +18,7 @@ import { BlogPost } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import BlogCard from '../components/BlogCard';
 import LazyImage from '../components/LazyImage';
+import BlogCommentSection from '../components/BlogCommentSection';
 
 const BlogDetailPage: React.FC = () => {
   const navigate = useNavigate();
@@ -112,6 +114,56 @@ const BlogDetailPage: React.FC = () => {
         if (twitterImage && postData.coverImage) {
           twitterImage.setAttribute('content', postData.coverImage);
         }
+
+        // Update canonical URL
+        let canonicalLink = document.querySelector('link[rel="canonical"]');
+        if (!canonicalLink) {
+          canonicalLink = document.createElement('link');
+          canonicalLink.setAttribute('rel', 'canonical');
+          document.head.appendChild(canonicalLink);
+        }
+        canonicalLink.setAttribute('href', window.location.href);
+
+        // Add Structured Data (JSON-LD) for SEO
+        const existingScript = document.querySelector('script[type="application/ld+json"]');
+        if (existingScript) {
+          existingScript.remove();
+        }
+
+        const structuredData = {
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "headline": postData.title,
+          "description": postData.excerpt,
+          "image": postData.coverImage,
+          "datePublished": postData.publishedAt?.toDate().toISOString() || postData.createdAt?.toDate().toISOString(),
+          "dateModified": postData.updatedAt?.toDate().toISOString() || postData.createdAt?.toDate().toISOString(),
+          "author": {
+            "@type": "Person",
+            "name": postData.author.name,
+            "email": postData.author.email
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "SafetyConnect",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://raw.githubusercontent.com/thanhlv87/pic/refs/heads/main/connected.png"
+            }
+          },
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": window.location.href
+          },
+          "keywords": postData.tags.join(', '),
+          "articleSection": postData.category,
+          "inLanguage": "vi-VN"
+        };
+
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.text = JSON.stringify(structuredData);
+        document.head.appendChild(script);
 
         // Increment view count (silently fail if not authorized)
         try {
@@ -319,6 +371,9 @@ const BlogDetailPage: React.FC = () => {
               </div>
             </div>
           )}
+
+          {/* Comments Section */}
+          <BlogCommentSection postId={post.id} currentUser={auth.currentUser} />
 
           {/* Related Posts */}
           {relatedPosts.length > 0 && (

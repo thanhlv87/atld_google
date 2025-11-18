@@ -24,8 +24,9 @@ import KPIStatCard from '../components/KPIStatCard';
 import GrowthChart from '../components/GrowthChart';
 import InfoPanel from '../components/InfoPanel';
 import BlogManagement from '../components/BlogManagement';
+import SitemapGenerator from '../components/SitemapGenerator';
 
-type AdminTab = 'dashboard' | 'blog';
+type AdminTab = 'dashboard' | 'blog' | 'seo';
 
 const AdminPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
@@ -276,6 +277,17 @@ const AdminPage: React.FC = () => {
                             <i className="fas fa-newspaper mr-2"></i>
                             Quản lý Blog
                         </button>
+                        <button
+                            onClick={() => setActiveTab('seo')}
+                            className={`px-6 py-3 font-semibold transition-all ${
+                                activeTab === 'seo'
+                                    ? 'text-primary border-b-2 border-primary'
+                                    : 'text-gray-600 hover:text-gray-800'
+                            }`}
+                        >
+                            <i className="fas fa-search mr-2"></i>
+                            SEO Tools
+                        </button>
                     </nav>
                 </div>
 
@@ -369,6 +381,15 @@ const AdminPage: React.FC = () => {
                 {/* Blog Management Tab */}
                 {activeTab === 'blog' && currentUser && (
                     <BlogManagement user={currentUser} />
+                )}
+
+                {/* SEO Tools Tab */}
+                {activeTab === 'seo' && (
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 gap-6">
+                            <SitemapGenerator />
+                        </div>
+                    </div>
                 )}
             </div>
             {selectedPartner && (

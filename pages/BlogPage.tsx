@@ -13,6 +13,7 @@ import {
 import { BlogPost } from '../types';
 import BlogCard from '../components/BlogCard';
 import LoadingSpinner from '../components/LoadingSpinner';
+import SEOHead from '../components/SEOHead';
 
 const POSTS_PER_PAGE = 10;
 
@@ -93,6 +94,22 @@ const BlogPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEOHead
+        title="Blog & Kiến thức An toàn Lao động | SafetyConnect"
+        description="Cập nhật tin tức, kiến thức, quy định pháp luật về An toàn Lao động. Hướng dẫn, case study và kinh nghiệm thực tế từ các chuyên gia ATVSLĐ."
+        url={window.location.href}
+        type="website"
+        keywords={[
+          'blog an toàn lao động',
+          'kiến thức ATVSLĐ',
+          'tin tức an toàn lao động',
+          'quy định an toàn lao động',
+          'hướng dẫn ATVSLĐ',
+          'case study an toàn',
+          'SafetyConnect blog'
+        ]}
+      />
+
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-primary to-orange-500 text-white py-16">
         <div className="container mx-auto px-4">

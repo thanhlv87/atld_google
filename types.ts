@@ -121,6 +121,19 @@ export interface BlogPost {
   publishedAt?: Timestamp;
 }
 
+export interface BlogComment {
+  id: string;
+  postId: string; // ID của blog post
+  authorId: string; // UID của người comment
+  authorName: string;
+  authorEmail: string;
+  authorRole: 'admin' | 'user'; // Admin hoặc user thường
+  content: string; // Nội dung comment
+  images?: string[]; // Mảng URL của ảnh đính kèm
+  createdAt: Timestamp;
+  updatedAt?: Timestamp;
+}
+
 // Hằng số cho các nhóm đào tạo trong form
 export const TRAINING_GROUPS = [
     "Không áp dụng",

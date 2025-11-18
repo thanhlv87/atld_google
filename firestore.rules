@@ -145,6 +145,26 @@ service cloud.firestore {
       allow create, delete: if isAdmin();
     }
 
+    // === BLOG COMMENTS ===
+    match /blogComments/{commentId} {
+      // Anyone can read comments for published blog posts
+      allow read: if true;
+
+      // Authenticated users can create comments
+      allow create: if isAuthenticated() &&
+                    request.resource.data.authorId == request.auth.uid;
+
+      // Only comment author or admin can update their own comments
+      allow update: if isAuthenticated() && (
+        resource.data.authorId == request.auth.uid || isAdmin()
+      );
+
+      // Only comment author or admin can delete
+      allow delete: if isAuthenticated() && (
+        resource.data.authorId == request.auth.uid || isAdmin()
+      );
+    }
+
     // === DEFAULT DENY ===
 
     match /{document=**} {

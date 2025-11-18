@@ -1,11 +1,23 @@
-# Allow all friendly web crawlers
+# SafetyConnect - Robots.txt
+# Allow all search engines to crawl the site
+
 User-agent: *
+Allow: /
+
+# Disallow admin and private areas
 Disallow: /admin
+Disallow: /dashboard
 Disallow: /settings
+Disallow: /api/
 
-# Allow specific crawlers if needed
-# User-agent: Googlebot
-# Allow: /
+# Allow important paths for SEO
+Allow: /blog
+Allow: /blog/*
+Allow: /training
+Allow: /training/*
 
-# Point to the sitemap
+# Sitemap location
 Sitemap: https://atld.web.app/sitemap.xml
+
+# Crawl-delay for good measure (optional)
+Crawl-delay: 0.5
