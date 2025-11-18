@@ -11,7 +11,8 @@
       "Bash(npm install:*)",
       "Bash(firebase deploy:*)",
       "Bash(timeout:*)",
-      "Bash(firebase init:*)"
+      "Bash(firebase init:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
