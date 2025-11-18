@@ -13,7 +13,9 @@
       "Bash(timeout:*)",
       "Bash(firebase init:*)",
       "Bash(git push:*)",
-      "Bash(npm run deploy:*)"
+      "Bash(npm run deploy:*)",
+      "Bash(curl -I \"https://us-central1-gen-lang-client-0113063590.cloudfunctions.net/blogMetaTags\")",
+      "Bash(firebase firestore:get:*)"
     ],
     "deny": [],
     "ask": []

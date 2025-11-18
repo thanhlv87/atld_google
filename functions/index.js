@@ -344,17 +344,35 @@ Trả về dưới dạng JSON array: ["tag1", "tag2", "tag3", ...]`;
  * Serves HTML with proper OG tags for Facebook, Twitter, etc.
  */
 exports.blogMetaTags = onRequest(async (req, res) => {
-  const postId = req.path.split('/').pop();
-  
+  // Get postId from URL path or query parameter
+  // Firebase hosting rewrite sends: /blog/POST_ID -> function receives path or query
+  const urlPath = req.url || req.path;
+  let postId = '';
+
+  // Try to extract from path: /blog/POST_ID or /POST_ID
+  const pathMatch = urlPath.match(/\/blog\/([^/?]+)|^\/([^/?]+)/);
+  if (pathMatch) {
+    postId = pathMatch[1] || pathMatch[2];
+  }
+
+  // Also check query parameter as fallback
+  if (!postId && req.query && req.query.postId) {
+    postId = req.query.postId;
+  }
+
+  console.log('blogMetaTags called with URL:', urlPath, 'postId:', postId);
+
   if (!postId) {
+    console.log('No postId found, redirecting to home');
     res.redirect(302, 'https://atld.web.app/');
     return;
   }
 
   try {
     const postDoc = await db.collection('blogPosts').doc(postId).get();
-    
+
     if (!postDoc.exists) {
+      console.log('Post not found:', postId);
       res.redirect(302, 'https://atld.web.app/');
       return;
     }
