@@ -18,6 +18,8 @@ import {
 } from '../services/firebaseConfig';
 import { BlogComment } from '../types';
 import LoadingSpinner from './LoadingSpinner';
+import ImageLightbox from './ImageLightbox';
+import { compressImage, formatFileSize } from '../utils/imageCompression';
 
 interface BlogCommentSectionProps {
   postId: string;
@@ -31,6 +33,10 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
   const [commentText, setCommentText] = useState('');
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [showLightbox, setShowLightbox] = useState(false);
+  const [compressing, setCompressing] = useState(false);
 
   // Check if user is admin
   const isAdmin = currentUser?.email === 'thanhlv87@gmail.com';
@@ -55,7 +61,7 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
     return () => unsubscribe();
   }, [postId]);
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
       const maxImages = 5;
@@ -65,11 +71,32 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
         return;
       }
 
-      setImageFiles([...imageFiles, ...files]);
+      setCompressing(true);
+      try {
+        // Compress images before adding
+        const compressedFiles: File[] = [];
+        const newPreviewUrls: string[] = [];
 
-      // Create preview URLs
-      const newPreviewUrls = files.map(file => URL.createObjectURL(file));
-      setImagePreviewUrls([...imagePreviewUrls, ...newPreviewUrls]);
+        for (const file of files) {
+          const originalSize = file.size;
+          const compressedBlob = await compressImage(file, { maxWidth: 1080, maxHeight: 1080, quality: 0.8 });
+          const compressedFile = new File([compressedBlob], file.name, { type: file.type });
+          const compressedSize = compressedFile.size;
+
+          console.log(`Compressed ${file.name}: ${formatFileSize(originalSize)} → ${formatFileSize(compressedSize)}`);
+
+          compressedFiles.push(compressedFile);
+          newPreviewUrls.push(URL.createObjectURL(compressedBlob));
+        }
+
+        setImageFiles([...imageFiles, ...compressedFiles]);
+        setImagePreviewUrls([...imagePreviewUrls, ...newPreviewUrls]);
+      } catch (error) {
+        console.error('Error compressing images:', error);
+        alert('Có lỗi khi nén ảnh. Vui lòng thử lại.');
+      } finally {
+        setCompressing(false);
+      }
     }
   };
 
@@ -213,17 +240,26 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
 
               <div className="flex items-center gap-3 mt-3">
                 {/* Image Upload - All users can upload */}
-                <label className="cursor-pointer text-gray-600 hover:text-primary transition-colors">
+                <label className={`cursor-pointer transition-colors ${compressing ? 'text-gray-400' : 'text-gray-600 hover:text-primary'}`}>
                   <input
                     type="file"
                     accept="image/*"
                     multiple
                     onChange={handleImageSelect}
                     className="hidden"
-                    disabled={submitting}
+                    disabled={submitting || compressing}
                   />
-                  <i className="fas fa-image mr-2"></i>
-                  Thêm ảnh ({imageFiles.length}/5)
+                  {compressing ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin mr-2"></i>
+                      Đang nén ảnh...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-image mr-2"></i>
+                      Thêm ảnh ({imageFiles.length}/5)
+                    </>
+                  )}
                 </label>
 
                 <button
@@ -296,19 +332,24 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
                   {comment.images && comment.images.length > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-2">
                       {comment.images.map((imageUrl, index) => (
-                        <a
+                        <button
                           key={index}
-                          href={imageUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block"
+                          onClick={() => {
+                            setLightboxImages(comment.images || []);
+                            setLightboxIndex(index);
+                            setShowLightbox(true);
+                          }}
+                          className="block relative group overflow-hidden rounded-lg"
                         >
                           <img
                             src={imageUrl}
                             alt={`Comment image ${index + 1}`}
-                            className="w-full h-32 object-cover rounded-lg hover:opacity-90 transition-opacity cursor-pointer"
+                            className="w-full h-32 object-cover transition-transform group-hover:scale-110 cursor-pointer"
                           />
-                        </a>
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                            <i className="fas fa-search-plus text-white text-2xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                          </div>
+                        </button>
                       ))}
                     </div>
                   )}
@@ -329,6 +370,15 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
           ))
         )}
       </div>
+
+      {/* Image Lightbox */}
+      {showLightbox && (
+        <ImageLightbox
+          images={lightboxImages}
+          initialIndex={lightboxIndex}
+          onClose={() => setShowLightbox(false)}
+        />
+      )}
     </div>
   );
 };
