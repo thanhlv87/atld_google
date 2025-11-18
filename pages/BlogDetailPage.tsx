@@ -85,6 +85,18 @@ const BlogDetailPage: React.FC = () => {
           ogImage.setAttribute('content', postData.coverImage);
         }
 
+        // Update og:url
+        const ogUrl = document.querySelector('meta[property="og:url"]');
+        if (ogUrl) {
+          ogUrl.setAttribute('content', window.location.href);
+        }
+
+        // Update og:type for article
+        const ogType = document.querySelector('meta[property="og:type"]');
+        if (ogType) {
+          ogType.setAttribute('content', 'article');
+        }
+
         // Update Twitter Card tags
         const twitterTitle = document.querySelector('meta[property="twitter:title"]');
         if (twitterTitle) {
