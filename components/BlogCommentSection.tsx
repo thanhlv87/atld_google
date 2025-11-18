@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   db,
   storage,
@@ -189,6 +189,11 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
     });
   };
 
+  // Memoize onClose to prevent unnecessary re-renders
+  const handleCloseLightbox = useCallback(() => {
+    setShowLightbox(false);
+  }, []);
+
   if (loading) {
     return <LoadingSpinner size="small" message="Đang tải bình luận..." />;
   }
@@ -376,7 +381,7 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
         <ImageLightbox
           images={lightboxImages}
           initialIndex={lightboxIndex}
-          onClose={() => setShowLightbox(false)}
+          onClose={handleCloseLightbox}
         />
       )}
     </div>
