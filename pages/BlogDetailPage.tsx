@@ -27,6 +27,7 @@ const BlogDetailPage: React.FC = () => {
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [currentUser, setCurrentUser] = useState(auth.currentUser);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -189,6 +190,15 @@ const BlogDetailPage: React.FC = () => {
 
     fetchPost();
   }, [postId]);
+
+  // Monitor auth state changes
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setCurrentUser(user);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const formatDate = (timestamp: any) => {
     if (!timestamp) return '';
@@ -362,7 +372,7 @@ const BlogDetailPage: React.FC = () => {
           )}
 
           {/* Comments Section */}
-          <BlogCommentSection postId={post.id} currentUser={auth.currentUser} />
+          <BlogCommentSection postId={post.id} currentUser={currentUser} />
 
           {/* Related Posts */}
           {relatedPosts.length > 0 && (
