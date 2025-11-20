@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebaseConfig';
-import { TrustedPartner } from '../types';
+import { TrustedPartner, PartnerProfile, partnerProfileToTrustedPartner } from '../types';
 import TrustedPartnerCard from '../components/TrustedPartnerCard';
 import TrustedPartnerInfoModal from '../components/TrustedPartnerInfoModal';
 
@@ -19,10 +19,10 @@ const AllPartnersPage: React.FC = () => {
     setError('');
     setLoading(true);
 
-    const partnersCollection = collection(db, 'trustedPartners');
+    const partnersCollection = collection(db, 'partners');
     const partnersQuery = query(
       partnersCollection,
-      where('verified', '==', true),
+      where('status', '==', 'approved'),
       orderBy('displayOrder', 'asc'),
       orderBy('createdAt', 'desc')
     );
@@ -30,10 +30,13 @@ const AllPartnersPage: React.FC = () => {
     const unsubscribe = onSnapshot(
       partnersQuery,
       (querySnapshot) => {
-        const partnersData = querySnapshot.docs.map(docSnap => ({
-          id: docSnap.id,
-          ...docSnap.data(),
-        } as TrustedPartner));
+        const partnersData = querySnapshot.docs.map(docSnap => {
+          const partnerProfile = {
+            uid: docSnap.id,
+            ...docSnap.data()
+          } as PartnerProfile;
+          return partnerProfileToTrustedPartner(partnerProfile);
+        });
         setPartners(partnersData);
         setLoading(false);
       },

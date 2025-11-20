@@ -35,6 +35,15 @@ export interface PartnerProfile {
     status: 'pending' | 'approved' | 'rejected';
     membership: 'free' | 'premium';
     createdAt: Timestamp;
+    // New fields for trusted partners feature
+    businessName?: string; // Tên doanh nghiệp
+    website?: string; // Địa chỉ website
+    logo?: string; // URL logo
+    description?: string; // Mô tả ngắn về doanh nghiệp
+    establishedYear?: number; // Năm thành lập
+    featured?: boolean; // Có được hiển thị trên trang chủ không
+    displayOrder?: number; // Thứ tự hiển thị (cho featured partners)
+    verified?: boolean; // Trạng thái xác nhận đặc biệt (khác với approved)
 }
 
 export interface Document {
@@ -200,4 +209,28 @@ export interface TrustedPartner {
   displayOrder?: number; // Thứ tự hiển thị
   createdAt: Timestamp;
   updatedAt?: Timestamp;
+}
+
+// Helper function to convert PartnerProfile to TrustedPartner format
+export function partnerProfileToTrustedPartner(partner: PartnerProfile): TrustedPartner {
+  return {
+    id: partner.uid,
+    businessName: partner.businessName || partner.email.split('@')[0] || 'Đối tác đào tạo',
+    taxId: partner.taxId,
+    website: partner.website || '',
+    logo: partner.logo,
+    description: partner.description || 'Đơn vị đào tạo an toàn lao động uy tín',
+    specializations: partner.capabilities || [],
+    address: partner.address,
+    phone: partner.phone,
+    email: partner.email,
+    establishedYear: partner.establishedYear,
+    certifications: [],
+    notableClients: partner.notableClients ? [partner.notableClients] : [],
+    verified: partner.verified || false,
+    featured: partner.featured || false,
+    displayOrder: partner.displayOrder,
+    createdAt: partner.createdAt,
+    updatedAt: partner.createdAt
+  };
 }

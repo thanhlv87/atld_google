@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebaseConfig';
-import { TrustedPartner } from '../types';
+import { TrustedPartner, PartnerProfile, partnerProfileToTrustedPartner } from '../types';
 import TrainingRequestForm from '../components/TrainingRequestForm';
 import TrustedPartnerCard from '../components/TrustedPartnerCard';
 import TrustedPartnerInfoModal from '../components/TrustedPartnerInfoModal';
@@ -73,12 +73,12 @@ const HomePage: React.FC = () => {
     document.getElementById('create-request-form')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Fetch featured trusted partners
+  // Fetch featured trusted partners from partners collection
   useEffect(() => {
-    const partnersCollection = collection(db, 'trustedPartners');
+    const partnersCollection = collection(db, 'partners');
     const partnersQuery = query(
       partnersCollection,
-      where('verified', '==', true),
+      where('status', '==', 'approved'),
       where('featured', '==', true),
       orderBy('displayOrder', 'asc'),
       limit(3)
@@ -87,10 +87,13 @@ const HomePage: React.FC = () => {
     const unsubscribe = onSnapshot(
       partnersQuery,
       (querySnapshot) => {
-        const partnersData = querySnapshot.docs.map(docSnap => ({
-          id: docSnap.id,
-          ...docSnap.data(),
-        } as TrustedPartner));
+        const partnersData = querySnapshot.docs.map(docSnap => {
+          const partnerProfile = {
+            uid: docSnap.id,
+            ...docSnap.data()
+          } as PartnerProfile;
+          return partnerProfileToTrustedPartner(partnerProfile);
+        });
         setTrustedPartners(partnersData);
       },
       (err) => {
