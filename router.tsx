@@ -11,6 +11,7 @@ const DocumentsPage = lazy(() => import('./pages/DocumentsPage'));
 const ChatPage = lazy(() => import('./pages/ChatPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const TrainingLandingPage = lazy(() => import('./pages/TrainingLandingPage'));
+const AllPartnersPage = lazy(() => import('./pages/AllPartnersPage'));
 
 export const router = createBrowserRouter([
   {
@@ -44,6 +45,11 @@ export const router = createBrowserRouter([
       {
         path: 'admin',
         element: <AdminPage />
+      },
+      // All partners page
+      {
+        path: 'partners',
+        element: <AllPartnersPage />
       },
       // Training landing pages - using dynamic route with param
       {

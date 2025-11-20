@@ -179,3 +179,25 @@ export const PARTNER_CAPABILITIES = [
     "Sơ cấp cứu",
     "Huấn luyện chung (Nhiều lĩnh vực)",
 ];
+
+// Trusted Training Partner Types
+export interface TrustedPartner {
+  id: string;
+  businessName: string; // Tên doanh nghiệp
+  taxId: string; // Mã số thuế
+  website: string; // Địa chỉ website
+  logo?: string; // URL logo (optional)
+  description: string; // Mô tả ngắn về doanh nghiệp
+  specializations: string[]; // Các lĩnh vực chuyên môn
+  address: string; // Địa chỉ trụ sở
+  phone: string; // Số điện thoại
+  email: string; // Email liên hệ
+  establishedYear?: number; // Năm thành lập (optional)
+  certifications?: string[]; // Các chứng chỉ, giấy phép (optional)
+  notableClients?: string[]; // Khách hàng tiêu biểu (optional)
+  verified: boolean; // Trạng thái xác nhận
+  featured: boolean; // Có được hiển thị trên trang chủ không
+  displayOrder?: number; // Thứ tự hiển thị
+  createdAt: Timestamp;
+  updatedAt?: Timestamp;
+}

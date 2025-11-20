@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { db } from '../services/firebaseConfig';
+import { TrustedPartner } from '../types';
 import TrainingRequestForm from '../components/TrainingRequestForm';
+import TrustedPartnerCard from '../components/TrustedPartnerCard';
+import TrustedPartnerInfoModal from '../components/TrustedPartnerInfoModal';
 
 const StatCard: React.FC<{ value: string; label: string; icon: string; gradient: string }> = ({ value, label, icon, gradient }) => (
   <div className={`relative overflow-hidden bg-gradient-to-br ${gradient} rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group`}>
@@ -61,10 +66,40 @@ const CourseCard: React.FC<{ icon: string; title: string; onClick?: () => void; 
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
+  const [trustedPartners, setTrustedPartners] = useState<TrustedPartner[]>([]);
+  const [selectedPartner, setSelectedPartner] = useState<TrustedPartner | null>(null);
 
   const scrollToForm = () => {
     document.getElementById('create-request-form')?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  // Fetch featured trusted partners
+  useEffect(() => {
+    const partnersCollection = collection(db, 'trustedPartners');
+    const partnersQuery = query(
+      partnersCollection,
+      where('verified', '==', true),
+      where('featured', '==', true),
+      orderBy('displayOrder', 'asc'),
+      limit(3)
+    );
+
+    const unsubscribe = onSnapshot(
+      partnersQuery,
+      (querySnapshot) => {
+        const partnersData = querySnapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data(),
+        } as TrustedPartner));
+        setTrustedPartners(partnersData);
+      },
+      (err) => {
+        console.error("Error fetching trusted partners: ", err);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <>
@@ -222,6 +257,46 @@ const HomePage: React.FC = () => {
           </div>
       </section>
 
+      {/* Trusted Partners Section */}
+      {trustedPartners.length > 0 && (
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <div className="inline-block bg-gradient-to-r from-blue-500 to-blue-700 text-white px-4 py-1 rounded-full text-sm font-semibold mb-4 flex items-center gap-2 justify-center">
+                <i className="fas fa-check-circle"></i>
+                <span>ĐỐI TÁC UY TÍN</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-extrabold text-neutral-dark mb-4">
+                Đơn vị đối tác huấn luyện được xác nhận
+              </h2>
+              <p className="text-gray-600 text-lg max-w-3xl mx-auto">
+                Các đơn vị đào tạo an toàn lao động uy tín, được kiểm chứng và đánh giá cao
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              {trustedPartners.map((partner) => (
+                <TrustedPartnerCard
+                  key={partner.id}
+                  partner={partner}
+                  onClick={() => setSelectedPartner(partner)}
+                />
+              ))}
+            </div>
+
+            {/* View All Partners Button */}
+            <div className="text-center">
+              <button
+                onClick={() => navigate('/partners')}
+                className="group bg-gradient-to-r from-blue-500 to-blue-700 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 hover:scale-105 inline-flex items-center gap-3"
+              >
+                <span>Xem tất cả đối tác</span>
+                <i className="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Form Section */}
       <section id="create-request-form" className="relative py-20 bg-gradient-to-br from-white via-blue-50 to-white overflow-hidden">
@@ -244,6 +319,18 @@ const HomePage: React.FC = () => {
               </div>
           </div>
       </section>
+
+      {/* Trusted Partner Info Modal */}
+      {selectedPartner && (
+        <TrustedPartnerInfoModal
+          partner={selectedPartner}
+          onClose={() => setSelectedPartner(null)}
+          onViewAllPartners={() => {
+            setSelectedPartner(null);
+            navigate('/partners');
+          }}
+        />
+      )}
     </>
   );
 };
