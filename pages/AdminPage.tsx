@@ -230,6 +230,21 @@ const AdminPage: React.FC = () => {
         setSelectedPartner(null);
     };
 
+    const handleUpdatePartner = (uid: string, updates: Partial<PartnerProfile>) => {
+        setActionError(null);
+        const partnerDocRef = doc(db, 'partners', uid);
+        updateDoc(partnerDocRef, updates)
+            .then(() => {
+                console.log('Partner updated successfully:', updates);
+                setSelectedPartner(null);
+            })
+            .catch((err: any) => {
+                console.error('Error updating partner:', err);
+                const errorMessage = `Không thể cập nhật đối tác. Lỗi: ${err.message}`;
+                setActionError(errorMessage);
+            });
+    };
+
     const handleShowViewers = (request: TrainingRequest) => {
         if (!request.viewedBy || request.viewedBy.length === 0) return;
         const viewers = partners.filter(p => request.viewedBy.includes(p.uid));
@@ -393,11 +408,12 @@ const AdminPage: React.FC = () => {
                 )}
             </div>
             {selectedPartner && (
-                <PartnerDetailModal 
+                <PartnerDetailModal
                     partner={selectedPartner}
                     onClose={() => setSelectedPartner(null)}
                     onApprove={handleApproveFromModal}
                     onReject={handleRejectFromModal}
+                    onUpdate={handleUpdatePartner}
                 />
             )}
             {viewingPartners && (
