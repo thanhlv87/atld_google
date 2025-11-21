@@ -24,8 +24,7 @@ const AllPartnersPage: React.FC = () => {
     const partnersQuery = query(
       partnersCollection,
       where('status', '==', 'approved'),
-      orderBy('displayOrder', 'asc'),
-      orderBy('createdAt', 'desc')
+      orderBy('displayOrder', 'asc')
     );
 
     const unsubscribe = onSnapshot(
