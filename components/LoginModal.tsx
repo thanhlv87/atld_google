@@ -24,9 +24,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
 
   const initialRegisterState = {
+    businessName: '',
     taxId: '',
     address: '',
     phone: '',
+    website: '',
+    description: '',
     notableClients: '',
     capabilities: [] as string[],
     subscribesToEmails: true,
@@ -66,6 +69,16 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
             setLoading(false);
             return;
         }
+        if (!registerData.businessName.trim()) {
+            setError('Vui lòng nhập tên doanh nghiệp.');
+            setLoading(false);
+            return;
+        }
+        if (registerData.capabilities.length === 0) {
+            setError('Vui lòng chọn ít nhất một năng lực đào tạo.');
+            setLoading(false);
+            return;
+        }
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         if (user) {
@@ -73,15 +86,20 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
             await setDoc(partnerDocRef, {
                 uid: user.uid,
                 email: email,
+                businessName: registerData.businessName,
                 taxId: registerData.taxId,
                 address: registerData.address,
                 phone: registerData.phone,
+                website: registerData.website,
+                description: registerData.description || 'description',
                 notableClients: registerData.notableClients,
                 capabilities: registerData.capabilities,
                 subscribesToEmails: registerData.subscribesToEmails,
                 createdAt: serverTimestamp(),
                 status: 'pending',
                 membership: 'free',
+                verified: false,
+                featured: false,
             });
         }
       }
@@ -171,12 +189,15 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
                   <input type="email" placeholder="Email đăng nhập (*)" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClasses} required />
                   <input type="password" placeholder="Mật khẩu (*)" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClasses} required />
               </div>
+              <input type="text" name="businessName" placeholder="Tên doanh nghiệp (*)" value={registerData.businessName} onChange={handleRegisterChange} className={inputClasses} required />
               <input type="text" name="taxId" placeholder="Mã số thuế (*)" value={registerData.taxId} onChange={handleRegisterChange} className={inputClasses} required />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <input type="text" name="address" placeholder="Địa chỉ công ty (*)" value={registerData.address} onChange={handleRegisterChange} className={inputClasses} required />
                   <input type="tel" name="phone" placeholder="Số điện thoại (*)" value={registerData.phone} onChange={handleRegisterChange} className={inputClasses} required />
               </div>
-              <textarea name="notableClients" placeholder="Các khách hàng/dự án tiêu biểu (cách nhau bởi dấu phẩy)" value={registerData.notableClients} onChange={handleRegisterChange} rows={3} className={inputClasses} />
+              <input type="url" name="website" placeholder="Website (nếu có)" value={registerData.website} onChange={handleRegisterChange} className={inputClasses} />
+              <textarea name="description" placeholder="Mô tả về doanh nghiệp và năng lực đào tạo" value={registerData.description} onChange={handleRegisterChange} rows={3} className={inputClasses} />
+              <textarea name="notableClients" placeholder="Các khách hàng/dự án tiêu biểu (cách nhau bởi dấu phẩy)" value={registerData.notableClients} onChange={handleRegisterChange} rows={2} className={inputClasses} />
               <div>
                   <label className="font-semibold text-neutral-dark mb-2 block text-sm">Năng lực đào tạo (*)</label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 max-h-40 overflow-y-auto p-3 border rounded-lg bg-gray-50">

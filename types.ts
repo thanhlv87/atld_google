@@ -229,7 +229,8 @@ export function partnerProfileToTrustedPartner(partner: PartnerProfile): Trusted
 
   // Create professional description based on specializations
   const getDescription = (description: string | undefined, capabilities: string[]): string => {
-    if (description && description.trim() !== '') {
+    // Ignore placeholder or empty descriptions
+    if (description && description.trim() !== '' && description.trim().toLowerCase() !== 'description') {
       return description.trim();
     }
 
