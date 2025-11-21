@@ -2,9 +2,9 @@ import { Timestamp } from './services/firebaseConfig';
 
 // Cấu trúc cho một mục đào tạo chi tiết
 export interface TrainingDetail {
-    type: string;
-    group: string; // e.g., "Nhóm 1 (NĐ 44)" or "Không áp dụng"
-    participants: number;
+  type: string;
+  group: string; // e.g., "Nhóm 1 (NĐ 44)" or "Không áp dụng"
+  participants: number;
 }
 
 export interface TrainingRequest {
@@ -24,26 +24,26 @@ export interface TrainingRequest {
 }
 
 export interface PartnerProfile {
-    uid: string;
-    email: string;
-    taxId: string;
-    address: string;
-    phone: string;
-    notableClients: string;
-    capabilities: string[];
-    subscribesToEmails: boolean;
-    status: 'pending' | 'approved' | 'rejected';
-    membership: 'free' | 'premium';
-    createdAt: Timestamp;
-    // New fields for trusted partners feature
-    businessName?: string; // Tên doanh nghiệp
-    website?: string; // Địa chỉ website
-    logo?: string; // URL logo
-    description?: string; // Mô tả ngắn về doanh nghiệp
-    establishedYear?: number; // Năm thành lập
-    featured?: boolean; // Có được hiển thị trên trang chủ không
-    displayOrder?: number; // Thứ tự hiển thị (cho featured partners)
-    verified?: boolean; // Trạng thái xác nhận đặc biệt (khác với approved)
+  uid: string;
+  email: string;
+  taxId: string;
+  address: string;
+  phone: string;
+  notableClients: string;
+  capabilities: string[];
+  subscribesToEmails: boolean;
+  status: 'pending' | 'approved' | 'rejected';
+  membership: 'free' | 'premium';
+  createdAt: Timestamp;
+  // New fields for trusted partners feature
+  businessName?: string; // Tên doanh nghiệp
+  website?: string; // Địa chỉ website
+  logo?: string; // URL logo
+  description?: string; // Mô tả ngắn về doanh nghiệp
+  establishedYear?: number; // Năm thành lập
+  featured?: boolean; // Có được hiển thị trên trang chủ không
+  displayOrder?: number; // Thứ tự hiển thị (cho featured partners)
+  verified?: boolean; // Trạng thái xác nhận đặc biệt (khác với approved)
 }
 
 export interface Document {
@@ -145,48 +145,48 @@ export interface BlogComment {
 
 // Hằng số cho các nhóm đào tạo trong form
 export const TRAINING_GROUPS = [
-    "Không áp dụng",
-    "Nhóm 1 (NĐ 44)",
-    "Nhóm 2 (NĐ 44)",
-    "Nhóm 3 (NĐ 44)",
-    "Nhóm 4 (NĐ 44)",
-    "Nhóm 5 (NĐ 44)",
-    "Nhóm 6 (NĐ 44)",
+  "Không áp dụng",
+  "Nhóm 1 (NĐ 44)",
+  "Nhóm 2 (NĐ 44)",
+  "Nhóm 3 (NĐ 44)",
+  "Nhóm 4 (NĐ 44)",
+  "Nhóm 5 (NĐ 44)",
+  "Nhóm 6 (NĐ 44)",
 ];
 
 export const DECREE_44_GROUPS = [ // Giữ lại để tham khảo
-    "Đào tạo Nhóm 1 (NĐ 44)",
-    "Đào tạo Nhóm 2 (NĐ 44)",
-    "Đào tạo Nhóm 3 (NĐ 44)",
-    "Đào tạo Nhóm 4 (NĐ 44)",
-    "Đào tạo Nhóm 5 (NĐ 44)",
-    "Đào tạo Nhóm 6 (NĐ 44)",
+  "Đào tạo Nhóm 1 (NĐ 44)",
+  "Đào tạo Nhóm 2 (NĐ 44)",
+  "Đào tạo Nhóm 3 (NĐ 44)",
+  "Đào tạo Nhóm 4 (NĐ 44)",
+  "Đào tạo Nhóm 5 (NĐ 44)",
+  "Đào tạo Nhóm 6 (NĐ 44)",
 ];
 
 // For clients to choose from when creating a request
 export const TRAINING_TYPES = [
-    "An toàn điện",
-    "An toàn xây dựng",
-    "An toàn hóa chất",
-    "Phòng cháy chữa cháy (PCCC)",
-    "An toàn bức xạ",
-    "Quan trắc môi trường",
-    "Đánh giá phân loại lao động",
-    "Sơ cấp cứu",
-    "Khác (Vui lòng ghi rõ)"
+  "An toàn điện",
+  "An toàn xây dựng",
+  "An toàn hóa chất",
+  "Phòng cháy chữa cháy (PCCC)",
+  "An toàn bức xạ",
+  "Quan trắc môi trường",
+  "Đánh giá phân loại lao động",
+  "Sơ cấp cứu",
+  "Khác (Vui lòng ghi rõ)"
 ];
 
 // For partners to select their capabilities during registration
 export const PARTNER_CAPABILITIES = [
-    "An toàn điện",
-    "An toàn xây dựng",
-    "An toàn hóa chất",
-    "Phòng cháy chữa cháy (PCCC)",
-    "An toàn bức xạ",
-    "Quan trắc môi trường",
-    "Đánh giá phân loại lao động",
-    "Sơ cấp cứu",
-    "Huấn luyện chung (Nhiều lĩnh vực)",
+  "An toàn điện",
+  "An toàn xây dựng",
+  "An toàn hóa chất",
+  "Phòng cháy chữa cháy (PCCC)",
+  "An toàn bức xạ",
+  "Quan trắc môi trường",
+  "Đánh giá phân loại lao động",
+  "Sơ cấp cứu",
+  "Huấn luyện chung (Nhiều lĩnh vực)",
 ];
 
 // Trusted Training Partner Types
@@ -213,13 +213,41 @@ export interface TrustedPartner {
 
 // Helper function to convert PartnerProfile to TrustedPartner format
 export function partnerProfileToTrustedPartner(partner: PartnerProfile): TrustedPartner {
+  // Create professional business name from email if not provided
+  const getBusinessName = (businessName: string | undefined, email: string): string => {
+    if (businessName && businessName.trim() !== '') {
+      return businessName.trim();
+    }
+
+    // Extract from email and capitalize
+    const emailPrefix = email.split('@')[0];
+    return emailPrefix
+      .split(/[-_.]/)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
+  // Create professional description based on specializations
+  const getDescription = (description: string | undefined, capabilities: string[]): string => {
+    if (description && description.trim() !== '') {
+      return description.trim();
+    }
+
+    if (capabilities && capabilities.length > 0) {
+      const mainSpec = capabilities[0];
+      return `Đơn vị đào tạo chuyên về ${mainSpec} và các lĩnh vực an toàn lao động khác`;
+    }
+
+    return 'Đơn vị đào tạo an toàn lao động uy tín';
+  };
+
   return {
     id: partner.uid,
-    businessName: partner.businessName || partner.email.split('@')[0] || 'Đối tác đào tạo',
+    businessName: getBusinessName(partner.businessName, partner.email),
     taxId: partner.taxId,
     website: partner.website || '',
     logo: partner.logo,
-    description: partner.description || 'Đơn vị đào tạo an toàn lao động uy tín',
+    description: getDescription(partner.description, partner.capabilities || []),
     specializations: partner.capabilities || [],
     address: partner.address,
     phone: partner.phone,

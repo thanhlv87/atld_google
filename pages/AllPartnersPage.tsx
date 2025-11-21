@@ -5,6 +5,7 @@ import { db } from '../services/firebaseConfig';
 import { TrustedPartner, PartnerProfile, partnerProfileToTrustedPartner } from '../types';
 import TrustedPartnerCard from '../components/TrustedPartnerCard';
 import TrustedPartnerInfoModal from '../components/TrustedPartnerInfoModal';
+import SEOHead from '../components/SEOHead';
 
 const AllPartnersPage: React.FC = () => {
   const navigate = useNavigate();
@@ -92,6 +93,20 @@ const AllPartnersPage: React.FC = () => {
 
   return (
     <>
+      {/* SEO Meta Tags */}
+      <SEOHead
+        title="Đối Tác Huấn Luyện An Toàn Lao Động Uy Tín | SafetyConnect"
+        description={`Danh sách ${partners.length} đơn vị đào tạo an toàn lao động được xác nhận và đánh giá cao trên toàn quốc. Tìm kiếm đối tác phù hợp với nhu cầu của bạn.`}
+        url="https://atld.web.app/partners"
+        keywords={[
+          'đối tác đào tạo ATLD',
+          'đơn vị huấn luyện an toàn lao động',
+          'danh sách đối tác uy tín',
+          'công ty đào tạo ATVSLĐ',
+          ...allSpecializations
+        ]}
+      />
+
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
         {/* Hero Section */}
         <section className="bg-gradient-to-r from-primary to-orange-600 text-white py-16">

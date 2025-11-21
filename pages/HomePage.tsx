@@ -34,33 +34,33 @@ const ProcessStep: React.FC<{ number: string; title: string; description: string
 );
 
 const BenefitCard: React.FC<{ icon: string; title: string; description: string; gradient: string }> = ({ icon, title, description, gradient }) => (
-    <div className="relative bg-white rounded-2xl shadow-lg p-8 border border-gray-100 text-center transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl h-full group overflow-hidden">
-        <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${gradient} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}></div>
-        <div className={`relative flex items-center justify-center h-20 w-20 rounded-2xl bg-gradient-to-br ${gradient} mx-auto mb-6 shadow-lg group-hover:scale-110 group-hover:rotate-12 transition-all duration-300`}>
-            <i className={`fas ${icon} text-4xl text-white`}></i>
-        </div>
-        <h3 className="font-bold text-neutral-dark mb-3 text-xl group-hover:text-primary transition-colors">{title}</h3>
-        <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
-        <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-orange-500/5 rounded-full blur-3xl transform translate-x-16 translate-y-16 group-hover:scale-150 transition-transform duration-500"></div>
+  <div className="relative bg-white rounded-2xl shadow-lg p-8 border border-gray-100 text-center transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl h-full group overflow-hidden">
+    <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${gradient} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}></div>
+    <div className={`relative flex items-center justify-center h-20 w-20 rounded-2xl bg-gradient-to-br ${gradient} mx-auto mb-6 shadow-lg group-hover:scale-110 group-hover:rotate-12 transition-all duration-300`}>
+      <i className={`fas ${icon} text-4xl text-white`}></i>
     </div>
+    <h3 className="font-bold text-neutral-dark mb-3 text-xl group-hover:text-primary transition-colors">{title}</h3>
+    <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
+    <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-orange-500/5 rounded-full blur-3xl transform translate-x-16 translate-y-16 group-hover:scale-150 transition-transform duration-500"></div>
+  </div>
 );
 
 const CourseCard: React.FC<{ icon: string; title: string; onClick?: () => void; gradient: string }> = ({ icon, title, onClick, gradient }) => (
-    <div
-        onClick={onClick}
-        className="relative bg-gradient-to-br from-white to-gray-50 p-8 rounded-2xl shadow-lg border border-gray-100 text-center transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl cursor-pointer group overflow-hidden"
-    >
-        <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
-        <div className="relative z-10">
-            <div className={`inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br ${gradient} mb-4 shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
-                <i className={`fas ${icon} text-4xl text-white`}></i>
-            </div>
-            <h4 className="font-bold text-neutral-dark group-hover:text-white transition-colors text-lg mb-2">{title}</h4>
-            <p className="text-xs text-gray-500 group-hover:text-white/90 mt-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                <i className="fas fa-arrow-right mr-1"></i>Xem chi tiết
-            </p>
-        </div>
+  <div
+    onClick={onClick}
+    className="relative bg-gradient-to-br from-white to-gray-50 p-8 rounded-2xl shadow-lg border border-gray-100 text-center transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl cursor-pointer group overflow-hidden"
+  >
+    <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+    <div className="relative z-10">
+      <div className={`inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br ${gradient} mb-4 shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
+        <i className={`fas ${icon} text-4xl text-white`}></i>
+      </div>
+      <h4 className="font-bold text-neutral-dark group-hover:text-white transition-colors text-lg mb-2">{title}</h4>
+      <p className="text-xs text-gray-500 group-hover:text-white/90 mt-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+        <i className="fas fa-arrow-right mr-1"></i>Xem chi tiết
+      </p>
     </div>
+  </div>
 );
 
 
@@ -175,7 +175,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
-      
+
       {/* How it Works Section */}
       <section className="py-20 bg-gradient-to-br from-gray-50 via-white to-gray-50">
         <div className="container mx-auto px-4">
@@ -220,107 +220,130 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Benefits Section */}
-       <section className="py-20 bg-white">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-                <div className="inline-block bg-gradient-to-r from-primary to-orange-600 text-white px-4 py-1 rounded-full text-sm font-semibold mb-4">
-                  LỢI ÍCH
-                </div>
-                <h2 className="text-4xl md:text-5xl font-extrabold text-neutral-dark mb-4">Tại sao chọn SafetyConnect?</h2>
-                <p className="text-gray-600 text-lg max-w-2xl mx-auto">Giải pháp toàn diện cho nhu cầu đào tạo an toàn lao động của doanh nghiệp</p>
+          <div className="text-center mb-16">
+            <div className="inline-block bg-gradient-to-r from-primary to-orange-600 text-white px-4 py-1 rounded-full text-sm font-semibold mb-4">
+              LỢI ÍCH
             </div>
-            <div className="grid md:grid-cols-3 gap-10">
-                <BenefitCard icon="fa-rocket" title="Kết nối nhanh chóng" description="Tiếp cận hàng chục đối tác đào tạo uy tín chỉ với một yêu cầu duy nhất, tiết kiệm thời gian tìm kiếm." gradient="from-blue-500 to-blue-700"/>
-                <BenefitCard icon="fa-piggy-bank" title="Hoàn toàn miễn phí" description="Nền tảng miễn phí cho các doanh nghiệp có nhu cầu đào tạo, giúp tối ưu hóa chi phí." gradient="from-green-500 to-green-700"/>
-                <BenefitCard icon="fa-star" title="Chất lượng đảm bảo" description="Tất cả đối tác đào tạo đều được xác minh năng lực và kinh nghiệm trước khi tham gia nền tảng." gradient="from-purple-500 to-purple-700"/>
-            </div>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-neutral-dark mb-4">Tại sao chọn SafetyConnect?</h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">Giải pháp toàn diện cho nhu cầu đào tạo an toàn lao động của doanh nghiệp</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-10">
+            <BenefitCard icon="fa-rocket" title="Kết nối nhanh chóng" description="Tiếp cận hàng chục đối tác đào tạo uy tín chỉ với một yêu cầu duy nhất, tiết kiệm thời gian tìm kiếm." gradient="from-blue-500 to-blue-700" />
+            <BenefitCard icon="fa-piggy-bank" title="Hoàn toàn miễn phí" description="Nền tảng miễn phí cho các doanh nghiệp có nhu cầu đào tạo, giúp tối ưu hóa chi phí." gradient="from-green-500 to-green-700" />
+            <BenefitCard icon="fa-star" title="Chất lượng đảm bảo" description="Tất cả đối tác đào tạo đều được xác minh năng lực và kinh nghiệm trước khi tham gia nền tảng." gradient="from-purple-500 to-purple-700" />
+          </div>
         </div>
       </section>
 
-       {/* Popular Courses Section */}
+      {/* Popular Courses Section */}
       <section className="py-20 bg-gradient-to-br from-gray-50 via-white to-gray-50">
-          <div className="container mx-auto px-4">
-              <div className="text-center mb-16">
-                  <div className="inline-block bg-gradient-to-r from-primary to-orange-600 text-white px-4 py-1 rounded-full text-sm font-semibold mb-4">
-                    KHÓA HỌC
-                  </div>
-                  <h2 className="text-4xl md:text-5xl font-extrabold text-neutral-dark mb-4">Các khóa đào tạo phổ biến</h2>
-                  <p className="text-gray-600 text-lg">Nhấn vào từng khóa để xem thông tin chi tiết</p>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
-                  <CourseCard icon="fa-bolt" title="An toàn Điện" onClick={() => navigate('/training/an-toan-dien')} gradient="from-yellow-500 to-yellow-700" />
-                  <CourseCard icon="fa-hard-hat" title="An toàn Xây dựng" onClick={() => navigate('/training/an-toan-xay-dung')} gradient="from-orange-500 to-orange-700" />
-                  <CourseCard icon="fa-flask" title="An toàn Hóa chất" onClick={() => navigate('/training/an-toan-hoa-chat')} gradient="from-purple-500 to-purple-700" />
-                  <CourseCard icon="fa-fire-extinguisher" title="PCCC" onClick={() => navigate('/training/pccc')} gradient="from-red-500 to-red-700" />
-                  <CourseCard icon="fa-radiation-alt" title="An toàn Bức xạ" onClick={() => navigate('/training/an-toan-buc-xa')} gradient="from-cyan-500 to-cyan-700" />
-                  <CourseCard icon="fa-leaf" title="Quan trắc Môi trường" onClick={() => navigate('/training/quan-trac-moi-truong')} gradient="from-green-500 to-green-700"/>
-                  <CourseCard icon="fa-clipboard-check" title="Đánh giá Phân loại Lao động" onClick={() => navigate('/training/danh-gia-phan-loai-lao-dong')} gradient="from-indigo-500 to-indigo-700" />
-                  <CourseCard icon="fa-medkit" title="Sơ Cấp Cứu" onClick={() => navigate('/training/so-cap-cuu')} gradient="from-pink-500 to-pink-700" />
-              </div>
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <div className="inline-block bg-gradient-to-r from-primary to-orange-600 text-white px-4 py-1 rounded-full text-sm font-semibold mb-4">
+              KHÓA HỌC
+            </div>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-neutral-dark mb-4">Các khóa đào tạo phổ biến</h2>
+            <p className="text-gray-600 text-lg">Nhấn vào từng khóa để xem thông tin chi tiết</p>
           </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+            <CourseCard icon="fa-bolt" title="An toàn Điện" onClick={() => navigate('/training/an-toan-dien')} gradient="from-yellow-500 to-yellow-700" />
+            <CourseCard icon="fa-hard-hat" title="An toàn Xây dựng" onClick={() => navigate('/training/an-toan-xay-dung')} gradient="from-orange-500 to-orange-700" />
+            <CourseCard icon="fa-flask" title="An toàn Hóa chất" onClick={() => navigate('/training/an-toan-hoa-chat')} gradient="from-purple-500 to-purple-700" />
+            <CourseCard icon="fa-fire-extinguisher" title="PCCC" onClick={() => navigate('/training/pccc')} gradient="from-red-500 to-red-700" />
+            <CourseCard icon="fa-radiation-alt" title="An toàn Bức xạ" onClick={() => navigate('/training/an-toan-buc-xa')} gradient="from-cyan-500 to-cyan-700" />
+            <CourseCard icon="fa-leaf" title="Quan trắc Môi trường" onClick={() => navigate('/training/quan-trac-moi-truong')} gradient="from-green-500 to-green-700" />
+            <CourseCard icon="fa-clipboard-check" title="Đánh giá Phân loại Lao động" onClick={() => navigate('/training/danh-gia-phan-loai-lao-dong')} gradient="from-indigo-500 to-indigo-700" />
+            <CourseCard icon="fa-medkit" title="Sơ Cấp Cứu" onClick={() => navigate('/training/so-cap-cuu')} gradient="from-pink-500 to-pink-700" />
+          </div>
+        </div>
       </section>
 
       {/* Trusted Partners Section */}
-      {trustedPartners.length > 0 && (
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <div className="inline-block bg-gradient-to-r from-blue-500 to-blue-700 text-white px-4 py-1 rounded-full text-sm font-semibold mb-4 flex items-center gap-2 justify-center">
-                <i className="fas fa-check-circle"></i>
-                <span>ĐỐI TÁC UY TÍN</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-extrabold text-neutral-dark mb-4">
-                Đơn vị đối tác huấn luyện được xác nhận
-              </h2>
-              <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-                Các đơn vị đào tạo an toàn lao động uy tín, được kiểm chứng và đánh giá cao
-              </p>
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <div className="inline-block bg-gradient-to-r from-blue-500 to-blue-700 text-white px-4 py-1 rounded-full text-sm font-semibold mb-4 flex items-center gap-2 justify-center">
+              <i className="fas fa-check-circle"></i>
+              <span>ĐỐI TÁC UY TÍN</span>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              {trustedPartners.map((partner) => (
-                <TrustedPartnerCard
-                  key={partner.id}
-                  partner={partner}
-                  onClick={() => setSelectedPartner(partner)}
-                />
-              ))}
-            </div>
-
-            {/* View All Partners Button */}
-            <div className="text-center">
-              <button
-                onClick={() => navigate('/partners')}
-                className="group bg-gradient-to-r from-blue-500 to-blue-700 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 hover:scale-105 inline-flex items-center gap-3"
-              >
-                <span>Xem tất cả đối tác</span>
-                <i className="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-              </button>
-            </div>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-neutral-dark mb-4">
+              Đơn vị đối tác huấn luyện được xác nhận
+            </h2>
+            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
+              Các đơn vị đào tạo an toàn lao động uy tín, được kiểm chứng và đánh giá cao
+            </p>
           </div>
-        </section>
-      )}
+
+          {trustedPartners.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                {trustedPartners.map((partner) => (
+                  <TrustedPartnerCard
+                    key={partner.id}
+                    partner={partner}
+                    onClick={() => setSelectedPartner(partner)}
+                  />
+                ))}
+              </div>
+
+              {/* View All Partners Button */}
+              <div className="text-center">
+                <button
+                  onClick={() => navigate('/partners')}
+                  className="group bg-gradient-to-r from-blue-500 to-blue-700 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 hover:scale-105 inline-flex items-center gap-3"
+                >
+                  <span>Xem tất cả đối tác</span>
+                  <i className="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-16 bg-gradient-to-br from-gray-50 to-white rounded-2xl border-2 border-dashed border-gray-300">
+              <div className="max-w-md mx-auto">
+                <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center">
+                  <i className="fas fa-handshake text-4xl text-blue-600"></i>
+                </div>
+                <h3 className="text-2xl font-bold text-neutral-dark mb-3">
+                  Đang cập nhật đối tác
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Chúng tôi đang xác minh và thêm các đối tác đào tạo uy tín. Vui lòng quay lại sau.
+                </p>
+                <button
+                  onClick={() => navigate('/partners')}
+                  className="text-blue-600 hover:text-blue-800 font-semibold inline-flex items-center gap-2"
+                >
+                  <span>Xem tất cả đối tác</span>
+                  <i className="fas fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* Form Section */}
       <section id="create-request-form" className="relative py-20 bg-gradient-to-br from-white via-blue-50 to-white overflow-hidden">
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="relative container mx-auto px-4 max-w-4xl">
+          <div className="text-center mb-12">
+            <div className="inline-block bg-gradient-to-r from-primary to-orange-600 text-white px-4 py-1 rounded-full text-sm font-semibold mb-4">
+              BẮT ĐẦU NGAY
+            </div>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-neutral-dark mb-4">Tạo yêu cầu đào tạo</h2>
+            <p className="text-gray-600 text-lg">Nhận báo giá từ nhiều đối tác uy tín trong vòng 24h</p>
           </div>
 
-          <div className="relative container mx-auto px-4 max-w-4xl">
-              <div className="text-center mb-12">
-                  <div className="inline-block bg-gradient-to-r from-primary to-orange-600 text-white px-4 py-1 rounded-full text-sm font-semibold mb-4">
-                    BẮT ĐẦU NGAY
-                  </div>
-                  <h2 className="text-4xl md:text-5xl font-extrabold text-neutral-dark mb-4">Tạo yêu cầu đào tạo</h2>
-                  <p className="text-gray-600 text-lg">Nhận báo giá từ nhiều đối tác uy tín trong vòng 24h</p>
-              </div>
-
-              <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border border-gray-100">
-                  <TrainingRequestForm />
-              </div>
+          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border border-gray-100">
+            <TrainingRequestForm />
           </div>
+        </div>
       </section>
 
       {/* Trusted Partner Info Modal */}
