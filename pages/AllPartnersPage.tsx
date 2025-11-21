@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebaseConfig';
 import { TrustedPartner, PartnerProfile, partnerProfileToTrustedPartner } from '../types';
 import TrustedPartnerCard from '../components/TrustedPartnerCard';
@@ -21,10 +21,11 @@ const AllPartnersPage: React.FC = () => {
     setLoading(true);
 
     const partnersCollection = collection(db, 'partners');
+    // Remove orderBy from query to avoid needing composite index
+    // We'll sort in JavaScript instead
     const partnersQuery = query(
       partnersCollection,
-      where('status', '==', 'approved'),
-      orderBy('displayOrder', 'asc')
+      where('status', '==', 'approved')
     );
 
     const unsubscribe = onSnapshot(
@@ -37,6 +38,14 @@ const AllPartnersPage: React.FC = () => {
           } as PartnerProfile;
           return partnerProfileToTrustedPartner(partnerProfile);
         });
+
+        // Sort by displayOrder in JavaScript (handles missing displayOrder values)
+        partnersData.sort((a, b) => {
+          const orderA = a.displayOrder ?? 999999;
+          const orderB = b.displayOrder ?? 999999;
+          return orderA - orderB;
+        });
+
         setPartners(partnersData);
         setLoading(false);
       },

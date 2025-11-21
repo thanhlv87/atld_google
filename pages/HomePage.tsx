@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebaseConfig';
 import { TrustedPartner, PartnerProfile, partnerProfileToTrustedPartner } from '../types';
 import TrainingRequestForm from '../components/TrainingRequestForm';
@@ -76,12 +76,12 @@ const HomePage: React.FC = () => {
   // Fetch featured trusted partners from partners collection
   useEffect(() => {
     const partnersCollection = collection(db, 'partners');
+    // Remove orderBy to avoid composite index requirement
+    // We'll sort in JavaScript and limit after sorting
     const partnersQuery = query(
       partnersCollection,
       where('status', '==', 'approved'),
-      where('featured', '==', true),
-      orderBy('displayOrder', 'asc'),
-      limit(3)
+      where('featured', '==', true)
     );
 
     const unsubscribe = onSnapshot(
@@ -94,7 +94,15 @@ const HomePage: React.FC = () => {
           } as PartnerProfile;
           return partnerProfileToTrustedPartner(partnerProfile);
         });
-        setTrustedPartners(partnersData);
+
+        // Sort by displayOrder and limit to 3 in JavaScript
+        partnersData.sort((a, b) => {
+          const orderA = a.displayOrder ?? 999999;
+          const orderB = b.displayOrder ?? 999999;
+          return orderA - orderB;
+        });
+
+        setTrustedPartners(partnersData.slice(0, 3));
       },
       (err) => {
         console.error("Error fetching trusted partners: ", err);
