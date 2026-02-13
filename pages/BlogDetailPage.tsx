@@ -19,106 +19,58 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import BlogCard from '../components/BlogCard';
 import LazyImage from '../components/LazyImage';
 import BlogCommentSection from '../components/BlogCommentSection';
+import SEOHead from '../components/SEOHead';
 
 const BlogDetailPage: React.FC = () => {
   const navigate = useNavigate();
-  const { postId } = useParams<{ postId: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentUser, setCurrentUser] = useState(auth.currentUser);
 
-  // Debug logging
-  console.log('[BlogDetailPage] Render - postId:', postId, 'loading:', loading, 'error:', error);
-
   useEffect(() => {
-    console.log('[BlogDetailPage] fetchPost useEffect triggered - postId:', postId);
     const fetchPost = async () => {
       try {
-        // Check if postId exists
-        if (!postId) {
+        if (!slug) {
           setError('Không tìm thấy bài viết');
           setLoading(false);
           return;
         }
 
         setLoading(true);
-        const postRef = doc(db, 'blogPosts', postId);
-        const postDoc = await getDoc(postRef);
 
-        if (!postDoc.exists()) {
+        // Try to find post by slug first
+        let postData: BlogPost | null = null;
+        const slugQuery = query(
+          collection(db, 'blogPosts'),
+          where('slug', '==', slug),
+          firestoreLimit(1)
+        );
+        const slugSnapshot = await getDocs(slugQuery);
+
+        if (!slugSnapshot.empty) {
+          const postDoc = slugSnapshot.docs[0];
+          postData = { id: postDoc.id, ...postDoc.data() } as BlogPost;
+        } else {
+          // Fallback: try to find by document ID (backward compatibility)
+          const postRef = doc(db, 'blogPosts', slug);
+          const postDoc = await getDoc(postRef);
+          if (postDoc.exists()) {
+            postData = { id: postDoc.id, ...postDoc.data() } as BlogPost;
+          }
+        }
+
+        if (!postData) {
           setError('Bài viết không tồn tại');
           setLoading(false);
           return;
         }
 
-        const postData = { id: postDoc.id, ...postDoc.data() } as BlogPost;
         setPost(postData);
 
-        // Update document title and meta tags
-        document.title = `${postData.title} | SafetyConnect`;
-
-        // Update meta description
-        const metaDescription = document.querySelector('meta[name="description"]');
-        if (metaDescription) {
-          metaDescription.setAttribute('content', postData.excerpt);
-        }
-
-        // Update Open Graph tags
-        const ogTitle = document.querySelector('meta[property="og:title"]');
-        if (ogTitle) {
-          ogTitle.setAttribute('content', `${postData.title} | SafetyConnect`);
-        }
-
-        const ogDescription = document.querySelector('meta[property="og:description"]');
-        if (ogDescription) {
-          ogDescription.setAttribute('content', postData.excerpt);
-        }
-
-        const ogImage = document.querySelector('meta[property="og:image"]');
-        if (ogImage && postData.coverImage) {
-          ogImage.setAttribute('content', postData.coverImage);
-        }
-
-        // Update og:url
-        const ogUrl = document.querySelector('meta[property="og:url"]');
-        if (ogUrl) {
-          ogUrl.setAttribute('content', window.location.href);
-        }
-
-        // Update og:type for article
-        const ogType = document.querySelector('meta[property="og:type"]');
-        if (ogType) {
-          ogType.setAttribute('content', 'article');
-        }
-
-        // Update Twitter Card tags
-        const twitterTitle = document.querySelector('meta[property="twitter:title"]');
-        if (twitterTitle) {
-          twitterTitle.setAttribute('content', `${postData.title} | SafetyConnect`);
-        }
-
-        const twitterDescription = document.querySelector('meta[property="twitter:description"]');
-        if (twitterDescription) {
-          twitterDescription.setAttribute('content', postData.excerpt);
-        }
-
-        const twitterImage = document.querySelector('meta[property="twitter:image"]');
-        if (twitterImage && postData.coverImage) {
-          twitterImage.setAttribute('content', postData.coverImage);
-        }
-
-        // Update canonical URL
-        let canonicalLink = document.querySelector('link[rel="canonical"]');
-        if (!canonicalLink) {
-          canonicalLink = document.createElement('link');
-          canonicalLink.setAttribute('rel', 'canonical');
-          document.head.appendChild(canonicalLink);
-        }
-        canonicalLink.setAttribute('href', window.location.href);
-
-        // Add Structured Data (JSON-LD) for SEO
+        // Add JSON-LD Structured Data for SEO (Google Rich Results)
         const existingScript = document.querySelector('script[type="application/ld+json"]');
         if (existingScript) {
           existingScript.remove();
@@ -147,7 +99,7 @@ const BlogDetailPage: React.FC = () => {
           },
           "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": window.location.href
+            "@id": `${window.location.origin}/blog/${postData.slug || slug}`
           },
           "keywords": postData.tags.join(', '),
           "articleSection": postData.category,
@@ -161,12 +113,13 @@ const BlogDetailPage: React.FC = () => {
 
         // Increment view count (silently fail if not authorized)
         try {
+          // Use document ID for update, not slug
+          const postRef = doc(db, 'blogPosts', postData.id);
           await updateDoc(postRef, {
             viewCount: increment(1)
           });
-        } catch (error) {
+        } catch (_error) {
           // Ignore permission errors for view count
-          console.log('Could not update view count (expected for non-admin users)');
         }
 
         // Fetch related posts (same category, limit 3)
@@ -180,7 +133,7 @@ const BlogDetailPage: React.FC = () => {
         const relatedSnapshot = await getDocs(relatedQuery);
         const related = relatedSnapshot.docs
           .map(doc => ({ id: doc.id, ...doc.data() } as BlogPost))
-          .filter(p => p.id !== postId)
+          .filter(p => p.id !== postData!.id)
           .slice(0, 3);
         setRelatedPosts(related);
 
@@ -193,14 +146,11 @@ const BlogDetailPage: React.FC = () => {
     };
 
     fetchPost();
-  }, [postId]);
+  }, [slug]);
 
   // Monitor auth state changes
   useEffect(() => {
-    console.log('[BlogDetailPage] auth useEffect triggered');
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      console.log('[BlogDetailPage] auth state changed:', user?.email || 'not logged in');
-      // Only update if the user actually changed
       setCurrentUser((prevUser) => {
         if (prevUser?.uid !== user?.uid) {
           return user;
@@ -249,8 +199,23 @@ const BlogDetailPage: React.FC = () => {
     );
   }
 
+  const blogUrl = `${window.location.origin}/blog/${post.slug || slug}`;
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* SEO Meta Tags */}
+      <SEOHead
+        title={`${post.title} | SafetyConnect`}
+        description={post.excerpt}
+        image={post.coverImage}
+        url={blogUrl}
+        type="article"
+        keywords={post.tags}
+        author={post.author.name}
+        publishedTime={post.publishedAt?.toDate().toISOString() || post.createdAt?.toDate().toISOString()}
+        modifiedTime={post.updatedAt?.toDate().toISOString() || post.createdAt?.toDate().toISOString()}
+      />
+
       {/* Back Button */}
       <div className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4">
@@ -329,7 +294,7 @@ const BlogDetailPage: React.FC = () => {
             <div className="flex flex-wrap gap-3">
               {/* Facebook Share */}
               <a
-                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(blogUrl)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition-colors"
@@ -340,7 +305,7 @@ const BlogDetailPage: React.FC = () => {
 
               {/* Zalo Share */}
               <a
-                href={`https://chat.zalo.me/?url=${encodeURIComponent(window.location.href)}`}
+                href={`https://chat.zalo.me/?url=${encodeURIComponent(blogUrl)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors"
@@ -352,7 +317,7 @@ const BlogDetailPage: React.FC = () => {
               {/* Copy Link */}
               <button
                 onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
+                  navigator.clipboard.writeText(blogUrl);
                   alert('Đã sao chép link!');
                 }}
                 className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-full hover:bg-gray-700 transition-colors"

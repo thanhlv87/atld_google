@@ -186,32 +186,36 @@ exports.generateBlogPost = onCall({ secrets: [geminiApiKey] }, async (request) =
     const genAI = new GoogleGenerativeAI(geminiApiKey.value());
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-    // Craft specialized prompt for Occupational Safety blog
-    const prompt = `Bạn là một chuyên gia về An toàn Lao động tại Việt Nam. Hãy viết một bài blog chuyên nghiệp, chi tiết và hữu ích về chủ đề sau:
+    // Craft specialized prompt for Occupational Safety blog (SEO-optimized)
+    const prompt = `Bạn là một chuyên gia về An toàn Lao động tại Việt Nam, đồng thời là chuyên gia SEO. Hãy viết một bài blog chuyên nghiệp, chi tiết, hữu ích và TỐI ƯU SEO về chủ đề sau:
 
 Chủ đề: ${topic}
 Danh mục: ${category || 'An toàn lao động'}
-${keywords ? `Từ khóa liên quan: ${keywords}` : ''}
+${keywords ? `Từ khóa chính: ${keywords}` : ''}
 
-Yêu cầu:
+YÊU CẦU NỘI DUNG:
 1. Viết bằng tiếng Việt chuẩn, chuyên nghiệp
 2. Nội dung phải chính xác, dựa trên quy định pháp luật Việt Nam (Luật An toàn Lao động, các Nghị định, Thông tư liên quan)
-3. Cấu trúc rõ ràng với các heading (dùng HTML tags: <h2>, <h3>)
-4. Độ dài: 800-1200 từ
-5. Bao gồm:
-   - Mở bài giới thiệu vấn đề
-   - Nội dung chính với các tiểu mục
-   - Phần kết luận và khuyến nghị
-6. Sử dụng các thẻ HTML để format: <p>, <strong>, <em>, <ul>, <ol>, <li>
-7. Tạo nội dung SEO-friendly nhưng tự nhiên
-8. Đưa ra ví dụ thực tế nếu có thể
+3. Độ dài: 800-1200 từ
+4. Bao gồm: Mở bài giới thiệu vấn đề → Nội dung chính với tiểu mục → Kết luận và khuyến nghị
+5. Đưa ra ví dụ thực tế nếu có thể
+
+YÊU CẦU SEO (QUAN TRỌNG):
+1. TIÊU ĐỀ (title): 50-60 ký tự, chứa từ khóa chính ở đầu, hấp dẫn và rõ ràng
+2. TÓM TẮT (excerpt): 150-160 ký tự, mô tả hấp dẫn kêu gọi hành động, chứa từ khóa chính
+3. CẤU TRÚC HEADING: Dùng đúng 1 <h2> cho tiêu đề phần chính, <h3> cho tiểu mục. KHÔNG dùng <h1> (đã dùng cho title)
+4. MẬT ĐỘ TỪ KHÓA: Từ khóa chính xuất hiện tự nhiên 3-5 lần trong bài, từ khóa phụ 1-2 lần
+5. ĐOẠN ĐẦU TIÊN: Phải chứa từ khóa chính trong 100 từ đầu
+6. TAGS: 5-7 tags, bao gồm cả long-tail keywords, viết bằng tiếng Việt có dấu
+7. FORMAT HTML: Dùng <p>, <strong>, <em>, <ul>, <ol>, <li>, <h2>, <h3>, <blockquote>
+8. NỘI DUNG: Tự nhiên, không nhồi keyword, cung cấp giá trị thực cho người đọc
 
 Trả về theo định dạng JSON với cấu trúc sau:
 {
-  "title": "Tiêu đề bài viết hấp dẫn (60-80 ký tự)",
-  "excerpt": "Tóm tắt ngắn gọn 2-3 câu (150-200 ký tự)",
-  "content": "Nội dung đầy đủ với HTML formatting",
-  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
+  "title": "Tiêu đề SEO tối ưu (50-60 ký tự, chứa keyword chính)",
+  "excerpt": "Meta description hấp dẫn (150-160 ký tự, chứa keyword + CTA)",
+  "content": "Nội dung đầy đủ với HTML formatting, heading hierarchy đúng chuẩn SEO",
+  "tags": ["từ khóa chính", "từ khóa phụ 1", "long-tail keyword 1", "long-tail keyword 2", "từ khóa liên quan"],
   "suggestedCategory": "Danh mục phù hợp nhất"
 }`;
 
@@ -355,46 +359,80 @@ Trả về dưới dạng JSON array: ["tag1", "tag2", "tag3", ...]`;
 });
 
 /**
+ * Escape HTML entities to prevent XSS in meta tags
+ */
+function escapeHtml(text) {
+  if (!text) return '';
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/**
  * SEO-friendly Blog Post Meta Tags for Social Media Crawlers
- * Serves HTML with proper OG tags for Facebook, Twitter, etc.
+ * Serves HTML with proper OG tags for Facebook, Twitter, Zalo etc.
+ * Supports slug-based URLs with fallback to document ID for backward compatibility.
  */
 exports.blogMetaTags = onRequest(async (req, res) => {
-  // Get postId from URL path or query parameter
-  // Firebase hosting rewrite sends: /blog/POST_ID -> function receives path or query
   const urlPath = req.url || req.path;
-  let postId = '';
 
-  // Try to extract from path: /blog/POST_ID or /POST_ID
-  const pathMatch = urlPath.match(/\/blog\/([^/?]+)|^\/([^/?]+)/);
-  if (pathMatch) {
-    postId = pathMatch[1] || pathMatch[2];
-  }
+  // Extract slug/id from path: /blog/SLUG_OR_ID
+  const pathMatch = urlPath.match(/\/blog\/([^/?#]+)/);
+  const slugOrId = pathMatch ? pathMatch[1] : '';
 
-  // Also check query parameter as fallback
-  if (!postId && req.query && req.query.postId) {
-    postId = req.query.postId;
-  }
+  console.log('blogMetaTags called with URL:', urlPath, 'slugOrId:', slugOrId);
 
-  console.log('blogMetaTags called with URL:', urlPath, 'postId:', postId);
-
-  if (!postId) {
-    console.log('No postId found, redirecting to home');
-    res.redirect(302, 'https://atld.web.app/');
+  // If accessing /blog (listing page), serve the SPA
+  if (!slugOrId || slugOrId === 'blog') {
+    // Serve SPA index.html for the blog listing page
+    res.redirect(302, 'https://atld.web.app/blog');
     return;
   }
 
   try {
-    const postDoc = await db.collection('blogPosts').doc(postId).get();
+    let postDoc = null;
+    let postId = slugOrId;
 
-    if (!postDoc.exists) {
-      console.log('Post not found:', postId);
-      res.redirect(302, 'https://atld.web.app/');
+    // Try to find by slug first
+    const slugQuery = db.collection('blogPosts').where('slug', '==', slugOrId).limit(1);
+    const slugSnapshot = await slugQuery.get();
+
+    if (!slugSnapshot.empty) {
+      postDoc = slugSnapshot.docs[0];
+      postId = postDoc.id;
+    } else {
+      // Fallback: try by document ID (backward compatibility)
+      const idDoc = await db.collection('blogPosts').doc(slugOrId).get();
+      if (idDoc.exists) {
+        postDoc = idDoc;
+        postId = idDoc.id;
+      }
+    }
+
+    if (!postDoc || !postDoc.exists) {
+      console.log('Post not found:', slugOrId);
+      res.redirect(302, 'https://atld.web.app/blog');
       return;
     }
 
     const post = postDoc.data();
-    const url = `https://atld.web.app/blog/${postId}`;
-    
+    // Use slug in URL if available, otherwise use ID
+    const blogSlug = post.slug || postId;
+    const url = `https://atld.web.app/blog/${blogSlug}`;
+
+    const title = escapeHtml(post.title);
+    const excerpt = escapeHtml(post.excerpt);
+    const siteName = 'SafetyConnect';
+    const coverImage = post.coverImage || '';
+    const authorName = escapeHtml(post.author?.name || 'SafetyConnect');
+    const keywords = (post.tags || []).map(t => escapeHtml(t)).join(', ');
+    const category = escapeHtml(post.category || '');
+    const publishedDate = post.publishedAt?.toDate?.()?.toISOString() || post.createdAt?.toDate?.()?.toISOString() || '';
+    const modifiedDate = post.updatedAt?.toDate?.()?.toISOString() || publishedDate;
+
     const html = `
 <!DOCTYPE html>
 <html lang="vi">
@@ -403,38 +441,153 @@ exports.blogMetaTags = onRequest(async (req, res) => {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <!-- Primary Meta Tags -->
-  <title>${post.title} | SafetyConnect</title>
-  <meta name="title" content="${post.title} | SafetyConnect" />
-  <meta name="description" content="${post.excerpt}" />
+  <title>${title} | ${siteName}</title>
+  <meta name="title" content="${title} | ${siteName}" />
+  <meta name="description" content="${excerpt}" />
+  <meta name="keywords" content="${keywords}" />
+  <meta name="author" content="${authorName}" />
+  <link rel="canonical" href="${url}" />
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="article" />
   <meta property="og:url" content="${url}" />
-  <meta property="og:title" content="${post.title}" />
-  <meta property="og:description" content="${post.excerpt}" />
-  <meta property="og:image" content="${post.coverImage}" />
-  <meta property="og:site_name" content="SafetyConnect" />
+  <meta property="og:title" content="${title}" />
+  <meta property="og:description" content="${excerpt}" />
+  <meta property="og:image" content="${coverImage}" />
+  <meta property="og:site_name" content="${siteName}" />
+  <meta property="og:locale" content="vi_VN" />
+  <meta property="article:published_time" content="${publishedDate}" />
+  <meta property="article:modified_time" content="${modifiedDate}" />
+  <meta property="article:author" content="${authorName}" />
+  <meta property="article:section" content="${category}" />
   
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image" />
   <meta property="twitter:url" content="${url}" />
-  <meta property="twitter:title" content="${post.title}" />
-  <meta property="twitter:description" content="${post.excerpt}" />
-  <meta property="twitter:image" content="${post.coverImage}" />
+  <meta property="twitter:title" content="${title}" />
+  <meta property="twitter:description" content="${excerpt}" />
+  <meta property="twitter:image" content="${coverImage}" />
   
-  <!-- Redirect to actual page -->
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "${title}",
+    "description": "${excerpt}",
+    "image": "${coverImage}",
+    "datePublished": "${publishedDate}",
+    "dateModified": "${modifiedDate}",
+    "author": {
+      "@type": "Person",
+      "name": "${authorName}"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "${siteName}",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://raw.githubusercontent.com/thanhlv87/pic/refs/heads/main/connected.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "${url}"
+    },
+    "keywords": "${keywords}",
+    "articleSection": "${category}",
+    "inLanguage": "vi-VN"
+  }
+  </script>
+  
+  <!-- Redirect to actual SPA page -->
   <meta http-equiv="refresh" content="0; url=${url}" />
   <script>window.location.href = "${url}";</script>
 </head>
 <body>
-  <p>Redirecting to <a href="${url}">${post.title}</a>...</p>
+  <p>Redirecting to <a href="${url}">${title}</a>...</p>
 </body>
 </html>`;
-    
+
     res.set('Cache-Control', 'public, max-age=600, s-maxage=1200');
     res.send(html);
   } catch (error) {
     console.error('Error fetching blog post:', error);
-    res.redirect(302, 'https://atld.web.app/');
+    res.redirect(302, 'https://atld.web.app/blog');
   }
 });
+
+/**
+ * Dynamic Sitemap Generator
+ * Generates sitemap.xml dynamically with all published blog posts using slug-based URLs.
+ */
+exports.dynamicSitemap = onRequest(async (req, res) => {
+  try {
+    const BASE_URL = 'https://atld.web.app';
+    const today = new Date().toISOString().split('T')[0];
+
+    // Static pages
+    const staticPages = [
+      { url: '/', changefreq: 'daily', priority: '1.0' },
+      { url: '/blog', changefreq: 'daily', priority: '0.9' },
+      { url: '/requests', changefreq: 'weekly', priority: '0.9' },
+      { url: '/documents', changefreq: 'weekly', priority: '0.8' },
+      { url: '/partners', changefreq: 'weekly', priority: '0.8' },
+      { url: '/chat', changefreq: 'weekly', priority: '0.7' },
+      { url: '/training/an-toan-dien', changefreq: 'monthly', priority: '0.8' },
+      { url: '/training/an-toan-xay-dung', changefreq: 'monthly', priority: '0.8' },
+      { url: '/training/an-toan-hoa-chat', changefreq: 'monthly', priority: '0.8' },
+      { url: '/training/pccc', changefreq: 'monthly', priority: '0.8' },
+      { url: '/training/an-toan-buc-xa', changefreq: 'monthly', priority: '0.8' },
+      { url: '/training/quan-trac-moi-truong', changefreq: 'monthly', priority: '0.8' },
+      { url: '/training/danh-gia-phan-loai-lao-dong', changefreq: 'monthly', priority: '0.8' },
+      { url: '/training/so-cap-cuu', changefreq: 'monthly', priority: '0.8' },
+    ];
+
+    // Fetch all published blog posts
+    const blogSnapshot = await db.collection('blogPosts')
+      .where('published', '==', true)
+      .orderBy('publishedAt', 'desc')
+      .get();
+
+    // Build XML
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+
+    // Add static pages
+    staticPages.forEach(page => {
+      xml += '  <url>\n';
+      xml += `    <loc>${BASE_URL}${page.url}</loc>\n`;
+      xml += `    <lastmod>${today}</lastmod>\n`;
+      xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
+      xml += `    <priority>${page.priority}</priority>\n`;
+      xml += '  </url>\n';
+    });
+
+    // Add blog posts with slug-based URLs
+    blogSnapshot.forEach(doc => {
+      const post = doc.data();
+      const blogSlug = post.slug || doc.id;
+      const lastmod = post.updatedAt?.toDate() || post.publishedAt?.toDate() || post.createdAt?.toDate() || new Date();
+
+      xml += '  <url>\n';
+      xml += `    <loc>${BASE_URL}/blog/${blogSlug}</loc>\n`;
+      xml += `    <lastmod>${lastmod.toISOString().split('T')[0]}</lastmod>\n`;
+      xml += `    <changefreq>weekly</changefreq>\n`;
+      xml += `    <priority>0.8</priority>\n`;
+      xml += '  </url>\n';
+    });
+
+    xml += '</urlset>';
+
+    res.set('Content-Type', 'application/xml');
+    res.set('Cache-Control', 'public, max-age=3600, s-maxage=7200');
+    res.send(xml);
+
+    console.log(`Dynamic sitemap generated: ${staticPages.length} static + ${blogSnapshot.size} blog = ${staticPages.length + blogSnapshot.size} URLs`);
+  } catch (error) {
+    console.error('Error generating sitemap:', error);
+    res.status(500).send('Error generating sitemap');
+  }
+});
+

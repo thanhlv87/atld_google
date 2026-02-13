@@ -89,31 +89,35 @@ const AIBlogWriter: React.FC<AIBlogWriterProps> = ({ onGenerate }) => {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 
-      const prompt = `Bạn là một chuyên gia về An toàn Lao động tại Việt Nam. Hãy viết một bài blog chuyên nghiệp, chi tiết và hữu ích về chủ đề sau:
+      const prompt = `Bạn là một chuyên gia về An toàn Lao động tại Việt Nam, đồng thời là chuyên gia SEO. Hãy viết một bài blog chuyên nghiệp, chi tiết, hữu ích và TỐI ƯU SEO về chủ đề sau:
 
 Chủ đề: ${topic.trim()}
 Danh mục: ${category}
-${keywords ? `Từ khóa liên quan: ${keywords.trim()}` : ''}
+${keywords ? `Từ khóa chính: ${keywords.trim()}` : ''}
 
-Yêu cầu:
+YÊU CẦU NỘI DUNG:
 1. Viết bằng tiếng Việt chuẩn, chuyên nghiệp
 2. Nội dung phải chính xác, dựa trên quy định pháp luật Việt Nam (Luật An toàn Lao động, các Nghị định, Thông tư liên quan)
-3. Cấu trúc rõ ràng với các heading (dùng HTML tags: <h2>, <h3>)
-4. Độ dài: 800-1200 từ
-5. Bao gồm:
-   - Mở bài giới thiệu vấn đề
-   - Nội dung chính với các tiểu mục
-   - Phần kết luận và khuyến nghị
-6. Sử dụng các thẻ HTML để format: <p>, <strong>, <em>, <ul>, <ol>, <li>
-7. Tạo nội dung SEO-friendly nhưng tự nhiên
-8. Đưa ra ví dụ thực tế nếu có thể
+3. Độ dài: 800-1200 từ
+4. Bao gồm: Mở bài giới thiệu vấn đề → Nội dung chính với tiểu mục → Kết luận và khuyến nghị
+5. Đưa ra ví dụ thực tế nếu có thể
+
+YÊU CẦU SEO (QUAN TRỌNG):
+1. TIÊU ĐỀ (title): 50-60 ký tự, chứa từ khóa chính ở đầu, hấp dẫn và rõ ràng
+2. TÓM TẮT (excerpt): 150-160 ký tự, mô tả hấp dẫn kêu gọi hành động, chứa từ khóa chính
+3. CẤU TRÚC HEADING: Dùng đúng 1 <h2> cho tiêu đề phần chính, <h3> cho tiểu mục. KHÔNG dùng <h1> (đã dùng cho title)
+4. MẬT ĐỘ TỪ KHÓA: Từ khóa chính xuất hiện tự nhiên 3-5 lần trong bài, từ khóa phụ 1-2 lần
+5. ĐOẠN ĐẦU TIÊN: Phải chứa từ khóa chính trong 100 từ đầu
+6. TAGS: 5-7 tags, bao gồm cả long-tail keywords, viết bằng tiếng Việt có dấu
+7. FORMAT HTML: Dùng <p>, <strong>, <em>, <ul>, <ol>, <li>, <h2>, <h3>, <blockquote>
+8. NỘI DUNG: Tự nhiên, không nhồi keyword, cung cấp giá trị thực cho người đọc
 
 Trả về theo định dạng JSON với cấu trúc sau:
 {
-  "title": "Tiêu đề bài viết hấp dẫn (60-80 ký tự)",
-  "excerpt": "Tóm tắt ngắn gọn 2-3 câu (150-200 ký tự)",
-  "content": "Nội dung đầy đủ với HTML formatting",
-  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
+  "title": "Tiêu đề SEO tối ưu (50-60 ký tự, chứa keyword chính)",
+  "excerpt": "Meta description hấp dẫn (150-160 ký tự, chứa keyword + CTA)",
+  "content": "Nội dung đầy đủ với HTML formatting, heading hierarchy đúng chuẩn SEO",
+  "tags": ["từ khóa chính", "từ khóa phụ 1", "long-tail keyword 1", "long-tail keyword 2", "từ khóa liên quan"],
   "suggestedCategory": "Danh mục phù hợp nhất"
 }`;
 
@@ -178,11 +182,10 @@ Trả về theo định dạng JSON với cấu trúc sau:
         </div>
         <button
           onClick={() => setShowApiKeyInput(!showApiKeyInput)}
-          className={`px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${
-            apiKeySaved
+          className={`px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${apiKeySaved
               ? 'bg-green-100 text-green-700 hover:bg-green-200'
               : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-          }`}
+            }`}
         >
           <i className={`fas ${apiKeySaved ? 'fa-check-circle' : 'fa-key'}`}></i>
           {apiKeySaved ? 'API Key đã lưu' : 'Cài đặt API Key'}

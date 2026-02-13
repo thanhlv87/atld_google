@@ -20,7 +20,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
 
   return (
     <Link
-      to={`/blog/${post.id}`}
+      to={`/blog/${post.slug || post.id}`}
       className="block bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group"
     >
       {/* Cover Image - Square Ratio */}

@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/thanhlv87/pic/refs/heads/main/connected.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Content Security Policy - Temporarily Disabled for Debugging -->
-    <!-- <meta http-equiv="Content-Security-Policy" content="
+<head>
+  <meta charset="UTF-8" />
+  <!-- Favicon -->
+  <link rel="icon" type="image/png"
+    href="https://raw.githubusercontent.com/thanhlv87/pic/refs/heads/main/connected.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Content Security Policy - Temporarily Disabled for Debugging -->
+  <!-- <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
       script-src 'self' 'unsafe-inline' 'unsafe-eval'
         https://cdn.tailwindcss.com
@@ -42,129 +44,127 @@
       form-action 'self';
     "> -->
 
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#FF6B35" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="SafetyConnect" />
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/thanhlv87/pic/refs/heads/main/connected.png" />
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#FF6B35" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="SafetyConnect" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/thanhlv87/pic/refs/heads/main/connected.png" />
 
-    <!-- SEO Meta Tags -->
-    <title>SafetyConnect - Nền Tảng Huấn Luyện An Toàn Lao Động</title>
-    <meta name="description" content="Một ứng dụng web kết nối khách hàng có nhu cầu huấn luyện an toàn lao động với các công ty đào tạo chuyên nghiệp. Khách hàng có thể đăng yêu cầu, và các công ty đào tạo đã xác thực có thể xem thông tin liên hệ để báo giá." />
-    <meta name="keywords" content="an toàn lao động, huấn luyện an toàn, SafetyConnect, đào tạo an toàn, kết nối đào tạo, báo giá huấn luyện, an toàn vệ sinh lao động, ATVSLĐ" />
-    <meta name="author" content="SafetyConnect" />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://atld.web.app/" />
+  <!-- SEO Meta Tags -->
+  <title>SafetyConnect - Nền Tảng Huấn Luyện An Toàn Lao Động</title>
+  <meta name="description"
+    content="Một ứng dụng web kết nối khách hàng có nhu cầu huấn luyện an toàn lao động với các công ty đào tạo chuyên nghiệp. Khách hàng có thể đăng yêu cầu, và các công ty đào tạo đã xác thực có thể xem thông tin liên hệ để báo giá." />
+  <meta name="keywords"
+    content="an toàn lao động, huấn luyện an toàn, SafetyConnect, đào tạo an toàn, kết nối đào tạo, báo giá huấn luyện, an toàn vệ sinh lao động, ATVSLĐ" />
+  <meta name="author" content="SafetyConnect" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://atld.web.app/" />
 
-    <!-- Resource Hints for Performance -->
-    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-    <link rel="dns-prefetch" href="https://aistudiocdn.com">
-    <link rel="dns-prefetch" href="https://images.unsplash.com">
+  <!-- Resource Hints for Performance -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+  <link rel="dns-prefetch" href="https://aistudiocdn.com">
+  <link rel="dns-prefetch" href="https://images.unsplash.com">
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://atld.web.app/" />
-    <meta property="og:title" content="SafetyConnect - Nền Tảng Huấn Luyện An Toàn Lao Động" />
-    <meta property="og:description" content="Kết nối doanh nghiệp với các đối tác đào tạo ATLD uy tín, chuyên nghiệp trên toàn quốc." />
-    <meta property="og:image" content="https://raw.githubusercontent.com/thanhlv87/pic/refs/heads/main/connected.png" />
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://atld.web.app/" />
+  <meta property="og:title" content="SafetyConnect - Nền Tảng Huấn Luyện An Toàn Lao Động" />
+  <meta property="og:description"
+    content="Kết nối doanh nghiệp với các đối tác đào tạo ATLD uy tín, chuyên nghiệp trên toàn quốc." />
+  <meta property="og:image" content="https://raw.githubusercontent.com/thanhlv87/pic/refs/heads/main/connected.png" />
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://atld.web.app/" />
-    <meta property="twitter:title" content="SafetyConnect - Nền Tảng Huấn Luyện An Toàn Lao Động" />
-    <meta property="twitter:description" content="Kết nối doanh nghiệp với các đối tác đào tạo ATLD uy tín, chuyên nghiệp trên toàn quốc." />
-    <meta property="twitter:image" content="https://raw.githubusercontent.com/thanhlv87/pic/refs/heads/main/connected.png" />
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://atld.web.app/" />
+  <meta property="twitter:title" content="SafetyConnect - Nền Tảng Huấn Luyện An Toàn Lao Động" />
+  <meta property="twitter:description"
+    content="Kết nối doanh nghiệp với các đối tác đào tạo ATLD uy tín, chuyên nghiệp trên toàn quốc." />
+  <meta property="twitter:image"
+    content="https://raw.githubusercontent.com/thanhlv87/pic/refs/heads/main/connected.png" />
 
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y2NK9VB75H"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-Y2NK9VB75H');
-    </script>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y2NK9VB75H"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-Y2NK9VB75H');
+  </script>
 
-    <!-- Other links -->
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Other links -->
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <!-- Tailwind CSS - Load immediately for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: '#EA580C', // A warmer, richer Orange-600
-              'primary-dark': '#C2410C', // Orange-700 for hover
-              secondary: '#FBBF24', // Amber-400
-              accent: '#3B82F6', // Blue-500
-              neutral: {
-                light: '#f8fafc', // A modern, clean light gray (slate-50)
-                DEFAULT: '#f1f5f9', // slate-100
-                dark: '#334155',    // slate-700
-              }
+  <!-- Tailwind CSS - Load immediately for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#EA580C', // A warmer, richer Orange-600
+            'primary-dark': '#C2410C', // Orange-700 for hover
+            secondary: '#FBBF24', // Amber-400
+            accent: '#3B82F6', // Blue-500
+            neutral: {
+              light: '#f8fafc', // A modern, clean light gray (slate-50)
+              DEFAULT: '#f1f5f9', // slate-100
+              dark: '#334155',    // slate-700
+            }
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.8s ease-out',
+            'fade-in-up': 'fadeInUp 1s ease-out',
+            'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'bounce': 'bounce 1s infinite',
+            'ping': 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
             },
-            animation: {
-              'fade-in': 'fadeIn 0.8s ease-out',
-              'fade-in-up': 'fadeInUp 1s ease-out',
-              'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-              'bounce': 'bounce 1s infinite',
-              'ping': 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
-            },
-            keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0' },
-                '100%': { opacity: '1' },
+            fadeInUp: {
+              '0%': {
+                opacity: '0',
+                transform: 'translateY(20px)',
               },
-              fadeInUp: {
-                '0%': {
-                  opacity: '0',
-                  transform: 'translateY(20px)',
-                },
-                '100%': {
-                  opacity: '1',
-                  transform: 'translateY(0)',
-                },
+              '100%': {
+                opacity: '1',
+                transform: 'translateY(0)',
               },
             },
-          }
+          },
         }
       }
-    </script>
-  <script type="importmap">
-{
-  "imports": {
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.1.3",
-    "firebase/": "https://aistudiocdn.com/firebase@^12.5.0/",
-    "html2canvas": "https://aistudiocdn.com/html2canvas@^1.4.1"
-  }
-}
-</script>
-</head>
-  <body class="bg-neutral-light">
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    }
+  </script>
 
-    <!-- Service Worker Registration - Temporarily Disabled for Debugging -->
-    <script>
-      // Unregister all service workers
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for(let registration of registrations) {
-            registration.unregister();
-            console.log('SW unregistered:', registration);
-          }
-        });
-      }
-    </script>
-  </body>
+</head>
+
+<body class="bg-neutral-light">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+
+  <!-- Service Worker Registration - Temporarily Disabled for Debugging -->
+  <script>
+    // Unregister all service workers
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (registrations) {
+        for (let registration of registrations) {
+          registration.unregister();
+          console.log('SW unregistered:', registration);
+        }
+      });
+    }
+  </script>
+</body>
+
 </html>

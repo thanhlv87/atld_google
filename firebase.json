@@ -20,6 +20,14 @@
       ],
       "rewrites": [
         {
+          "source": "/sitemap.xml",
+          "function": "dynamicSitemap"
+        },
+        {
+          "source": "/blog/**",
+          "function": "blogMetaTags"
+        },
+        {
           "source": "**",
           "destination": "/index.html"
         }

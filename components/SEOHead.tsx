@@ -10,6 +10,7 @@ interface SEOHeadProps {
   author?: string;
   publishedTime?: string;
   modifiedTime?: string;
+  articleSection?: string;
 }
 
 const SEOHead: React.FC<SEOHeadProps> = ({
@@ -21,7 +22,8 @@ const SEOHead: React.FC<SEOHeadProps> = ({
   keywords = [],
   author,
   publishedTime,
-  modifiedTime
+  modifiedTime,
+  articleSection
 }) => {
   useEffect(() => {
     // Update title
@@ -45,6 +47,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     updateMetaTag('property', 'og:description', description);
     updateMetaTag('property', 'og:image', image);
     updateMetaTag('property', 'og:type', type);
+    updateMetaTag('property', 'og:site_name', 'SafetyConnect');
 
     if (url) {
       updateMetaTag('property', 'og:url', url);
@@ -60,6 +63,9 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       }
       if (author) {
         updateMetaTag('property', 'article:author', author);
+      }
+      if (articleSection) {
+        updateMetaTag('property', 'article:section', articleSection);
       }
     }
 
@@ -77,7 +83,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     if (url) {
       updateCanonicalLink(url);
     }
-  }, [title, description, image, url, type, keywords, author, publishedTime, modifiedTime]);
+  }, [title, description, image, url, type, keywords, author, publishedTime, modifiedTime, articleSection]);
 
   return null;
 };
@@ -109,3 +115,4 @@ function updateCanonicalLink(url: string) {
 }
 
 export default SEOHead;
+
