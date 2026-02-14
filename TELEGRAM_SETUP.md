@@ -21,6 +21,7 @@ https://api.telegram.org/bot8474740440:AAFmqXZVe0tMLX1KVkuvrV1x-cLPTIo_CSI/getUp
 5. Tìm phần `"chat":{"id": 123456789}` - đây là **Chat ID** của bạn
 
 **Ví dụ response:**
+
 ```json
 {
   "ok": true,
@@ -47,11 +48,13 @@ firebase functions:config:set telegram.chat_id="YOUR_CHAT_ID"
 ```
 
 **Ví dụ:**
+
 ```bash
 firebase functions:config:set telegram.chat_id="123456789"
 ```
 
 Kiểm tra config:
+
 ```bash
 firebase functions:config:get
 ```
@@ -96,11 +99,13 @@ Khi có yêu cầu đào tạo mới, bot sẽ gửi:
 ### Không nhận được thông báo?
 
 1. Kiểm tra Chat ID đã set đúng chưa:
+
    ```bash
    firebase functions:config:get
    ```
 
 2. Kiểm tra logs của function:
+
    ```bash
    firebase functions:log
    ```
@@ -115,6 +120,7 @@ Khi có yêu cầu đào tạo mới, bot sẽ gửi:
 ## 🔒 Bảo Mật
 
 **LƯU Ý QUAN TRỌNG:**
+
 - Bot Token đã được hard-code trong `functions/index.js`
 - Không public file này lên GitHub public repository
 - Nên dùng Firebase Secret Manager trong production:

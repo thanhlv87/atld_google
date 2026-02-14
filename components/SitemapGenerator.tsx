@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
-import {
-  db,
-  collection,
-  query,
-  where,
-  getDocs
-} from '../services/firebaseConfig';
+import { db, collection, query, where, getDocs } from '../services/firebaseConfig';
 
 const SitemapGenerator: React.FC = () => {
   const [generating, setGenerating] = useState(false);
-  const [result, setResult] = useState<{ success: boolean; message: string; url?: string } | null>(null);
+  const [result, setResult] = useState<{ success: boolean; message: string; url?: string } | null>(
+    null
+  );
 
   const BASE_URL = 'https://atld.web.app';
 
@@ -27,10 +23,7 @@ const SitemapGenerator: React.FC = () => {
 
     try {
       // Fetch all published blog posts
-      const blogQuery = query(
-        collection(db, 'blogPosts'),
-        where('published', '==', true)
-      );
+      const blogQuery = query(collection(db, 'blogPosts'), where('published', '==', true));
       const blogSnapshot = await getDocs(blogQuery);
 
       // Start XML
@@ -38,7 +31,7 @@ const SitemapGenerator: React.FC = () => {
       xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
       // Add static pages
-      staticPages.forEach(page => {
+      staticPages.forEach((page) => {
         xml += '  <url>\n';
         xml += `    <loc>${BASE_URL}${page.url}</loc>\n`;
         xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
@@ -48,9 +41,13 @@ const SitemapGenerator: React.FC = () => {
       });
 
       // Add blog posts
-      blogSnapshot.forEach(doc => {
+      blogSnapshot.forEach((doc) => {
         const post = doc.data();
-        const lastmod = post.updatedAt?.toDate() || post.publishedAt?.toDate() || post.createdAt?.toDate() || new Date();
+        const lastmod =
+          post.updatedAt?.toDate() ||
+          post.publishedAt?.toDate() ||
+          post.createdAt?.toDate() ||
+          new Date();
 
         xml += '  <url>\n';
         xml += `    <loc>${BASE_URL}/blog/${doc.id}</loc>\n`;
@@ -77,13 +74,13 @@ const SitemapGenerator: React.FC = () => {
       setResult({
         success: true,
         message: `Sitemap generated successfully! ${staticPages.length} static pages + ${blogSnapshot.size} blog posts = ${staticPages.length + blogSnapshot.size} total URLs.`,
-        url: `${BASE_URL}/sitemap.xml`
+        url: `${BASE_URL}/sitemap.xml`,
       });
     } catch (error: any) {
       console.error('Error generating sitemap:', error);
       setResult({
         success: false,
-        message: `Error: ${error.message}`
+        message: `Error: ${error.message}`,
       });
     } finally {
       setGenerating(false);
@@ -107,7 +104,10 @@ const SitemapGenerator: React.FC = () => {
           <i className="fas fa-info-circle text-blue-500 mt-1"></i>
           <div className="text-sm text-gray-700 space-y-1">
             <p className="font-semibold">What is sitemap.xml?</p>
-            <p>Sitemap helps search engines like Google discover and index all pages on your website, improving SEO rankings.</p>
+            <p>
+              Sitemap helps search engines like Google discover and index all pages on your website,
+              improving SEO rankings.
+            </p>
             <ul className="list-disc list-inside space-y-1 text-xs mt-2">
               <li>Static pages (Home, Blog, Training, etc.)</li>
               <li>All published blog posts with updated dates</li>
@@ -136,13 +136,17 @@ const SitemapGenerator: React.FC = () => {
       </button>
 
       {result && (
-        <div className={`mt-4 p-4 rounded-lg border ${
-          result.success
-            ? 'bg-green-50 border-green-200 text-green-700'
-            : 'bg-red-50 border-red-200 text-red-700'
-        }`}>
+        <div
+          className={`mt-4 p-4 rounded-lg border ${
+            result.success
+              ? 'bg-green-50 border-green-200 text-green-700'
+              : 'bg-red-50 border-red-200 text-red-700'
+          }`}
+        >
           <div className="flex items-start gap-2">
-            <i className={`fas ${result.success ? 'fa-check-circle' : 'fa-exclamation-circle'} mt-1`}></i>
+            <i
+              className={`fas ${result.success ? 'fa-check-circle' : 'fa-exclamation-circle'} mt-1`}
+            ></i>
             <div className="flex-1">
               <p className="text-sm">{result.message}</p>
               {result.success && (

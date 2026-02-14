@@ -1,12 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import {
-  db,
-  collection,
-  query,
-  where,
-  orderBy,
-  onSnapshot
-} from '../services/firebaseConfig';
+import { db, collection, query, where, orderBy, onSnapshot } from '../services/firebaseConfig';
 import { ChatRoom } from '../types';
 import ChatList from '../components/ChatList';
 import ChatWindow from '../components/ChatWindow';
@@ -63,10 +56,13 @@ const ChatPage: React.FC = () => {
     }
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const roomsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as ChatRoom));
+      const roomsData = snapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          }) as ChatRoom
+      );
       setRooms(roomsData);
       setLoading(false);
 
@@ -85,9 +81,7 @@ const ChatPage: React.FC = () => {
         <div className="max-w-md mx-auto text-center bg-white rounded-lg shadow-lg p-8">
           <i className="fas fa-lock text-5xl text-gray-400 mb-4"></i>
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Đăng nhập để tiếp tục</h2>
-          <p className="text-gray-600 mb-6">
-            Bạn cần đăng nhập để sử dụng chức năng chat.
-          </p>
+          <p className="text-gray-600 mb-6">Bạn cần đăng nhập để sử dụng chức năng chat.</p>
           <button
             onClick={onLoginRequired}
             className="bg-gradient-to-r from-primary to-orange-500 text-white px-6 py-3 rounded-full hover:shadow-lg transition-all"
@@ -118,8 +112,8 @@ const ChatPage: React.FC = () => {
           {isAdmin
             ? 'Quản lý tất cả các cuộc trò chuyện'
             : partnerStatus === 'approved'
-            ? 'Trao đổi với khách hàng về các yêu cầu đào tạo'
-            : 'Trao đổi với đối tác đào tạo'}
+              ? 'Trao đổi với khách hàng về các yêu cầu đào tạo'
+              : 'Trao đổi với đối tác đào tạo'}
         </p>
       </div>
 

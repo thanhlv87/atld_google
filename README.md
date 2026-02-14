@@ -5,24 +5,28 @@ Nền tảng kết nối doanh nghiệp với đơn vị cung cấp dịch vụ 
 ## 🌟 Tính năng chính
 
 ### 📋 Cho Doanh nghiệp
+
 - Đăng yêu cầu đào tạo miễn phí
 - Nhận báo giá từ nhiều đơn vị
 - Chat trực tiếp với đơn vị đào tạo
 - Theo dõi tiến độ yêu cầu
 
 ### 🎓 Cho Đơn vị Đào tạo
+
 - Xem danh sách yêu cầu đào tạo
 - Gửi báo giá cho khách hàng
 - Chat với khách hàng tiềm năng
 - Quản lý hồ sơ doanh nghiệp
 
 ### 📰 Blog & Tài liệu
+
 - Blog về An toàn Lao động
 - **🤖 AI Blog Writer** - Tạo bài viết tự động với Gemini AI
 - Thư viện tài liệu pháp lý
 - Hướng dẫn và Case studies
 
 ### 👨‍💼 Admin Panel
+
 - Quản lý yêu cầu đào tạo
 - Phê duyệt đối tác
 - **Viết blog tự động với AI**
@@ -34,12 +38,14 @@ Nền tảng kết nối doanh nghiệp với đơn vị cung cấp dịch vụ 
 Tạo bài blog chuyên nghiệp tự động bằng Gemini AI:
 
 ### Setup trong 2 phút:
+
 1. Lấy API key: https://aistudio.google.com/app/apikey
 2. Admin → Quản lý Blog → "Viết bằng AI"
 3. Paste API key → Lưu
 4. Done!
 
 ### Sử dụng:
+
 ```
 Nhập chủ đề → AI tạo bài viết hoàn chỉnh trong 15s
 → Title + Excerpt + Content (800-1200 từ) + Tags

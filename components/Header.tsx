@@ -34,9 +34,7 @@ const NavLink: React.FC<{
           : 'text-neutral-dark hover:text-primary hover:bg-gray-50'
       }`
     : `cursor-pointer px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
-        isActive
-          ? 'text-primary'
-          : 'text-neutral-dark hover:text-primary'
+        isActive ? 'text-primary' : 'text-neutral-dark hover:text-primary'
       }`;
 
   return (
@@ -46,7 +44,14 @@ const NavLink: React.FC<{
   );
 };
 
-const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPage, partnerStatus, unreadCount = 0 }) => {
+const Header: React.FC<HeaderProps> = ({
+  user,
+  isAdmin,
+  onLoginClick,
+  currentPage,
+  partnerStatus,
+  unreadCount = 0,
+}) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -55,22 +60,22 @@ const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPag
       await signOut(auth);
       navigate('/'); // Redirect to home on logout
     } catch (error) {
-      console.error("Error signing out: ", error);
-      alert("Đã xảy ra lỗi khi đăng xuất.");
+      console.error('Error signing out: ', error);
+      alert('Đã xảy ra lỗi khi đăng xuất.');
     }
   };
 
   const handleCreateRequestClick = () => {
     const scrollToForm = () => {
-        document.getElementById('create-request-form')?.scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('create-request-form')?.scrollIntoView({ behavior: 'smooth' });
     };
 
     if (currentPage === 'home') {
-        scrollToForm();
+      scrollToForm();
     } else {
-        navigate('/');
-        // Wait for the home page to render before scrolling
-        setTimeout(scrollToForm, 100);
+      navigate('/');
+      // Wait for the home page to render before scrolling
+      setTimeout(scrollToForm, 100);
     }
   };
 
@@ -80,17 +85,18 @@ const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPag
     <>
       <header className="bg-white shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link
-            to="/"
-            className="text-2xl font-bold text-primary cursor-pointer"
-          >
+          <Link to="/" className="text-2xl font-bold text-primary cursor-pointer">
             SafetyConnect
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-4">
-            <NavLink to="/" currentPage={currentPage}>Trang Chủ</NavLink>
-            <NavLink to="/requests" currentPage={currentPage}>Danh Sách Yêu Cầu</NavLink>
+            <NavLink to="/" currentPage={currentPage}>
+              Trang Chủ
+            </NavLink>
+            <NavLink to="/requests" currentPage={currentPage}>
+              Danh Sách Yêu Cầu
+            </NavLink>
             <NavLink to="/blog" currentPage={currentPage}>
               <i className="fas fa-newspaper mr-1"></i>Blog
             </NavLink>
@@ -106,32 +112,34 @@ const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPag
                 </span>
               </NavLink>
             )}
-            <NavLink to="/documents" currentPage={currentPage}>Tài Liệu</NavLink>
+            <NavLink to="/documents" currentPage={currentPage}>
+              Tài Liệu
+            </NavLink>
             {isAdmin && (
               <NavLink to="/admin" currentPage={currentPage}>
-                  <span className="font-bold text-red-600">
-                      <i className="fas fa-user-shield mr-1"></i> Quản Trị
-                  </span>
+                <span className="font-bold text-red-600">
+                  <i className="fas fa-user-shield mr-1"></i> Quản Trị
+                </span>
               </NavLink>
             )}
           </nav>
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-2 md:space-x-4">
-             {!user && (
+            {!user && (
               <button
                 onClick={handleCreateRequestClick}
                 className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition duration-300 text-sm font-medium"
               >
                 Tạo Yêu Cầu
               </button>
-             )}
+            )}
             {user ? (
               <>
                 {partnerStatus === 'pending' && (
-                    <span className="text-xs font-bold bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
-                      Chờ phê duyệt
-                    </span>
+                  <span className="text-xs font-bold bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+                    Chờ phê duyệt
+                  </span>
                 )}
                 <span className="text-neutral-dark text-sm hidden lg:block">{user.email}</span>
                 <button
@@ -158,12 +166,32 @@ const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPag
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? (
-              <svg className="w-6 h-6 text-neutral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6 text-neutral-dark"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             ) : (
-              <svg className="w-6 h-6 text-neutral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <svg
+                className="w-6 h-6 text-neutral-dark"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             )}
           </button>
@@ -193,8 +221,18 @@ const Header: React.FC<HeaderProps> = ({ user, isAdmin, onLoginClick, currentPag
               className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
               aria-label="Close menu"
             >
-              <svg className="w-6 h-6 text-neutral-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6 text-neutral-dark"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>

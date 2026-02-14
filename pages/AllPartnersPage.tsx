@@ -23,18 +23,15 @@ const AllPartnersPage: React.FC = () => {
     const partnersCollection = collection(db, 'partners');
     // Remove orderBy from query to avoid needing composite index
     // We'll sort in JavaScript instead
-    const partnersQuery = query(
-      partnersCollection,
-      where('status', '==', 'approved')
-    );
+    const partnersQuery = query(partnersCollection, where('status', '==', 'approved'));
 
     const unsubscribe = onSnapshot(
       partnersQuery,
       (querySnapshot) => {
-        const partnersData = querySnapshot.docs.map(docSnap => {
+        const partnersData = querySnapshot.docs.map((docSnap) => {
           const partnerProfile = {
             uid: docSnap.id,
-            ...docSnap.data()
+            ...docSnap.data(),
           } as PartnerProfile;
           return partnerProfileToTrustedPartner(partnerProfile);
         });
@@ -50,7 +47,7 @@ const AllPartnersPage: React.FC = () => {
         setLoading(false);
       },
       (err) => {
-        console.error("Error fetching trusted partners: ", err);
+        console.error('Error fetching trusted partners: ', err);
         setError(`Không thể tải danh sách đối tác: ${err.message}`);
         setLoading(false);
       }
@@ -61,18 +58,19 @@ const AllPartnersPage: React.FC = () => {
 
   // Get unique specializations for filtering
   const allSpecializations = Array.from(
-    new Set(partners.flatMap(p => p.specializations || []))
+    new Set(partners.flatMap((p) => p.specializations || []))
   ).sort();
 
   // Filter partners based on search and specialization
-  const filteredPartners = partners.filter(partner => {
-    const matchesSearch = searchTerm === '' ||
+  const filteredPartners = partners.filter((partner) => {
+    const matchesSearch =
+      searchTerm === '' ||
       partner.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       partner.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       partner.taxId.includes(searchTerm);
 
-    const matchesSpecialization = selectedSpecialization === 'all' ||
-      partner.specializations?.includes(selectedSpecialization);
+    const matchesSpecialization =
+      selectedSpecialization === 'all' || partner.specializations?.includes(selectedSpecialization);
 
     return matchesSearch && matchesSpecialization;
   });
@@ -111,7 +109,7 @@ const AllPartnersPage: React.FC = () => {
           'đơn vị huấn luyện an toàn lao động',
           'danh sách đối tác uy tín',
           'công ty đào tạo ATVSLĐ',
-          ...allSpecializations
+          ...allSpecializations,
         ]}
       />
 
@@ -177,7 +175,9 @@ const AllPartnersPage: React.FC = () => {
 
             {/* Results Count */}
             <div className="mt-4 text-sm text-gray-600">
-              Hiển thị <span className="font-semibold text-neutral-dark">{filteredPartners.length}</span> kết quả
+              Hiển thị{' '}
+              <span className="font-semibold text-neutral-dark">{filteredPartners.length}</span> kết
+              quả
               {searchTerm && ` cho "${searchTerm}"`}
               {selectedSpecialization !== 'all' && ` trong lĩnh vực "${selectedSpecialization}"`}
             </div>

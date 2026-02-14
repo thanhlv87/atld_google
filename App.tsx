@@ -10,11 +10,12 @@ import {
   query,
   orderBy,
   onSnapshot,
-  type User
+  type User,
 } from './services/firebaseConfig';
 import { TrainingRequest } from './types';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import ErrorBoundary from './components/ErrorBoundary';
 import LoadingSpinner from './components/LoadingSpinner';
 import { useUnreadMessages } from './hooks/useUnreadMessages';
 
@@ -40,7 +41,7 @@ export const AppContext = React.createContext<{
   loadingAuth: true,
   loadingRequests: true,
   unreadCount: 0,
-  onLoginRequired: () => {}
+  onLoginRequired: () => {},
 });
 
 const App: React.FC = () => {
@@ -99,7 +100,7 @@ const App: React.FC = () => {
         setLoadingRequests(false);
       },
       (error) => {
-        console.error("Error fetching training requests: ", error);
+        console.error('Error fetching training requests: ', error);
         setLoadingRequests(false);
       }
     );
@@ -130,7 +131,7 @@ const App: React.FC = () => {
     loadingAuth,
     loadingRequests,
     unreadCount,
-    onLoginRequired: () => setLoginModalOpen(true)
+    onLoginRequired: () => setLoginModalOpen(true),
   };
 
   return (
@@ -145,9 +146,11 @@ const App: React.FC = () => {
           unreadCount={unreadCount}
         />
         <main className="flex-grow">
-          <Suspense fallback={<LoadingSpinner size="fullscreen" message="Đang tải..." />}>
-            <Outlet />
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner size="fullscreen" message="Đang tải..." />}>
+              <Outlet />
+            </Suspense>
+          </ErrorBoundary>
         </main>
         <Footer />
         {isLoginModalOpen && (

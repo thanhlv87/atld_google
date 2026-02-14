@@ -14,7 +14,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
     return timestamp.toDate().toLocaleDateString('vi-VN', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
+      year: 'numeric',
     });
   };
 
@@ -51,9 +51,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
         <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2 group-hover:text-primary transition-colors">
           {post.title}
         </h3>
-        <p className="text-gray-600 text-sm line-clamp-3 mb-4">
-          {post.excerpt}
-        </p>
+        <p className="text-gray-600 text-sm line-clamp-3 mb-4">{post.excerpt}</p>
 
         {/* Tags */}
         {post.tags && post.tags.length > 0 && (

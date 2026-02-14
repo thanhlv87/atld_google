@@ -372,23 +372,76 @@ function escapeHtml(text) {
 }
 
 /**
+ * Known social media and search engine crawler user-agents
+ */
+const CRAWLER_USER_AGENTS = [
+  'facebookexternalhit', 'Facebot',
+  'Twitterbot', 'TwitterBot',
+  'LinkedInBot',
+  'WhatsApp',
+  'Slackbot', 'Slack-ImgProxy',
+  'TelegramBot',
+  'Googlebot', 'Google-InspectionTool',
+  'bingbot', 'msnbot',
+  'Zalobot',
+  'viber',
+  'Pinterest', 'PinterestBot',
+  'Discordbot',
+  'Applebot',
+  'Yandex',
+  'rogerbot',
+  'SemrushBot',
+  'AhrefsBot',
+  'DotBot',
+];
+
+function isCrawler(userAgent) {
+  if (!userAgent) return false;
+  const ua = userAgent.toLowerCase();
+  return CRAWLER_USER_AGENTS.some(bot => ua.includes(bot.toLowerCase()));
+}
+
+/**
+ * Fetch and serve the SPA's index.html for regular browsers
+ */
+async function serveSPAForBrowser(res) {
+  try {
+    const response = await fetch('https://atld.web.app/index.html');
+    const html = await response.text();
+    res.set('Content-Type', 'text/html; charset=utf-8');
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.send(html);
+  } catch (error) {
+    console.error('Error fetching index.html:', error);
+    // Last resort fallback
+    res.redirect(302, 'https://atld.web.app/');
+  }
+}
+
+/**
  * SEO-friendly Blog Post Meta Tags for Social Media Crawlers
  * Serves HTML with proper OG tags for Facebook, Twitter, Zalo etc.
+ * Regular browsers receive the SPA's index.html directly (no redirect loop).
  * Supports slug-based URLs with fallback to document ID for backward compatibility.
  */
 exports.blogMetaTags = onRequest(async (req, res) => {
   const urlPath = req.url || req.path;
+  const userAgent = req.headers['user-agent'] || '';
 
   // Extract slug/id from path: /blog/SLUG_OR_ID
   const pathMatch = urlPath.match(/\/blog\/([^/?#]+)/);
   const slugOrId = pathMatch ? pathMatch[1] : '';
 
-  console.log('blogMetaTags called with URL:', urlPath, 'slugOrId:', slugOrId);
+  console.log('blogMetaTags called:', { urlPath, slugOrId, isCrawler: isCrawler(userAgent) });
 
-  // If accessing /blog (listing page), serve the SPA
+  // If NOT a crawler (regular browser), serve the SPA directly
+  if (!isCrawler(userAgent)) {
+    return serveSPAForBrowser(res);
+  }
+
+  // If accessing /blog listing (crawler), redirect to homepage
   if (!slugOrId || slugOrId === 'blog') {
-    // Serve SPA index.html for the blog listing page
-    res.redirect(302, 'https://atld.web.app/blog');
+    res.redirect(302, 'https://atld.web.app/');
     return;
   }
 

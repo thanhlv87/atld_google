@@ -15,15 +15,8 @@ export interface CompressImageOptions {
  * @param options - Compression options
  * @returns Compressed image blob
  */
-export async function compressImage(
-  file: File,
-  options: CompressImageOptions = {}
-): Promise<Blob> {
-  const {
-    maxWidth = 1080,
-    maxHeight = 1080,
-    quality = 0.8
-  } = options;
+export async function compressImage(file: File, options: CompressImageOptions = {}): Promise<Blob> {
+  const { maxWidth = 1080, maxHeight = 1080, quality = 0.8 } = options;
 
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -94,5 +87,5 @@ export function formatFileSize(bytes: number): string {
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 }

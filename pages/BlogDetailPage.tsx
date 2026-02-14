@@ -12,7 +12,7 @@ import {
   where,
   orderBy,
   limit as firestoreLimit,
-  getDocs
+  getDocs,
 } from '../services/firebaseConfig';
 import { BlogPost } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -77,33 +77,37 @@ const BlogDetailPage: React.FC = () => {
         }
 
         const structuredData = {
-          "@context": "https://schema.org",
-          "@type": "Article",
-          "headline": postData.title,
-          "description": postData.excerpt,
-          "image": postData.coverImage,
-          "datePublished": postData.publishedAt?.toDate().toISOString() || postData.createdAt?.toDate().toISOString(),
-          "dateModified": postData.updatedAt?.toDate().toISOString() || postData.createdAt?.toDate().toISOString(),
-          "author": {
-            "@type": "Person",
-            "name": postData.author.name,
-            "email": postData.author.email
+          '@context': 'https://schema.org',
+          '@type': 'Article',
+          headline: postData.title,
+          description: postData.excerpt,
+          image: postData.coverImage,
+          datePublished:
+            postData.publishedAt?.toDate().toISOString() ||
+            postData.createdAt?.toDate().toISOString(),
+          dateModified:
+            postData.updatedAt?.toDate().toISOString() ||
+            postData.createdAt?.toDate().toISOString(),
+          author: {
+            '@type': 'Person',
+            name: postData.author.name,
+            email: postData.author.email,
           },
-          "publisher": {
-            "@type": "Organization",
-            "name": "SafetyConnect",
-            "logo": {
-              "@type": "ImageObject",
-              "url": "https://raw.githubusercontent.com/thanhlv87/pic/refs/heads/main/connected.png"
-            }
+          publisher: {
+            '@type': 'Organization',
+            name: 'SafetyConnect',
+            logo: {
+              '@type': 'ImageObject',
+              url: 'https://raw.githubusercontent.com/thanhlv87/pic/refs/heads/main/connected.png',
+            },
           },
-          "mainEntityOfPage": {
-            "@type": "WebPage",
-            "@id": `${window.location.origin}/blog/${postData.slug || slug}`
+          mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': `${window.location.origin}/blog/${postData.slug || slug}`,
           },
-          "keywords": postData.tags.join(', '),
-          "articleSection": postData.category,
-          "inLanguage": "vi-VN"
+          keywords: postData.tags.join(', '),
+          articleSection: postData.category,
+          inLanguage: 'vi-VN',
         };
 
         const script = document.createElement('script');
@@ -116,7 +120,7 @@ const BlogDetailPage: React.FC = () => {
           // Use document ID for update, not slug
           const postRef = doc(db, 'blogPosts', postData.id);
           await updateDoc(postRef, {
-            viewCount: increment(1)
+            viewCount: increment(1),
           });
         } catch (_error) {
           // Ignore permission errors for view count
@@ -132,8 +136,8 @@ const BlogDetailPage: React.FC = () => {
         );
         const relatedSnapshot = await getDocs(relatedQuery);
         const related = relatedSnapshot.docs
-          .map(doc => ({ id: doc.id, ...doc.data() } as BlogPost))
-          .filter(p => p.id !== postData!.id)
+          .map((doc) => ({ id: doc.id, ...doc.data() }) as BlogPost)
+          .filter((p) => p.id !== postData!.id)
           .slice(0, 3);
         setRelatedPosts(related);
 
@@ -169,7 +173,7 @@ const BlogDetailPage: React.FC = () => {
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
@@ -212,8 +216,12 @@ const BlogDetailPage: React.FC = () => {
         type="article"
         keywords={post.tags}
         author={post.author.name}
-        publishedTime={post.publishedAt?.toDate().toISOString() || post.createdAt?.toDate().toISOString()}
-        modifiedTime={post.updatedAt?.toDate().toISOString() || post.createdAt?.toDate().toISOString()}
+        publishedTime={
+          post.publishedAt?.toDate().toISOString() || post.createdAt?.toDate().toISOString()
+        }
+        modifiedTime={
+          post.updatedAt?.toDate().toISOString() || post.createdAt?.toDate().toISOString()
+        }
       />
 
       {/* Back Button */}
@@ -242,9 +250,7 @@ const BlogDetailPage: React.FC = () => {
             <span className="inline-block bg-gradient-to-r from-primary to-orange-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
               {post.category}
             </span>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              {post.title}
-            </h1>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{post.title}</h1>
             <div className="flex flex-wrap items-center gap-4 text-white/90">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-orange-500 flex items-center justify-center text-white font-bold">
@@ -360,10 +366,7 @@ const BlogDetailPage: React.FC = () => {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {relatedPosts.map((relatedPost) => (
-                  <BlogCard
-                    key={relatedPost.id}
-                    post={relatedPost}
-                  />
+                  <BlogCard key={relatedPost.id} post={relatedPost} />
                 ))}
               </div>
             </div>

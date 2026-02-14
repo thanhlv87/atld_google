@@ -1,8 +1,19 @@
 import React, { useState } from 'react';
-import { db, sendEmail, doc, getDoc, collection, addDoc, serverTimestamp } from '../services/firebaseConfig';
+import {
+  db,
+  sendEmail,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  serverTimestamp,
+} from '../services/firebaseConfig';
 import { TrainingRequest } from '../types';
 import { generateQuoteNotificationEmail } from '../utils/emailTemplates';
-import { getOrCreateAdminPartnerChatRoom, sendQuoteNotificationToAdminChat } from '../utils/chatHelpers';
+import {
+  getOrCreateAdminPartnerChatRoom,
+  sendQuoteNotificationToAdminChat,
+} from '../utils/chatHelpers';
 
 interface QuoteFormProps {
   request: TrainingRequest;
@@ -17,12 +28,12 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
   partnerUid,
   partnerEmail,
   onClose,
-  onSuccess
+  onSuccess,
 }) => {
   const [formData, setFormData] = useState({
     price: '',
     timeline: '',
-    notes: ''
+    notes: '',
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -30,7 +41,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const formatCurrency = (value: string) => {
@@ -42,7 +53,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCurrency(e.target.value);
-    setFormData(prev => ({ ...prev, price: formatted }));
+    setFormData((prev) => ({ ...prev, price: formatted }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,7 +93,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
         timeline: formData.timeline,
         notes: formData.notes,
         status: 'pending',
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       };
 
       const quotesCollection = collection(db, 'quotes');
@@ -96,12 +107,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
           partnerName,
           partnerEmail
         );
-        await sendQuoteNotificationToAdminChat(
-          chatRoomId,
-          partnerUid,
-          partnerName,
-          priceNumber
-        );
+        await sendQuoteNotificationToAdminChat(chatRoomId, partnerUid, partnerName, priceNumber);
       } catch (chatError) {
         console.error('Error creating chat room:', chatError);
         // Không fail toàn bộ operation nếu chat bị lỗi
@@ -117,7 +123,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
           price: priceNumber,
           timeline: formData.timeline,
           notes: formData.notes,
-          trainingDetails: request.trainingDetails
+          trainingDetails: request.trainingDetails,
         });
 
         await sendEmail(request.clientEmail, 'Bạn có báo giá mới từ đối tác đào tạo', emailHtml);
@@ -179,7 +185,10 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
               <span className="font-semibold text-gray-700">Nội dung đào tạo:</span>
               <div className="mt-1">
                 {request.trainingDetails.map((detail, idx) => (
-                  <span key={idx} className="inline-block bg-primary bg-opacity-10 text-primary px-2 py-1 rounded mr-2 mb-1 text-xs">
+                  <span
+                    key={idx}
+                    className="inline-block bg-primary bg-opacity-10 text-primary px-2 py-1 rounded mr-2 mb-1 text-xs"
+                  >
                     {detail.type} ({detail.participants} người)
                   </span>
                 ))}
@@ -296,10 +305,17 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 
           {/* Success message - hiển thị ngay dưới nút submit */}
           {success && (
-            <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg relative animate-pulse" role="alert">
+            <div
+              className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg relative animate-pulse"
+              role="alert"
+            >
               <div className="flex items-start">
                 <svg className="w-6 h-6 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 <div>
                   <p className="font-bold text-lg">Thành công!</p>

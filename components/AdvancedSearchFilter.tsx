@@ -18,69 +18,69 @@ interface AdvancedSearchFilterProps {
 
 // Danh sách tỉnh thành phổ biến tại Việt Nam
 const VIETNAM_PROVINCES = [
-  "Hà Nội",
-  "Hồ Chí Minh",
-  "Đà Nẵng",
-  "Hải Phòng",
-  "Cần Thơ",
-  "An Giang",
-  "Bà Rịa - Vũng Tàu",
-  "Bắc Giang",
-  "Bắc Kạn",
-  "Bạc Liêu",
-  "Bắc Ninh",
-  "Bến Tre",
-  "Bình Định",
-  "Bình Dương",
-  "Bình Phước",
-  "Bình Thuận",
-  "Cà Mau",
-  "Cao Bằng",
-  "Đắk Lắk",
-  "Đắk Nông",
-  "Điện Biên",
-  "Đồng Nai",
-  "Đồng Tháp",
-  "Gia Lai",
-  "Hà Giang",
-  "Hà Nam",
-  "Hà Tĩnh",
-  "Hải Dương",
-  "Hậu Giang",
-  "Hòa Bình",
-  "Hưng Yên",
-  "Khánh Hòa",
-  "Kiên Giang",
-  "Kon Tum",
-  "Lai Châu",
-  "Lâm Đồng",
-  "Lạng Sơn",
-  "Lào Cai",
-  "Long An",
-  "Nam Định",
-  "Nghệ An",
-  "Ninh Bình",
-  "Ninh Thuận",
-  "Phú Thọ",
-  "Phú Yên",
-  "Quảng Bình",
-  "Quảng Nam",
-  "Quảng Ngãi",
-  "Quảng Ninh",
-  "Quảng Trị",
-  "Sóc Trăng",
-  "Sơn La",
-  "Tây Ninh",
-  "Thái Bình",
-  "Thái Nguyên",
-  "Thanh Hóa",
-  "Thừa Thiên Huế",
-  "Tiền Giang",
-  "Trà Vinh",
-  "Tuyên Quang",
-  "Vĩnh Long",
-  "Vĩnh Phúc",
-  "Yên Bái"
+  'Hà Nội',
+  'Hồ Chí Minh',
+  'Đà Nẵng',
+  'Hải Phòng',
+  'Cần Thơ',
+  'An Giang',
+  'Bà Rịa - Vũng Tàu',
+  'Bắc Giang',
+  'Bắc Kạn',
+  'Bạc Liêu',
+  'Bắc Ninh',
+  'Bến Tre',
+  'Bình Định',
+  'Bình Dương',
+  'Bình Phước',
+  'Bình Thuận',
+  'Cà Mau',
+  'Cao Bằng',
+  'Đắk Lắk',
+  'Đắk Nông',
+  'Điện Biên',
+  'Đồng Nai',
+  'Đồng Tháp',
+  'Gia Lai',
+  'Hà Giang',
+  'Hà Nam',
+  'Hà Tĩnh',
+  'Hải Dương',
+  'Hậu Giang',
+  'Hòa Bình',
+  'Hưng Yên',
+  'Khánh Hòa',
+  'Kiên Giang',
+  'Kon Tum',
+  'Lai Châu',
+  'Lâm Đồng',
+  'Lạng Sơn',
+  'Lào Cai',
+  'Long An',
+  'Nam Định',
+  'Nghệ An',
+  'Ninh Bình',
+  'Ninh Thuận',
+  'Phú Thọ',
+  'Phú Yên',
+  'Quảng Bình',
+  'Quảng Nam',
+  'Quảng Ngãi',
+  'Quảng Ninh',
+  'Quảng Trị',
+  'Sóc Trăng',
+  'Sơn La',
+  'Tây Ninh',
+  'Thái Bình',
+  'Thái Nguyên',
+  'Thanh Hóa',
+  'Thừa Thiên Huế',
+  'Tiền Giang',
+  'Trà Vinh',
+  'Tuyên Quang',
+  'Vĩnh Long',
+  'Vĩnh Phúc',
+  'Yên Bái',
 ];
 
 const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({ onFilterChange, onClear }) => {
@@ -92,12 +92,12 @@ const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({ onFilterCha
     participantsMax: 1000,
     urgent: false,
     dateFrom: '',
-    dateTo: ''
+    dateTo: '',
   });
 
   const handleTrainingTypeToggle = (type: string) => {
     const newTypes = filters.trainingTypes.includes(type)
-      ? filters.trainingTypes.filter(t => t !== type)
+      ? filters.trainingTypes.filter((t) => t !== type)
       : [...filters.trainingTypes, type];
 
     const newFilters = { ...filters, trainingTypes: newTypes };
@@ -106,13 +106,19 @@ const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({ onFilterCha
   };
 
   const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, (option: HTMLOptionElement) => option.value);
+    const selectedOptions = Array.from(
+      e.target.selectedOptions,
+      (option: HTMLOptionElement) => option.value
+    );
     const newFilters = { ...filters, provinces: selectedOptions };
     setFilters(newFilters);
     onFilterChange(newFilters);
   };
 
-  const handleParticipantsChange = (field: 'participantsMin' | 'participantsMax', value: number) => {
+  const handleParticipantsChange = (
+    field: 'participantsMin' | 'participantsMax',
+    value: number
+  ) => {
     const newFilters = { ...filters, [field]: value };
     setFilters(newFilters);
     onFilterChange(newFilters);
@@ -138,7 +144,7 @@ const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({ onFilterCha
       participantsMax: 1000,
       urgent: false,
       dateFrom: '',
-      dateTo: ''
+      dateTo: '',
     };
     setFilters(clearedFilters);
     onClear();
@@ -185,12 +191,16 @@ const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({ onFilterCha
               Xóa hết
             </button>
           )}
-          <i className={`fas fa-chevron-${isExpanded ? 'up' : 'down'} text-gray-500 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}></i>
+          <i
+            className={`fas fa-chevron-${isExpanded ? 'up' : 'down'} text-gray-500 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+          ></i>
         </div>
       </button>
 
       {/* Filter Content with Animation */}
-      <div className={`transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+      <div
+        className={`transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
+      >
         <div className="p-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Training Types Card */}
@@ -199,9 +209,7 @@ const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({ onFilterCha
                 <div className="bg-blue-100 p-2 rounded-lg">
                   <i className="fas fa-graduation-cap text-blue-600"></i>
                 </div>
-                <label className="text-sm font-bold text-gray-800">
-                  Loại đào tạo
-                </label>
+                <label className="text-sm font-bold text-gray-800">Loại đào tạo</label>
               </div>
 
               {/* Selected Training Types Pills */}
@@ -229,7 +237,9 @@ const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({ onFilterCha
                   <label
                     key={type}
                     className={`flex items-center cursor-pointer hover:bg-blue-50 p-2.5 rounded-lg transition-all ${
-                      filters.trainingTypes.includes(type) ? 'bg-blue-50 border border-blue-200' : ''
+                      filters.trainingTypes.includes(type)
+                        ? 'bg-blue-50 border border-blue-200'
+                        : ''
                     }`}
                   >
                     <input
@@ -250,9 +260,7 @@ const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({ onFilterCha
                 <div className="bg-green-100 p-2 rounded-lg">
                   <i className="fas fa-map-marker-alt text-green-600"></i>
                 </div>
-                <label className="text-sm font-bold text-gray-800">
-                  Tỉnh/Thành phố
-                </label>
+                <label className="text-sm font-bold text-gray-800">Tỉnh/Thành phố</label>
               </div>
 
               {/* Selected Provinces Pills */}
@@ -266,7 +274,7 @@ const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({ onFilterCha
                       {province}
                       <button
                         onClick={() => {
-                          const newProvinces = filters.provinces.filter(p => p !== province);
+                          const newProvinces = filters.provinces.filter((p) => p !== province);
                           const newFilters = { ...filters, provinces: newProvinces };
                           setFilters(newFilters);
                           onFilterChange(newFilters);
@@ -311,16 +319,16 @@ const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({ onFilterCha
                   <div className="bg-purple-100 p-2 rounded-lg">
                     <i className="fas fa-users text-purple-600"></i>
                   </div>
-                  <label className="text-sm font-bold text-gray-800">
-                    Số học viên
-                  </label>
+                  <label className="text-sm font-bold text-gray-800">Số học viên</label>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
                     <input
                       type="number"
                       value={filters.participantsMin}
-                      onChange={(e) => handleParticipantsChange('participantsMin', parseInt(e.target.value) || 0)}
+                      onChange={(e) =>
+                        handleParticipantsChange('participantsMin', parseInt(e.target.value) || 0)
+                      }
                       placeholder="Từ"
                       min="0"
                       className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 pl-8"
@@ -332,7 +340,12 @@ const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({ onFilterCha
                     <input
                       type="number"
                       value={filters.participantsMax}
-                      onChange={(e) => handleParticipantsChange('participantsMax', parseInt(e.target.value) || 1000)}
+                      onChange={(e) =>
+                        handleParticipantsChange(
+                          'participantsMax',
+                          parseInt(e.target.value) || 1000
+                        )
+                      }
                       placeholder="Đến"
                       min="0"
                       className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 pl-8"
@@ -354,9 +367,7 @@ const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({ onFilterCha
                   <div className="bg-orange-100 p-2 rounded-lg">
                     <i className="fas fa-calendar-alt text-orange-600"></i>
                   </div>
-                  <label className="text-sm font-bold text-gray-800">
-                    Thời gian dự kiến
-                  </label>
+                  <label className="text-sm font-bold text-gray-800">Thời gian dự kiến</label>
                 </div>
                 <div className="space-y-3">
                   <div className="relative">
@@ -384,9 +395,13 @@ const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({ onFilterCha
 
               {/* Urgent Checkbox */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
-                <label className={`flex items-center cursor-pointer p-3 rounded-lg transition-all ${
-                  filters.urgent ? 'bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-300' : 'hover:bg-gray-50'
-                }`}>
+                <label
+                  className={`flex items-center cursor-pointer p-3 rounded-lg transition-all ${
+                    filters.urgent
+                      ? 'bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-300'
+                      : 'hover:bg-gray-50'
+                  }`}
+                >
                   <input
                     type="checkbox"
                     checked={filters.urgent}
@@ -394,10 +409,16 @@ const AdvancedSearchFilter: React.FC<AdvancedSearchFilterProps> = ({ onFilterCha
                     className="w-5 h-5 text-red-600 focus:ring-red-500 focus:ring-2 rounded border-gray-300"
                   />
                   <div className="flex items-center gap-2 ml-3">
-                    <div className={`p-1.5 rounded-lg ${filters.urgent ? 'bg-red-100' : 'bg-gray-100'}`}>
-                      <i className={`fas fa-bolt ${filters.urgent ? 'text-red-600' : 'text-gray-400'}`}></i>
+                    <div
+                      className={`p-1.5 rounded-lg ${filters.urgent ? 'bg-red-100' : 'bg-gray-100'}`}
+                    >
+                      <i
+                        className={`fas fa-bolt ${filters.urgent ? 'text-red-600' : 'text-gray-400'}`}
+                      ></i>
                     </div>
-                    <span className={`text-sm font-bold ${filters.urgent ? 'text-red-700' : 'text-gray-700'}`}>
+                    <span
+                      className={`text-sm font-bold ${filters.urgent ? 'text-red-700' : 'text-gray-700'}`}
+                    >
                       Chỉ yêu cầu khẩn cấp
                     </span>
                   </div>

@@ -55,7 +55,7 @@ const AIBlogWriter: React.FC<AIBlogWriterProps> = ({ onGenerate }) => {
     'Case Study',
     'Tin tức',
     'Hướng dẫn',
-    'Kiến thức chuyên sâu'
+    'Kiến thức chuyên sâu',
   ];
 
   // Sample topics for quick selection
@@ -67,7 +67,7 @@ const AIBlogWriter: React.FC<AIBlogWriterProps> = ({ onGenerate }) => {
     'Kỹ năng sơ cấp cứu cơ bản tại nơi làm việc',
     'Đánh giá rủi ro an toàn lao động theo ISO 45001',
     'Phòng cháy chữa cháy trong nhà máy sản xuất',
-    'An toàn hóa chất trong phòng thí nghiệm'
+    'An toàn hóa chất trong phòng thí nghiệm',
   ];
 
   const handleGenerate = async () => {
@@ -128,7 +128,8 @@ Trả về theo định dạng JSON với cấu trúc sau:
       // Parse JSON response
       let blogData;
       try {
-        const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/) || text.match(/```\s*([\s\S]*?)\s*```/);
+        const jsonMatch =
+          text.match(/```json\s*([\s\S]*?)\s*```/) || text.match(/```\s*([\s\S]*?)\s*```/);
         const jsonText = jsonMatch ? jsonMatch[1] : text;
         blogData = JSON.parse(jsonText);
       } catch (parseError) {
@@ -137,8 +138,8 @@ Trả về theo định dạng JSON với cấu trúc sau:
           title: topic,
           excerpt: text.substring(0, 200) + '...',
           content: text,
-          tags: keywords ? keywords.split(',').map(k => k.trim()) : [],
-          suggestedCategory: category
+          tags: keywords ? keywords.split(',').map((k) => k.trim()) : [],
+          suggestedCategory: category,
         };
       }
 
@@ -147,13 +148,12 @@ Trả về theo định dạng JSON với cấu trúc sau:
         excerpt: blogData.excerpt,
         content: blogData.content,
         tags: blogData.tags || [],
-        suggestedCategory: blogData.suggestedCategory || category
+        suggestedCategory: blogData.suggestedCategory || category,
       });
 
       // Reset form
       setTopic('');
       setKeywords('');
-
     } catch (err: any) {
       console.error('Error generating blog:', err);
       if (err.message?.includes('API_KEY_INVALID')) {
@@ -182,10 +182,11 @@ Trả về theo định dạng JSON với cấu trúc sau:
         </div>
         <button
           onClick={() => setShowApiKeyInput(!showApiKeyInput)}
-          className={`px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${apiKeySaved
+          className={`px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${
+            apiKeySaved
               ? 'bg-green-100 text-green-700 hover:bg-green-200'
               : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-            }`}
+          }`}
         >
           <i className={`fas ${apiKeySaved ? 'fa-check-circle' : 'fa-key'}`}></i>
           {apiKeySaved ? 'API Key đã lưu' : 'Cài đặt API Key'}
@@ -201,9 +202,7 @@ Trả về theo định dạng JSON với cấu trúc sau:
           </h4>
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                API Key
-              </label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">API Key</label>
               <input
                 type="password"
                 value={apiKey}
@@ -212,7 +211,15 @@ Trả về theo định dạng JSON với cấu trúc sau:
                 placeholder="AIza..."
               />
               <p className="text-xs text-gray-500 mt-1">
-                Lấy API key tại: <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">https://aistudio.google.com/app/apikey</a>
+                Lấy API key tại:{' '}
+                <a
+                  href="https://aistudio.google.com/app/apikey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-purple-600 hover:underline"
+                >
+                  https://aistudio.google.com/app/apikey
+                </a>
               </p>
             </div>
             <div className="flex gap-2">
@@ -293,16 +300,16 @@ Trả về theo định dạng JSON với cấu trúc sau:
 
             {/* Category */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Danh mục
-              </label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Danh mục</label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
-                {categories.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
                 ))}
               </select>
             </div>
@@ -319,7 +326,9 @@ Trả về theo định dạng JSON với cấu trúc sau:
                 className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="VD: thiết bị bảo hộ, mũ bảo hiểm, giày an toàn"
               />
-              <p className="text-xs text-gray-500 mt-1">Giúp AI tạo nội dung tập trung hơn vào các khía cạnh bạn muốn</p>
+              <p className="text-xs text-gray-500 mt-1">
+                Giúp AI tạo nội dung tập trung hơn vào các khía cạnh bạn muốn
+              </p>
             </div>
           </>
         )}

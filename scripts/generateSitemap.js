@@ -16,12 +16,12 @@ const __dirname = path.dirname(__filename);
 
 // Firebase config - same as your app
 const firebaseConfig = {
-  apiKey: "AIzaSyBiJGS0vd5xwHFPmNbE4YVwxZc5HsQ-xOM",
-  authDomain: "atld.firebaseapp.com",
-  projectId: "gen-lang-client-0113063590",
-  storageBucket: "gen-lang-client-0113063590.firebasestorage.app",
-  messagingSenderId: "951042361899",
-  appId: "1:951042361899:web:3f7d3f8bb7cf3cbe80fea3"
+  apiKey: 'AIzaSyBiJGS0vd5xwHFPmNbE4YVwxZc5HsQ-xOM',
+  authDomain: 'atld.firebaseapp.com',
+  projectId: 'gen-lang-client-0113063590',
+  storageBucket: 'gen-lang-client-0113063590.firebasestorage.app',
+  messagingSenderId: '951042361899',
+  appId: '1:951042361899:web:3f7d3f8bb7cf3cbe80fea3',
 };
 
 const app = initializeApp(firebaseConfig);
@@ -43,10 +43,7 @@ async function generateSitemap() {
     console.log('🚀 Starting sitemap generation...');
 
     // Fetch all published blog posts
-    const blogQuery = query(
-      collection(db, 'blogPosts'),
-      where('published', '==', true)
-    );
+    const blogQuery = query(collection(db, 'blogPosts'), where('published', '==', true));
     const blogSnapshot = await getDocs(blogQuery);
 
     console.log(`📝 Found ${blogSnapshot.size} published blog posts`);
@@ -56,7 +53,7 @@ async function generateSitemap() {
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
     // Add static pages
-    staticPages.forEach(page => {
+    staticPages.forEach((page) => {
       xml += '  <url>\n';
       xml += `    <loc>${BASE_URL}${page.url}</loc>\n`;
       xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
@@ -66,9 +63,13 @@ async function generateSitemap() {
     });
 
     // Add blog posts
-    blogSnapshot.forEach(doc => {
+    blogSnapshot.forEach((doc) => {
       const post = doc.data();
-      const lastmod = post.updatedAt?.toDate() || post.publishedAt?.toDate() || post.createdAt?.toDate() || new Date();
+      const lastmod =
+        post.updatedAt?.toDate() ||
+        post.publishedAt?.toDate() ||
+        post.createdAt?.toDate() ||
+        new Date();
 
       xml += '  <url>\n';
       xml += `    <loc>${BASE_URL}/blog/${doc.id}</loc>\n`;

@@ -23,7 +23,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
   author,
   publishedTime,
   modifiedTime,
-  articleSection
+  articleSection,
 }) => {
   useEffect(() => {
     // Update title
@@ -83,7 +83,18 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     if (url) {
       updateCanonicalLink(url);
     }
-  }, [title, description, image, url, type, keywords, author, publishedTime, modifiedTime, articleSection]);
+  }, [
+    title,
+    description,
+    image,
+    url,
+    type,
+    keywords,
+    author,
+    publishedTime,
+    modifiedTime,
+    articleSection,
+  ]);
 
   return null;
 };
@@ -115,4 +126,3 @@ function updateCanonicalLink(url: string) {
 }
 
 export default SEOHead;
-

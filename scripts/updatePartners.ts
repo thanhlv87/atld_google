@@ -3,13 +3,13 @@ import { getFirestore, collection, getDocs, doc, updateDoc } from 'firebase/fire
 
 // Firebase config - copy from your firebaseConfig.ts
 const firebaseConfig = {
-  apiKey: "AIzaSyCf5P3bEEJxqxo5Gu8OtQXdWM9NwYSA4eM",
-  authDomain: "gen-lang-client-0113063590.firebaseapp.com",
-  projectId: "gen-lang-client-0113063590",
-  storageBucket: "gen-lang-client-0113063590.firebasestorage.app",
-  messagingSenderId: "808783437931",
-  appId: "1:808783437931:web:cbcea9cb98c14fe9f08eb3",
-  measurementId: "G-F5VLX1M8VX"
+  apiKey: 'AIzaSyCf5P3bEEJxqxo5Gu8OtQXdWM9NwYSA4eM',
+  authDomain: 'gen-lang-client-0113063590.firebaseapp.com',
+  projectId: 'gen-lang-client-0113063590',
+  storageBucket: 'gen-lang-client-0113063590.firebasestorage.app',
+  messagingSenderId: '808783437931',
+  appId: '1:808783437931:web:cbcea9cb98c14fe9f08eb3',
+  measurementId: 'G-F5VLX1M8VX',
 };
 
 const app = initializeApp(firebaseConfig);

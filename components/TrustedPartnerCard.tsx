@@ -47,9 +47,7 @@ const TrustedPartnerCard: React.FC<TrustedPartnerCardProps> = ({ partner, onClic
           {partner.businessName}
         </h3>
 
-        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-          {partner.description}
-        </p>
+        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{partner.description}</p>
 
         {/* Specializations */}
         {partner.specializations && partner.specializations.length > 0 && (

@@ -56,41 +56,42 @@ import { generatePartnerNotificationEmail } from '../utils/emailTemplates';
 ```typescript
 const trainingDetails = [
   {
-    type: "Team Building",
-    group: "Nhóm 20-50 người",
-    participants: 35
+    type: 'Team Building',
+    group: 'Nhóm 20-50 người',
+    participants: 35,
   },
   {
-    type: "Kỹ năng lãnh đạo",
-    group: "Nhóm 10-20 người",
-    participants: 15
-  }
+    type: 'Kỹ năng lãnh đạo',
+    group: 'Nhóm 10-20 người',
+    participants: 15,
+  },
 ];
 
 const clientInfo = {
-  clientName: "Nguyễn Văn A",
-  clientEmail: "nguyenvana@company.com",
-  clientPhone: "0901234567",
-  location: "Hà Nội",
-  description: "Công ty chúng tôi muốn tổ chức khóa đào tạo team building và kỹ năng lãnh đạo cho đội ngũ quản lý cấp trung. Mong muốn giảng viên có kinh nghiệm thực tế trong lĩnh vực quản lý doanh nghiệp.",
-  trainingDuration: "2 ngày",
-  preferredTime: "Tháng 12/2024"
+  clientName: 'Nguyễn Văn A',
+  clientEmail: 'nguyenvana@company.com',
+  clientPhone: '0901234567',
+  location: 'Hà Nội',
+  description:
+    'Công ty chúng tôi muốn tổ chức khóa đào tạo team building và kỹ năng lãnh đạo cho đội ngũ quản lý cấp trung. Mong muốn giảng viên có kinh nghiệm thực tế trong lĩnh vực quản lý doanh nghiệp.',
+  trainingDuration: '2 ngày',
+  preferredTime: 'Tháng 12/2024',
 };
 
 // Tạo HTML email
 const emailHtml = generatePartnerNotificationEmail(
   trainingDetails,
   clientInfo,
-  true  // isUrgent = true
+  true // isUrgent = true
 );
 
 // Tạo document trong Firestore
 const emailDoc = {
-  to: ["partner@example.com"],
+  to: ['partner@example.com'],
   message: {
-    subject: "🎯 Yêu cầu đào tạo mới: Team Building, Kỹ năng lãnh đạo",
-    html: emailHtml
-  }
+    subject: '🎯 Yêu cầu đào tạo mới: Team Building, Kỹ năng lãnh đạo',
+    html: emailHtml,
+  },
 };
 
 // Thêm vào collection 'mail'

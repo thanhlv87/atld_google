@@ -1,43 +1,62 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-export type TrainingTypeKey = 'an-toan-dien' | 'an-toan-xay-dung' | 'an-toan-hoa-chat' | 'pccc' | 'an-toan-buc-xa' | 'quan-trac-moi-truong' | 'danh-gia-phan-loai-lao-dong' | 'so-cap-cuu';
+export type TrainingTypeKey =
+  | 'an-toan-dien'
+  | 'an-toan-xay-dung'
+  | 'an-toan-hoa-chat'
+  | 'pccc'
+  | 'an-toan-buc-xa'
+  | 'quan-trac-moi-truong'
+  | 'danh-gia-phan-loai-lao-dong'
+  | 'so-cap-cuu';
 
 // Dữ liệu chi tiết cho từng loại đào tạo
-const trainingData: Record<string, {
-  title: string;
-  description: string;
-  metaDescription: string;
-  keywords: string[];
-  benefits: string[];
-  targetAudience: string[];
-  content: string[];
-  requirements: string[];
-  duration: string;
-  certificate: string;
-  imageUrl: string;
-  bgColor: string;
-  iconClass: string;
-}> = {
+const trainingData: Record<
+  string,
+  {
+    title: string;
+    description: string;
+    metaDescription: string;
+    keywords: string[];
+    benefits: string[];
+    targetAudience: string[];
+    content: string[];
+    requirements: string[];
+    duration: string;
+    certificate: string;
+    imageUrl: string;
+    bgColor: string;
+    iconClass: string;
+  }
+> = {
   'an-toan-dien': {
     title: 'Đào Tạo An Toàn Điện',
-    description: 'Khóa đào tạo an toàn điện chuyên nghiệp, đầy đủ kiến thức và kỹ năng vận hành, sửa chữa điện an toàn theo quy định Nhà nước',
-    metaDescription: 'Đào tạo an toàn điện chuyên nghiệp, cấp chứng chỉ theo Nghị định 44. Học viên được trang bị kiến thức về điện an toàn, vận hành thiết bị điện, xử lý sự cố.',
-    keywords: ['đào tạo an toàn điện', 'chứng chỉ an toàn điện', 'huấn luyện điện công nghiệp', 'an toàn lao động điện', 'nghị định 44'],
+    description:
+      'Khóa đào tạo an toàn điện chuyên nghiệp, đầy đủ kiến thức và kỹ năng vận hành, sửa chữa điện an toàn theo quy định Nhà nước',
+    metaDescription:
+      'Đào tạo an toàn điện chuyên nghiệp, cấp chứng chỉ theo Nghị định 44. Học viên được trang bị kiến thức về điện an toàn, vận hành thiết bị điện, xử lý sự cố.',
+    keywords: [
+      'đào tạo an toàn điện',
+      'chứng chỉ an toàn điện',
+      'huấn luyện điện công nghiệp',
+      'an toàn lao động điện',
+      'nghị định 44',
+    ],
     benefits: [
       'Hiểu rõ các nguy cơ điện và cách phòng tránh',
       'Thực hành vận hành thiết bị điện an toàn',
       'Xử lý sự cố điện hiệu quả',
       'Đạt chứng chỉ theo quy định Nhà nước',
       'Giảm thiểu tai nạn lao động do điện',
-      'Nâng cao năng lực nghề nghiệp'
+      'Nâng cao năng lực nghề nghiệp',
     ],
     targetAudience: [
       'Công nhân điện, thợ điện',
       'Kỹ sư vận hành hệ thống điện',
       'Cán bộ quản lý an toàn điện',
       'Người làm việc gần thiết bị điện',
-      'Doanh nghiệp có hoạt động liên quan điện'
+      'Doanh nghiệp có hoạt động liên quan điện',
     ],
     content: [
       'Kiến thức cơ bản về điện và an toàn điện',
@@ -47,39 +66,47 @@ const trainingData: Record<string, {
       'Sơ cứu người bị điện giật',
       'Xử lý sự cố điện phổ biến',
       'Kiểm tra và bảo trì hệ thống điện',
-      'Thực hành an toàn điện trong thực tế'
+      'Thực hành an toàn điện trong thực tế',
     ],
     requirements: [
       'Trên 18 tuổi',
       'Sức khỏe tốt, không mắc bệnh nghề nghiệp',
       'Có kiến thức cơ bản về điện (ưu tiên)',
-      'Mang theo CMND/CCCD'
+      'Mang theo CMND/CCCD',
     ],
     duration: '3-5 ngày (20-40 giờ)',
     certificate: 'Chứng chỉ An Toàn Điện theo Nghị định 44/2016/NĐ-CP',
     imageUrl: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&h=400&fit=crop',
     bgColor: 'from-yellow-500 to-orange-600',
-    iconClass: 'fa-bolt'
+    iconClass: 'fa-bolt',
   },
   'an-toan-xay-dung': {
     title: 'Đào Tạo An Toàn Xây Dựng',
-    description: 'Khóa đào tạo an toàn xây dựng toàn diện, trang bị kiến thức và kỹ năng làm việc an toàn tại công trường xây dựng',
-    metaDescription: 'Đào tạo an toàn xây dựng cho công nhân, kỹ sư xây dựng. Cấp chứng chỉ hợp lệ, đúng quy định. Học thực tế tại công trường.',
-    keywords: ['đào tạo an toàn xây dựng', 'huấn luyện công trường', 'chứng chỉ xây dựng', 'an toàn lao động xây dựng', 'nghị định 44'],
+    description:
+      'Khóa đào tạo an toàn xây dựng toàn diện, trang bị kiến thức và kỹ năng làm việc an toàn tại công trường xây dựng',
+    metaDescription:
+      'Đào tạo an toàn xây dựng cho công nhân, kỹ sư xây dựng. Cấp chứng chỉ hợp lệ, đúng quy định. Học thực tế tại công trường.',
+    keywords: [
+      'đào tạo an toàn xây dựng',
+      'huấn luyện công trường',
+      'chứng chỉ xây dựng',
+      'an toàn lao động xây dựng',
+      'nghị định 44',
+    ],
     benefits: [
       'Nhận biết nguy hiểm tại công trường',
       'Sử dụng thiết bị bảo hộ đúng cách',
       'Làm việc trên cao an toàn',
       'Phòng ngừa tai nạn lao động',
       'Tuân thủ quy định an toàn xây dựng',
-      'Cấp chứng chỉ hợp lệ toàn quốc'
+      'Cấp chứng chỉ hợp lệ toàn quốc',
     ],
     targetAudience: [
       'Công nhân xây dựng',
       'Kỹ sư giám sát công trình',
       'Chủ đầu tư, nhà thầu',
       'Quản đốc công trường',
-      'Cán bộ ATVSLĐ trong xây dựng'
+      'Cán bộ ATVSLĐ trong xây dựng',
     ],
     content: [
       'Quy định pháp luật về an toàn xây dựng',
@@ -89,39 +116,47 @@ const trainingData: Record<string, {
       'An toàn giàn giáo, thang máy công trình',
       'Phòng chống sập đổ, vùi lấp',
       'Sơ cứu tai nạn tại công trường',
-      'Kế hoạch ứng phó khẩn cấp'
+      'Kế hoạch ứng phó khẩn cấp',
     ],
     requirements: [
       'Trên 18 tuổi',
       'Sức khỏe đủ tiêu chuẩn làm việc xây dựng',
       'Không có chống chỉ định sức khỏe',
-      'Mang theo CMND/CCCD và ảnh 3x4'
+      'Mang theo CMND/CCCD và ảnh 3x4',
     ],
     duration: '3-7 ngày (24-56 giờ)',
     certificate: 'Chứng chỉ An Toàn Xây Dựng theo Nghị định 44/2016/NĐ-CP',
     imageUrl: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&h=400&fit=crop',
     bgColor: 'from-blue-500 to-cyan-600',
-    iconClass: 'fa-hard-hat'
+    iconClass: 'fa-hard-hat',
   },
   'an-toan-hoa-chat': {
     title: 'Đào Tạo An Toàn Hóa Chất',
-    description: 'Khóa đào tạo an toàn hóa chất, hướng dẫn xử lý, bảo quản và sử dụng hóa chất đúng quy định',
-    metaDescription: 'Đào tạo an toàn hóa chất cho doanh nghiệp. Học về MSDS, phân loại hóa chất, xử lý sự cố hóa chất. Cấp chứng chỉ hợp lệ.',
-    keywords: ['đào tạo an toàn hóa chất', 'xử lý hóa chất', 'MSDS', 'chứng chỉ hóa chất', 'an toàn lao động hóa chất'],
+    description:
+      'Khóa đào tạo an toàn hóa chất, hướng dẫn xử lý, bảo quản và sử dụng hóa chất đúng quy định',
+    metaDescription:
+      'Đào tạo an toàn hóa chất cho doanh nghiệp. Học về MSDS, phân loại hóa chất, xử lý sự cố hóa chất. Cấp chứng chỉ hợp lệ.',
+    keywords: [
+      'đào tạo an toàn hóa chất',
+      'xử lý hóa chất',
+      'MSDS',
+      'chứng chỉ hóa chất',
+      'an toàn lao động hóa chất',
+    ],
     benefits: [
       'Hiểu rõ tính chất và nguy hiểm của hóa chất',
       'Đọc và sử dụng phiếu MSDS',
       'Bảo quản hóa chất đúng cách',
       'Xử lý sự cố tràn đổ hóa chất',
       'Sơ cứu khi tiếp xúc hóa chất',
-      'Tuân thủ quy định về hóa chất'
+      'Tuân thủ quy định về hóa chất',
     ],
     targetAudience: [
       'Công nhân làm việc với hóa chất',
       'Cán bộ kho hóa chất',
       'Kỹ sư an toàn hóa chất',
       'Quản lý nhà máy hóa chất',
-      'Doanh nghiệp sản xuất/sử dụng hóa chất'
+      'Doanh nghiệp sản xuất/sử dụng hóa chất',
     ],
     content: [
       'Phân loại và nguy hiểm của hóa chất',
@@ -131,39 +166,47 @@ const trainingData: Record<string, {
       'Bảo quản và lưu trữ hóa chất',
       'Xử lý sự cố tràn đổ hóa chất',
       'Sơ cứu khi tiếp xúc hóa chất',
-      'Quy định pháp luật về hóa chất'
+      'Quy định pháp luật về hóa chất',
     ],
     requirements: [
       'Trên 18 tuổi',
       'Sức khỏe tốt, không dị ứng',
       'Có kiến thức cơ bản về hóa học (ưu tiên)',
-      'Mang theo CMND/CCCD'
+      'Mang theo CMND/CCCD',
     ],
     duration: '2-4 ngày (16-32 giờ)',
     certificate: 'Chứng chỉ An Toàn Hóa Chất theo quy định',
     imageUrl: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&h=400&fit=crop',
     bgColor: 'from-green-500 to-emerald-600',
-    iconClass: 'fa-flask'
+    iconClass: 'fa-flask',
   },
-  'pccc': {
+  pccc: {
     title: 'Đào Tạo Phòng Cháy Chữa Cháy (PCCC)',
-    description: 'Khóa đào tạo phòng cháy chữa cháy chuyên nghiệp, trang bị kiến thức và kỹ năng xử lý tình huống cháy nổ',
-    metaDescription: 'Đào tạo PCCC cho doanh nghiệp, cán bộ, công nhân. Học thực hành sử dụng bình chữa cháy, thoát hiểm, cứu nạn. Cấp chứng chỉ hợp lệ.',
-    keywords: ['đào tạo pccc', 'phòng cháy chữa cháy', 'chứng chỉ pccc', 'an toàn cháy nổ', 'nghị định 136'],
+    description:
+      'Khóa đào tạo phòng cháy chữa cháy chuyên nghiệp, trang bị kiến thức và kỹ năng xử lý tình huống cháy nổ',
+    metaDescription:
+      'Đào tạo PCCC cho doanh nghiệp, cán bộ, công nhân. Học thực hành sử dụng bình chữa cháy, thoát hiểm, cứu nạn. Cấp chứng chỉ hợp lệ.',
+    keywords: [
+      'đào tạo pccc',
+      'phòng cháy chữa cháy',
+      'chứng chỉ pccc',
+      'an toàn cháy nổ',
+      'nghị định 136',
+    ],
     benefits: [
       'Nhận biết nguy cơ cháy nổ',
       'Sử dụng thiết bị PCCC thành thạo',
       'Xử lý tình huống cháy hiệu quả',
       'Kỹ năng thoát hiểm và cứu nạn',
       'Tuân thủ quy định PCCC',
-      'Bảo vệ tính mạng và tài sản'
+      'Bảo vệ tính mạng và tài sản',
     ],
     targetAudience: [
       'Nhân viên trong doanh nghiệp',
       'Cán bộ phụ trách PCCC',
       'Bảo vệ, lễ tân',
       'Quản lý tòa nhà, chung cư',
-      'Chủ cơ sở kinh doanh'
+      'Chủ cơ sở kinh doanh',
     ],
     content: [
       'Cơ sở khoa học về cháy và chất cháy',
@@ -173,39 +216,47 @@ const trainingData: Record<string, {
       'Kế hoạch phòng cháy và chữa cháy',
       'Thoát hiểm trong cháy nổ',
       'Sơ cứu nạn nhân vụ cháy',
-      'Quy định pháp luật về PCCC'
+      'Quy định pháp luật về PCCC',
     ],
     requirements: [
       'Trên 18 tuổi',
       'Sức khỏe tốt',
       'Không có tiền sử bệnh tim, hô hấp nghiêm trọng',
-      'Mang theo CMND/CCCD'
+      'Mang theo CMND/CCCD',
     ],
     duration: '2-3 ngày (12-24 giờ)',
     certificate: 'Chứng chỉ PCCC theo Nghị định 136/2020/NĐ-CP',
     imageUrl: 'https://images.unsplash.com/photo-1587588354456-ae376af71a25?w=800&h=400&fit=crop',
     bgColor: 'from-red-500 to-rose-600',
-    iconClass: 'fa-fire-extinguisher'
+    iconClass: 'fa-fire-extinguisher',
   },
   'an-toan-buc-xa': {
     title: 'Đào Tạo An Toàn Bức Xạ',
-    description: 'Khóa đào tạo an toàn bức xạ chuyên nghiệp, trang bị kiến thức về phòng hộ và quản lý an toàn bức xạ',
-    metaDescription: 'Đào tạo an toàn bức xạ cho cán bộ, nhân viên làm việc trong môi trường bức xạ. Cấp chứng chỉ an toàn bức xạ theo quy định.',
-    keywords: ['đào tạo an toàn bức xạ', 'chứng chỉ an toàn bức xạ', 'phòng hộ bức xạ', 'kiểm soát bức xạ', 'an toàn hạt nhân'],
+    description:
+      'Khóa đào tạo an toàn bức xạ chuyên nghiệp, trang bị kiến thức về phòng hộ và quản lý an toàn bức xạ',
+    metaDescription:
+      'Đào tạo an toàn bức xạ cho cán bộ, nhân viên làm việc trong môi trường bức xạ. Cấp chứng chỉ an toàn bức xạ theo quy định.',
+    keywords: [
+      'đào tạo an toàn bức xạ',
+      'chứng chỉ an toàn bức xạ',
+      'phòng hộ bức xạ',
+      'kiểm soát bức xạ',
+      'an toàn hạt nhân',
+    ],
     benefits: [
       'Hiểu rõ nguy cơ và tác hại của bức xạ',
       'Sử dụng thiết bị đo và phòng hộ bức xạ',
       'Quản lý an toàn nguồn phóng xạ',
       'Xử lý sự cố bức xạ an toàn',
       'Tuân thủ quy định về an toàn bức xạ',
-      'Bảo vệ sức khỏe người lao động'
+      'Bảo vệ sức khỏe người lao động',
     ],
     targetAudience: [
       'Nhân viên y tế sử dụng thiết bị X-quang',
       'Kỹ thuật viên phòng thí nghiệm',
       'Cán bộ kiểm soát bức xạ',
       'Quản lý cơ sở có nguồn phóng xạ',
-      'Doanh nghiệp sử dụng thiết bị bức xạ'
+      'Doanh nghiệp sử dụng thiết bị bức xạ',
     ],
     content: [
       'Kiến thức cơ bản về bức xạ ion hóa',
@@ -215,40 +266,48 @@ const trainingData: Record<string, {
       'Quản lý nguồn phóng xạ an toàn',
       'Quy định pháp luật về an toàn bức xạ',
       'Xử lý sự cố bức xạ',
-      'Thực hành đo liều và kiểm soát'
+      'Thực hành đo liều và kiểm soát',
     ],
     requirements: [
       'Trên 18 tuổi',
       'Có kiến thức cơ bản về vật lý (ưu tiên)',
       'Sức khỏe tốt',
       'Không mang thai',
-      'Mang theo CMND/CCCD'
+      'Mang theo CMND/CCCD',
     ],
     duration: '3-5 ngày (24-40 giờ)',
     certificate: 'Chứng chỉ An Toàn Bức Xạ theo Luật Năng lượng nguyên tử',
     imageUrl: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&h=400&fit=crop',
     bgColor: 'from-cyan-500 to-cyan-700',
-    iconClass: 'fa-radiation-alt'
+    iconClass: 'fa-radiation-alt',
   },
   'quan-trac-moi-truong': {
     title: 'Đào Tạo Quan Trắc Môi Trường',
-    description: 'Khóa đào tạo quan trắc môi trường chuyên nghiệp, trang bị kỹ năng lấy mẫu, phân tích và đánh giá chất lượng môi trường',
-    metaDescription: 'Đào tạo quan trắc môi trường nước, không khí, đất. Học lấy mẫu, phân tích môi trường. Cấp chứng chỉ quan trắc môi trường hợp lệ.',
-    keywords: ['đào tạo quan trắc môi trường', 'lấy mẫu môi trường', 'phân tích môi trường', 'chứng chỉ quan trắc', 'giám sát môi trường'],
+    description:
+      'Khóa đào tạo quan trắc môi trường chuyên nghiệp, trang bị kỹ năng lấy mẫu, phân tích và đánh giá chất lượng môi trường',
+    metaDescription:
+      'Đào tạo quan trắc môi trường nước, không khí, đất. Học lấy mẫu, phân tích môi trường. Cấp chứng chỉ quan trắc môi trường hợp lệ.',
+    keywords: [
+      'đào tạo quan trắc môi trường',
+      'lấy mẫu môi trường',
+      'phân tích môi trường',
+      'chứng chỉ quan trắc',
+      'giám sát môi trường',
+    ],
     benefits: [
       'Nắm vững quy trình quan trắc môi trường',
       'Kỹ năng lấy mẫu nước, khí, đất',
       'Sử dụng thiết bị quan trắc hiện đại',
       'Phân tích và đánh giá chất lượng môi trường',
       'Lập báo cáo quan trắc môi trường',
-      'Đáp ứng yêu cầu pháp luật về môi trường'
+      'Đáp ứng yêu cầu pháp luật về môi trường',
     ],
     targetAudience: [
       'Cán bộ môi trường doanh nghiệp',
       'Kỹ thuật viên phòng thí nghiệm',
       'Nhân viên quan trắc môi trường',
       'Quản lý hệ thống ISO 14001',
-      'Doanh nghiệp có yêu cầu quan trắc môi trường'
+      'Doanh nghiệp có yêu cầu quan trắc môi trường',
     ],
     content: [
       'Luật Bảo vệ môi trường và các quy chuẩn',
@@ -258,40 +317,48 @@ const trainingData: Record<string, {
       'Kỹ thuật lấy mẫu đất và trầm tích',
       'Sử dụng thiết bị quan trắc môi trường',
       'Bảo quản và vận chuyển mẫu',
-      'Lập báo cáo kết quả quan trắc'
+      'Lập báo cáo kết quả quan trắc',
     ],
     requirements: [
       'Trên 18 tuổi',
       'Có kiến thức về môi trường hoặc hóa học (ưu tiên)',
       'Sức khỏe tốt',
       'Cẩn thận, tỉ mỉ trong công việc',
-      'Mang theo CMND/CCCD'
+      'Mang theo CMND/CCCD',
     ],
     duration: '3-5 ngày (24-40 giờ)',
     certificate: 'Chứng chỉ Quan Trắc Môi Trường theo Luật Bảo vệ môi trường',
     imageUrl: 'https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=800&h=400&fit=crop',
     bgColor: 'from-green-500 to-green-700',
-    iconClass: 'fa-leaf'
+    iconClass: 'fa-leaf',
   },
   'danh-gia-phan-loai-lao-dong': {
     title: 'Đào Tạo Đánh Giá Phân Loại Lao Động',
-    description: 'Khóa đào tạo đánh giá và phân loại lao động theo quy định, giúp doanh nghiệp tuân thủ pháp luật lao động',
-    metaDescription: 'Đào tạo đánh giá phân loại lao động cho HR, quản lý nhân sự. Học về định mức lao động, đánh giá năng lực. Cấp chứng chỉ hợp lệ.',
-    keywords: ['đánh giá lao động', 'phân loại lao động', 'định mức lao động', 'đánh giá năng lực', 'quản lý nhân sự'],
+    description:
+      'Khóa đào tạo đánh giá và phân loại lao động theo quy định, giúp doanh nghiệp tuân thủ pháp luật lao động',
+    metaDescription:
+      'Đào tạo đánh giá phân loại lao động cho HR, quản lý nhân sự. Học về định mức lao động, đánh giá năng lực. Cấp chứng chỉ hợp lệ.',
+    keywords: [
+      'đánh giá lao động',
+      'phân loại lao động',
+      'định mức lao động',
+      'đánh giá năng lực',
+      'quản lý nhân sự',
+    ],
     benefits: [
       'Nắm vững quy định về phân loại lao động',
       'Kỹ năng đánh giá và phân loại công việc',
       'Xây dựng định mức lao động khoa học',
       'Đánh giá năng lực người lao động',
       'Xây dựng thang bảng lương hiệu quả',
-      'Tuân thủ Bộ luật Lao động'
+      'Tuân thủ Bộ luật Lao động',
     ],
     targetAudience: [
       'Nhân viên phòng Nhân sự',
       'Quản lý nhân sự (HR Manager)',
       'Trưởng phòng, trưởng bộ phận',
       'Chuyên viên tổ chức lao động',
-      'Chủ doanh nghiệp, giám đốc'
+      'Chủ doanh nghiệp, giám đốc',
     ],
     content: [
       'Bộ luật Lao động về phân loại lao động',
@@ -301,25 +368,27 @@ const trainingData: Record<string, {
       'Phân tích công việc (Job Analysis)',
       'Bảng mô tả công việc (Job Description)',
       'Xây dựng thang bảng lương',
-      'Thực hành đánh giá và phân loại'
+      'Thực hành đánh giá và phân loại',
     ],
     requirements: [
       'Trên 21 tuổi',
       'Có kinh nghiệm làm việc (ưu tiên)',
       'Hiểu biết về quản lý nhân sự',
       'Mang theo CMND/CCCD',
-      'Máy tính xách tay (nếu có)'
+      'Máy tính xách tay (nếu có)',
     ],
     duration: '2-3 ngày (16-24 giờ)',
     certificate: 'Chứng chỉ Đánh Giá Phân Loại Lao Động',
     imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=400&fit=crop',
     bgColor: 'from-indigo-500 to-indigo-700',
-    iconClass: 'fa-clipboard-check'
+    iconClass: 'fa-clipboard-check',
   },
   'so-cap-cuu': {
     title: 'Đào Tạo Sơ Cấp Cứu',
-    description: 'Khóa đào tạo sơ cấp cứu cơ bản, trang bị kỹ năng xử lý tình huống cấp cứu tại nơi làm việc',
-    metaDescription: 'Đào tạo sơ cấp cứu cho doanh nghiệp. Học CPR, xử lý chấn thương, sơ cứu ban đầu. Cấp chứng chỉ sơ cấp cứu quốc tế.',
+    description:
+      'Khóa đào tạo sơ cấp cứu cơ bản, trang bị kỹ năng xử lý tình huống cấp cứu tại nơi làm việc',
+    metaDescription:
+      'Đào tạo sơ cấp cứu cho doanh nghiệp. Học CPR, xử lý chấn thương, sơ cứu ban đầu. Cấp chứng chỉ sơ cấp cứu quốc tế.',
     keywords: ['đào tạo sơ cấp cứu', 'CPR', 'sơ cứu ban đầu', 'chứng chỉ sơ cấp cứu', 'first aid'],
     benefits: [
       'Kỹ năng sơ cứu cơ bản',
@@ -327,14 +396,14 @@ const trainingData: Record<string, {
       'Xử lý chảy máu, gãy xương',
       'Cấp cứu ngừng hô hấp',
       'Tự tin xử lý tình huống khẩn cấp',
-      'Cứu sống trong tình huống nguy hiểm'
+      'Cứu sống trong tình huống nguy hiểm',
     ],
     targetAudience: [
       'Nhân viên y tế doanh nghiệp',
       'Cán bộ ATVSLĐ',
       'Giáo viên, nhân viên trường học',
       'Nhân viên khách sạn, nhà hàng',
-      'Mọi người muốn biết sơ cấp cứu'
+      'Mọi người muốn biết sơ cấp cứu',
     ],
     content: [
       'Nguyên tắc sơ cứu ban đầu',
@@ -344,20 +413,20 @@ const trainingData: Record<string, {
       'Xử lý chảy máu và băng bó vết thương',
       'Sơ cứu gãy xương, bong gân',
       'Sơ cứu bỏng, điện giật',
-      'Xử lý sốc, ngạt, ngộ độc'
+      'Xử lý sốc, ngạt, ngộ độc',
     ],
     requirements: [
       'Không giới hạn độ tuổi (khuyến khích từ 16 tuổi)',
       'Sức khỏe tốt',
       'Nhiệt tình, ham học hỏi',
-      'Mang theo CMND/CCCD'
+      'Mang theo CMND/CCCD',
     ],
     duration: '1-2 ngày (8-16 giờ)',
     certificate: 'Chứng chỉ Sơ Cấp Cứu (First Aid Certificate)',
     imageUrl: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=800&h=400&fit=crop',
     bgColor: 'from-pink-500 to-red-600',
-    iconClass: 'fa-medkit'
-  }
+    iconClass: 'fa-medkit',
+  },
 };
 
 const TrainingLandingPage: React.FC = () => {
@@ -403,9 +472,13 @@ const TrainingLandingPage: React.FC = () => {
       {/* Hero Section */}
       <div className={`bg-gradient-to-r ${data.bgColor} text-white py-16 relative overflow-hidden`}>
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'
-          }}></div>
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage:
+                'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+            }}
+          ></div>
         </div>
         <div className="container mx-auto px-4 relative z-10">
           <button
@@ -529,14 +602,14 @@ const TrainingLandingPage: React.FC = () => {
               Chứng Chỉ
             </h3>
             <p className="text-lg font-medium text-primary">{data.certificate}</p>
-            <p className="text-sm text-gray-600 mt-2">
-              Được công nhận trên toàn quốc
-            </p>
+            <p className="text-sm text-gray-600 mt-2">Được công nhận trên toàn quốc</p>
           </div>
         </div>
 
         {/* CTA Section */}
-        <div className={`bg-gradient-to-r ${data.bgColor} text-white rounded-2xl p-8 text-center shadow-xl`}>
+        <div
+          className={`bg-gradient-to-r ${data.bgColor} text-white rounded-2xl p-8 text-center shadow-xl`}
+        >
           <h2 className="text-3xl font-bold mb-4">Sẵn Sàng Bắt Đầu?</h2>
           <p className="text-xl mb-6 opacity-90">
             Kết nối với các đơn vị đào tạo uy tín ngay hôm nay
@@ -570,8 +643,9 @@ const TrainingLandingPage: React.FC = () => {
           </h2>
           <div className="prose max-w-none">
             <p className="text-gray-700 leading-relaxed mb-4">
-              SafetyConnect là nền tảng kết nối hàng đầu giữa doanh nghiệp và các đơn vị đào tạo an toàn lao động chuyên nghiệp.
-              Với mạng lưới hơn 50+ đối tác đào tạo uy tín trên toàn quốc, chúng tôi cam kết mang đến cho bạn:
+              SafetyConnect là nền tảng kết nối hàng đầu giữa doanh nghiệp và các đơn vị đào tạo an
+              toàn lao động chuyên nghiệp. Với mạng lưới hơn 50+ đối tác đào tạo uy tín trên toàn
+              quốc, chúng tôi cam kết mang đến cho bạn:
             </p>
             <ul className="grid md:grid-cols-2 gap-3 mb-4">
               <li className="flex items-start">
@@ -592,8 +666,9 @@ const TrainingLandingPage: React.FC = () => {
               </li>
             </ul>
             <p className="text-gray-700 leading-relaxed">
-              Việc đào tạo {data.title.toLowerCase()} không chỉ là yêu cầu bắt buộc của pháp luật mà còn là trách nhiệm của mỗi doanh nghiệp
-              trong việc bảo vệ người lao động. Hãy để SafetyConnect giúp bạn tìm được đơn vị đào tạo phù hợp nhất!
+              Việc đào tạo {data.title.toLowerCase()} không chỉ là yêu cầu bắt buộc của pháp luật mà
+              còn là trách nhiệm của mỗi doanh nghiệp trong việc bảo vệ người lao động. Hãy để
+              SafetyConnect giúp bạn tìm được đơn vị đào tạo phù hợp nhất!
             </p>
           </div>
         </div>

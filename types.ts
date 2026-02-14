@@ -145,48 +145,49 @@ export interface BlogComment {
 
 // Hằng số cho các nhóm đào tạo trong form
 export const TRAINING_GROUPS = [
-  "Không áp dụng",
-  "Nhóm 1 (NĐ 44)",
-  "Nhóm 2 (NĐ 44)",
-  "Nhóm 3 (NĐ 44)",
-  "Nhóm 4 (NĐ 44)",
-  "Nhóm 5 (NĐ 44)",
-  "Nhóm 6 (NĐ 44)",
+  'Không áp dụng',
+  'Nhóm 1 (NĐ 44)',
+  'Nhóm 2 (NĐ 44)',
+  'Nhóm 3 (NĐ 44)',
+  'Nhóm 4 (NĐ 44)',
+  'Nhóm 5 (NĐ 44)',
+  'Nhóm 6 (NĐ 44)',
 ];
 
-export const DECREE_44_GROUPS = [ // Giữ lại để tham khảo
-  "Đào tạo Nhóm 1 (NĐ 44)",
-  "Đào tạo Nhóm 2 (NĐ 44)",
-  "Đào tạo Nhóm 3 (NĐ 44)",
-  "Đào tạo Nhóm 4 (NĐ 44)",
-  "Đào tạo Nhóm 5 (NĐ 44)",
-  "Đào tạo Nhóm 6 (NĐ 44)",
+export const DECREE_44_GROUPS = [
+  // Giữ lại để tham khảo
+  'Đào tạo Nhóm 1 (NĐ 44)',
+  'Đào tạo Nhóm 2 (NĐ 44)',
+  'Đào tạo Nhóm 3 (NĐ 44)',
+  'Đào tạo Nhóm 4 (NĐ 44)',
+  'Đào tạo Nhóm 5 (NĐ 44)',
+  'Đào tạo Nhóm 6 (NĐ 44)',
 ];
 
 // For clients to choose from when creating a request
 export const TRAINING_TYPES = [
-  "An toàn điện",
-  "An toàn xây dựng",
-  "An toàn hóa chất",
-  "Phòng cháy chữa cháy (PCCC)",
-  "An toàn bức xạ",
-  "Quan trắc môi trường",
-  "Đánh giá phân loại lao động",
-  "Sơ cấp cứu",
-  "Khác (Vui lòng ghi rõ)"
+  'An toàn điện',
+  'An toàn xây dựng',
+  'An toàn hóa chất',
+  'Phòng cháy chữa cháy (PCCC)',
+  'An toàn bức xạ',
+  'Quan trắc môi trường',
+  'Đánh giá phân loại lao động',
+  'Sơ cấp cứu',
+  'Khác (Vui lòng ghi rõ)',
 ];
 
 // For partners to select their capabilities during registration
 export const PARTNER_CAPABILITIES = [
-  "An toàn điện",
-  "An toàn xây dựng",
-  "An toàn hóa chất",
-  "Phòng cháy chữa cháy (PCCC)",
-  "An toàn bức xạ",
-  "Quan trắc môi trường",
-  "Đánh giá phân loại lao động",
-  "Sơ cấp cứu",
-  "Huấn luyện chung (Nhiều lĩnh vực)",
+  'An toàn điện',
+  'An toàn xây dựng',
+  'An toàn hóa chất',
+  'Phòng cháy chữa cháy (PCCC)',
+  'An toàn bức xạ',
+  'Quan trắc môi trường',
+  'Đánh giá phân loại lao động',
+  'Sơ cấp cứu',
+  'Huấn luyện chung (Nhiều lĩnh vực)',
 ];
 
 // Trusted Training Partner Types
@@ -223,14 +224,18 @@ export function partnerProfileToTrustedPartner(partner: PartnerProfile): Trusted
     const emailPrefix = email.split('@')[0];
     return emailPrefix
       .split(/[-_.]/)
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
   };
 
   // Create professional description based on specializations
   const getDescription = (description: string | undefined, capabilities: string[]): string => {
     // Ignore placeholder or empty descriptions
-    if (description && description.trim() !== '' && description.trim().toLowerCase() !== 'description') {
+    if (
+      description &&
+      description.trim() !== '' &&
+      description.trim().toLowerCase() !== 'description'
+    ) {
       return description.trim();
     }
 
@@ -260,6 +265,6 @@ export function partnerProfileToTrustedPartner(partner: PartnerProfile): Trusted
     featured: partner.featured || false,
     displayOrder: partner.displayOrder,
     createdAt: partner.createdAt,
-    updatedAt: partner.createdAt
+    updatedAt: partner.createdAt,
   };
 }

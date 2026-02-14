@@ -22,7 +22,7 @@ export const generatePartnerNotificationEmail = (
   clientInfo: ClientInfo,
   isUrgent: boolean = false
 ): string => {
-  const trainingTypesText = trainingDetails.map(d => d.type).join(', ');
+  const trainingTypesText = trainingDetails.map((d) => d.type).join(', ');
 
   return `
 <!DOCTYPE html>
@@ -216,7 +216,9 @@ export const generatePartnerNotificationEmail = (
       <!-- Training Details Section -->
       <div class="section">
         <div class="section-title">📚 Nội dung đào tạo yêu cầu</div>
-        ${trainingDetails.map(detail => `
+        ${trainingDetails
+          .map(
+            (detail) => `
           <div class="training-item">
             <strong>${detail.type}</strong>
             <div class="meta">
@@ -224,7 +226,9 @@ export const generatePartnerNotificationEmail = (
               <span>🎓 Số lượng: ${detail.participants} học viên</span>
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
 
       <div class="divider"></div>
@@ -316,7 +320,7 @@ interface QuoteNotificationData {
  */
 export const generateQuoteNotificationEmail = (data: QuoteNotificationData): string => {
   const formattedPrice = data.price.toLocaleString('vi-VN');
-  const trainingTypesText = data.trainingDetails.map(d => d.type).join(', ');
+  const trainingTypesText = data.trainingDetails.map((d) => d.type).join(', ');
 
   return `
 <!DOCTYPE html>
@@ -572,11 +576,15 @@ ${data.notes}
       <!-- Request Summary Section -->
       <div class="section">
         <div class="section-title">📚 Yêu cầu đào tạo của bạn</div>
-        ${data.trainingDetails.map(detail => `
+        ${data.trainingDetails
+          .map(
+            (detail) => `
           <div class="training-item">
             <strong>${detail.type}</strong> - ${detail.participants} học viên (${detail.group})
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
 
       <!-- CTA Button -->

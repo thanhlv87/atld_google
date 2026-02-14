@@ -1,6 +1,10 @@
 import React from 'react';
 import { TrustedPartner } from '../types';
-import { validateAndFormatUrl, formatPhoneForTel, formatPhoneForDisplay } from '../utils/validationHelpers';
+import {
+  validateAndFormatUrl,
+  formatPhoneForTel,
+  formatPhoneForDisplay,
+} from '../utils/validationHelpers';
 
 interface TrustedPartnerInfoModalProps {
   partner: TrustedPartner;
@@ -11,7 +15,7 @@ interface TrustedPartnerInfoModalProps {
 const TrustedPartnerInfoModal: React.FC<TrustedPartnerInfoModalProps> = ({
   partner,
   onClose,
-  onViewAllPartners
+  onViewAllPartners,
 }) => {
   const websiteUrl = validateAndFormatUrl(partner.website);
   const phoneForTel = formatPhoneForTel(partner.phone);
@@ -35,9 +39,14 @@ const TrustedPartnerInfoModal: React.FC<TrustedPartnerInfoModalProps> = ({
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <h2 id="partner-modal-title" className="text-2xl font-bold">{partner.businessName}</h2>
+                <h2 id="partner-modal-title" className="text-2xl font-bold">
+                  {partner.businessName}
+                </h2>
                 {partner.verified && (
-                  <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1.5" aria-label="Đối tác đã được xác nhận">
+                  <div
+                    className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1.5"
+                    aria-label="Đối tác đã được xác nhận"
+                  >
                     <i className="fas fa-check-circle text-sm" aria-hidden="true"></i>
                     <span className="text-xs font-semibold">Đã xác nhận</span>
                   </div>

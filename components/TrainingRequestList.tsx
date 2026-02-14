@@ -14,7 +14,15 @@ interface TrainingRequestListProps {
   onChatClick?: (request: TrainingRequest) => void;
 }
 
-const TrainingRequestList: React.FC<TrainingRequestListProps> = ({ requests, user, loading, onLoginRequired, partnerStatus, searchQuery, onChatClick }) => {
+const TrainingRequestList: React.FC<TrainingRequestListProps> = ({
+  requests,
+  user,
+  loading,
+  onLoginRequired,
+  partnerStatus,
+  searchQuery,
+  onChatClick,
+}) => {
   const hasActiveSearch = searchQuery && searchQuery.trim() !== '';
 
   return (
@@ -25,7 +33,7 @@ const TrainingRequestList: React.FC<TrainingRequestListProps> = ({ requests, use
         </div>
       ) : requests.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {requests.map(request => (
+          {requests.map((request) => (
             <TrainingRequestCard
               key={request.id}
               request={request}
@@ -39,9 +47,13 @@ const TrainingRequestList: React.FC<TrainingRequestListProps> = ({ requests, use
       ) : (
         <div className="text-center py-10 bg-white rounded-lg shadow-md border">
           {hasActiveSearch ? (
-             <p className="text-neutral-dark">Không tìm thấy yêu cầu nào phù hợp với tìm kiếm của bạn.</p>
+            <p className="text-neutral-dark">
+              Không tìm thấy yêu cầu nào phù hợp với tìm kiếm của bạn.
+            </p>
           ) : (
-             <p className="text-neutral-dark">Chưa có yêu cầu nào được tạo. Hãy là người đầu tiên!</p>
+            <p className="text-neutral-dark">
+              Chưa có yêu cầu nào được tạo. Hãy là người đầu tiên!
+            </p>
           )}
         </div>
       )}

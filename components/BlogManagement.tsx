@@ -15,7 +15,7 @@ import {
   storageRef,
   uploadBytes,
   getDownloadURL,
-  type User
+  type User,
 } from '../services/firebaseConfig';
 import { BlogPost } from '../types';
 import LoadingSpinner from './LoadingSpinner';
@@ -50,7 +50,7 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
     'Case Study',
     'Tin tức',
     'Hướng dẫn',
-    'Kiến thức chuyên sâu'
+    'Kiến thức chuyên sâu',
   ];
 
   useEffect(() => {
@@ -58,10 +58,13 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
     const q = query(postsCollection, orderBy('createdAt', 'desc'));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const postsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as BlogPost));
+      const postsData = snapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          }) as BlogPost
+      );
       setPosts(postsData);
       setLoading(false);
     });
@@ -163,7 +166,10 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
         return;
       }
 
-      const tagsArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+      const tagsArray = tags
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter((tag) => tag);
       const slug = generateSlug(title);
 
       const postData = {
@@ -177,12 +183,12 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
         author: {
           uid: user.uid,
           name: user.displayName || user.email || 'Admin',
-          email: user.email || ''
+          email: user.email || '',
         },
         published,
         viewCount: editingPost?.viewCount || 0,
         updatedAt: serverTimestamp(),
-        ...(published && !editingPost?.publishedAt ? { publishedAt: serverTimestamp() } : {})
+        ...(published && !editingPost?.publishedAt ? { publishedAt: serverTimestamp() } : {}),
       };
 
       if (editingPost) {
@@ -193,7 +199,7 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
         // Create new post
         await addDoc(collection(db, 'blogPosts'), {
           ...postData,
-          createdAt: serverTimestamp()
+          createdAt: serverTimestamp(),
         });
         alert('Tạo bài viết thành công!');
       }
@@ -267,9 +273,7 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
       </div>
 
       {/* AI Writer */}
-      {showAIWriter && (
-        <AIBlogWriter onGenerate={handleAIGenerate} />
-      )}
+      {showAIWriter && <AIBlogWriter onGenerate={handleAIGenerate} />}
 
       {/* Form */}
       {showForm && (
@@ -322,16 +326,16 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Danh mục
-                </label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Danh mục</label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
-                  {categories.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -475,9 +479,7 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700">{post.viewCount}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {formatDate(post.createdAt)}
-                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{formatDate(post.createdAt)}</td>
                   <td className="px-6 py-4">
                     <div className="flex gap-2">
                       <button
@@ -537,76 +539,78 @@ const BlogManagement: React.FC<BlogManagementProps> = ({ user }) => {
 
               {/* Preview Content */}
               <div className="p-6 max-h-[calc(100vh-8rem)] overflow-y-auto">
-              {/* Cover Image Preview */}
-              {(coverImageFile || coverImageUrl) && (
-                <div className="relative h-96 bg-gray-900 rounded-lg overflow-hidden mb-6">
-                  <img
-                    src={coverImageFile ? URL.createObjectURL(coverImageFile) : coverImageUrl}
-                    alt="Cover preview"
-                    className="w-full h-full object-cover opacity-80"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 right-0 p-8">
-                    <span className="inline-block bg-gradient-to-r from-primary to-orange-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
-                      {category}
-                    </span>
-                    <h1 className="text-4xl font-bold text-white mb-4">
-                      {title || 'Tiêu đề bài viết'}
-                    </h1>
-                    <div className="flex flex-wrap items-center gap-4 text-white/90">
-                      <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-orange-500 flex items-center justify-center text-white font-bold">
-                          {user.displayName?.charAt(0).toUpperCase() || 'A'}
-                        </div>
-                        <span>{user.displayName || user.email || 'Admin'}</span>
-                      </div>
-                      <span>•</span>
-                      <span>
-                        <i className="fas fa-calendar-alt mr-2"></i>
-                        {new Date().toLocaleDateString('vi-VN')}
+                {/* Cover Image Preview */}
+                {(coverImageFile || coverImageUrl) && (
+                  <div className="relative h-96 bg-gray-900 rounded-lg overflow-hidden mb-6">
+                    <img
+                      src={coverImageFile ? URL.createObjectURL(coverImageFile) : coverImageUrl}
+                      alt="Cover preview"
+                      className="w-full h-full object-cover opacity-80"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-8">
+                      <span className="inline-block bg-gradient-to-r from-primary to-orange-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
+                        {category}
                       </span>
+                      <h1 className="text-4xl font-bold text-white mb-4">
+                        {title || 'Tiêu đề bài viết'}
+                      </h1>
+                      <div className="flex flex-wrap items-center gap-4 text-white/90">
+                        <div className="flex items-center gap-2">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-orange-500 flex items-center justify-center text-white font-bold">
+                            {user.displayName?.charAt(0).toUpperCase() || 'A'}
+                          </div>
+                          <span>{user.displayName || user.email || 'Admin'}</span>
+                        </div>
+                        <span>•</span>
+                        <span>
+                          <i className="fas fa-calendar-alt mr-2"></i>
+                          {new Date().toLocaleDateString('vi-VN')}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Excerpt Preview */}
-              {excerpt && (
-                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                  <p className="text-xl text-gray-700 italic border-l-4 border-primary pl-6">
-                    {excerpt}
-                  </p>
-                </div>
-              )}
-
-              {/* Content Preview */}
-              <div className="bg-white rounded-lg border border-gray-200 p-8">
-                <div
-                  className="prose prose-lg max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-a:text-primary prose-strong:text-gray-800 prose-ul:text-gray-700 prose-ol:text-gray-700"
-                  dangerouslySetInnerHTML={{ __html: content || '<p class="text-gray-400 italic">Chưa có nội dung</p>' }}
-                />
-              </div>
-
-              {/* Tags Preview */}
-              {tags && (
-                <div className="bg-white rounded-lg border border-gray-200 p-6 mt-6">
-                  <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                    <i className="fas fa-tags text-primary"></i>
-                    Tags
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {tags.split(',').map((tag, index) => (
-                      <span
-                        key={index}
-                        className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm"
-                      >
-                        #{tag.trim()}
-                      </span>
-                    ))}
+                {/* Excerpt Preview */}
+                {excerpt && (
+                  <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                    <p className="text-xl text-gray-700 italic border-l-4 border-primary pl-6">
+                      {excerpt}
+                    </p>
                   </div>
+                )}
+
+                {/* Content Preview */}
+                <div className="bg-white rounded-lg border border-gray-200 p-8">
+                  <div
+                    className="prose prose-lg max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-a:text-primary prose-strong:text-gray-800 prose-ul:text-gray-700 prose-ol:text-gray-700"
+                    dangerouslySetInnerHTML={{
+                      __html: content || '<p class="text-gray-400 italic">Chưa có nội dung</p>',
+                    }}
+                  />
                 </div>
-              )}
-            </div>
+
+                {/* Tags Preview */}
+                {tags && (
+                  <div className="bg-white rounded-lg border border-gray-200 p-6 mt-6">
+                    <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                      <i className="fas fa-tags text-primary"></i>
+                      Tags
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {tags.split(',').map((tag, index) => (
+                        <span
+                          key={index}
+                          className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm"
+                        >
+                          #{tag.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Preview Footer */}
               <div className="border-t border-gray-200 px-6 py-4 flex justify-end gap-3 rounded-b-lg bg-gray-50">

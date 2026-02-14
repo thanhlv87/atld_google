@@ -5,9 +5,9 @@ import {
   query,
   where,
   getDocs,
-  serverTimestamp
+  serverTimestamp,
 } from '../services/firebaseConfig';
-import { TrainingRequest } from '../types';
+import { TrainingRequest, ChatMessage } from '../types';
 
 /**
  * Tạo hoặc lấy phòng chat giữa đối tác và admin cho một yêu cầu cụ thể
@@ -52,9 +52,9 @@ export const getOrCreateAdminPartnerChatRoom = async (
     lastMessageTime: serverTimestamp(),
     unreadCount: {
       client: 0, // Admin
-      partner: 0
+      partner: 0,
     },
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
   };
 
   const roomRef = await addDoc(chatRoomsRef, roomData);
@@ -65,9 +65,9 @@ export const getOrCreateAdminPartnerChatRoom = async (
     senderId: 'system',
     senderName: 'Hệ thống',
     senderRole: 'admin',
-    message: `Phòng chat đã được tạo cho yêu cầu: ${request.trainingDetails.map(d => d.type).join(', ')}. Admin sẽ hỗ trợ bạn trong quá trình báo giá.`,
+    message: `Phòng chat đã được tạo cho yêu cầu: ${request.trainingDetails.map((d) => d.type).join(', ')}. Admin sẽ hỗ trợ bạn trong quá trình báo giá.`,
     read: false,
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
   });
 
   return roomRef.id;
@@ -89,6 +89,45 @@ export const sendQuoteNotificationToAdminChat = async (
     senderRole: 'partner',
     message: `Tôi đã gửi báo giá ${price.toLocaleString('vi-VN')} VND cho yêu cầu này. Nếu có thắc mắc gì, mong admin hỗ trợ.`,
     read: false,
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
   });
+};
+
+/**
+ * Format timestamp to time string (e.g. 10:30 AM)
+ */
+export const formatMessageTime = (timestamp: any): string => {
+  if (!timestamp) return '';
+
+  // Handle Firestore Timestamp
+  const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+
+  return date.toLocaleTimeString('vi-VN', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+/**
+ * Group messages by date
+ */
+export const groupMessagesByDate = (messages: ChatMessage[]) => {
+  const groups: { [key: string]: ChatMessage[] } = {};
+
+  messages.forEach(message => {
+    if (!message.createdAt) return;
+
+    // Handle both Firestore Timestamp and Date objects
+    // @ts-expect-error - Timestamp handling
+    const date = message.createdAt.toDate ? message.createdAt.toDate() : new Date(message.createdAt);
+    const dateString = date.toLocaleDateString('vi-VN');
+
+    if (!groups[dateString]) {
+      groups[dateString] = [];
+    }
+
+    groups[dateString].push(message);
+  });
+
+  return groups;
 };

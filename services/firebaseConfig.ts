@@ -25,7 +25,7 @@ import {
   DocumentSnapshot,
   DocumentReference,
   CollectionReference,
-  Query
+  Query,
 } from 'firebase/firestore';
 import {
   getAuth,
@@ -35,7 +35,7 @@ import {
   signOut,
   sendPasswordResetEmail,
   onAuthStateChanged,
-  User
+  User,
 } from 'firebase/auth';
 import {
   getStorage,
@@ -43,17 +43,20 @@ import {
   uploadBytes,
   getDownloadURL,
   deleteObject,
-  type FirebaseStorage
+  type FirebaseStorage,
 } from 'firebase/storage';
 
-// Firebase configuration
+// Firebase configuration from environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyBVkNiY3B4yIdCGH4afN8xnrQGP4-U685Q",
-  authDomain: "gen-lang-client-013063590.firebaseapp.com",
-  projectId: "gen-lang-client-0113063590",
-  storageBucket: "gen-lang-client-0113063590.firebasestorage.app",
-  messagingSenderId: "40246586993",
-  appId: "1:402246586993:web:a2a3af0df097e2d5ae41d0"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyBVkNiY3B4yIdCGH4afN8xnrQGP4-U685Q',
+  authDomain:
+    import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'gen-lang-client-013063590.firebaseapp.com',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'gen-lang-client-0113063590',
+  storageBucket:
+    import.meta.env.VITE_FIREBASE_STORAGE_BUCKET ||
+    'gen-lang-client-0113063590.firebasestorage.app',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '40246586993',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:402246586993:web:a2a3af0df097e2d5ae41d0',
 };
 
 // Initialize Firebase
@@ -78,9 +81,9 @@ const sendEmail = async (to: string | string[], subject: string, html: string, t
       message: {
         subject: subject,
         html: html,
-        ...(text && { text: text })
+        ...(text && { text: text }),
       },
-      createdAt: serverTimestamp()
+      createdAt: serverTimestamp(),
     };
 
     const docRef = await addDoc(mailCollection, emailData);
@@ -89,7 +92,9 @@ const sendEmail = async (to: string | string[], subject: string, html: string, t
     console.error('Error queuing email:', error);
 
     if (error.code === 'permission-denied') {
-      console.error('PERMISSION DENIED: Firestore rules may not allow writing to "mail" collection');
+      console.error(
+        'PERMISSION DENIED: Firestore rules may not allow writing to "mail" collection'
+      );
     } else if (error.code === 'unauthenticated') {
       console.error('UNAUTHENTICATED: User may need to be signed in');
     }
@@ -145,7 +150,7 @@ export {
   type DocumentSnapshot,
   type DocumentReference,
   type CollectionReference,
-  type Query
+  type Query,
 };
 
 // Legacy compatibility exports (for gradual migration)
@@ -154,8 +159,8 @@ export const firebase = {
     FieldValue: {
       serverTimestamp,
       arrayUnion,
-      arrayRemove
+      arrayRemove,
     },
-    Timestamp
-  }
+    Timestamp,
+  },
 };

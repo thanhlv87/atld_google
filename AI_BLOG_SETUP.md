@@ -74,6 +74,7 @@ Click vào bất kỳ để chọn nhanh:
 ## Chi phí
 
 **Gemini 1.5 Flash (FREE tier):**
+
 - ✅ 15 requests/phút
 - ✅ 1,500 requests/ngày
 - ✅ 1 triệu tokens/tháng
@@ -94,15 +95,19 @@ Click vào bất kỳ để chọn nhanh:
 ## Troubleshooting
 
 ### ❌ "Vui lòng nhập API key trước"
+
 → Click "Cài đặt API Key" và paste key
 
 ### ❌ "API key không hợp lệ"
+
 → Kiểm tra key phải bắt đầu bằng "AIza"
 
 ### ⏱️ Mất quá lâu (>30s)
+
 → Refresh và thử lại (API có thể bận)
 
 ### 🔑 Quên API key
+
 → Vào https://aistudio.google.com/app/apikey để xem lại
 
 ---

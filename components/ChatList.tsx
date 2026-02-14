@@ -44,7 +44,8 @@ const ChatList: React.FC<ChatListProps> = ({ rooms, selectedRoomId, onSelectRoom
     <div className="overflow-y-auto h-full">
       {rooms.map((room) => {
         const isSelected = room.id === selectedRoomId;
-        const unreadCount = userRole === 'client' ? room.unreadCount.client : room.unreadCount.partner;
+        const unreadCount =
+          userRole === 'client' ? room.unreadCount.client : room.unreadCount.partner;
         const displayName = userRole === 'partner' ? room.clientName : room.partnerName;
 
         return (

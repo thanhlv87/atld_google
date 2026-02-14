@@ -17,7 +17,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
   placeholder = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect width="400" height="300" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="%23999"%3EĐang tải...%3C/text%3E%3C/svg%3E',
   threshold = 0.01,
   onLoad,
-  onError
+  onError,
 }) => {
   const [imageSrc, setImageSrc] = useState(placeholder);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -47,7 +47,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
       },
       {
         threshold,
-        rootMargin: '50px' // Start loading 50px before image enters viewport
+        rootMargin: '50px', // Start loading 50px before image enters viewport
       }
     );
 
@@ -82,7 +82,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
       onLoad={handleLoad}
       onError={handleError}
       style={{
-        backgroundColor: imageError ? '#f3f4f6' : 'transparent'
+        backgroundColor: imageError ? '#f3f4f6' : 'transparent',
       }}
     />
   );

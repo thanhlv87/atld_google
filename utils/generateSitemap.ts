@@ -23,25 +23,25 @@ export const generateSitemap = async (): Promise<string> => {
   urls.push({
     loc: `${SITE_URL}/`,
     changefreq: 'daily',
-    priority: 1.0
+    priority: 1.0,
   });
 
   urls.push({
     loc: `${SITE_URL}/requests`,
     changefreq: 'hourly',
-    priority: 0.9
+    priority: 0.9,
   });
 
   urls.push({
     loc: `${SITE_URL}/blog`,
     changefreq: 'daily',
-    priority: 0.9
+    priority: 0.9,
   });
 
   urls.push({
     loc: `${SITE_URL}/documents`,
     changefreq: 'weekly',
-    priority: 0.7
+    priority: 0.7,
   });
 
   // Training landing pages
@@ -53,14 +53,14 @@ export const generateSitemap = async (): Promise<string> => {
     'an-toan-buc-xa',
     'quan-trac-moi-truong',
     'danh-gia-phan-loai-lao-dong',
-    'so-cap-cuu'
+    'so-cap-cuu',
   ];
 
-  trainingTypes.forEach(type => {
+  trainingTypes.forEach((type) => {
     urls.push({
       loc: `${SITE_URL}/training-${type}`,
       changefreq: 'monthly',
-      priority: 0.6
+      priority: 0.6,
     });
   });
 
@@ -72,14 +72,15 @@ export const generateSitemap = async (): Promise<string> => {
 
     querySnapshot.forEach((doc) => {
       const post = doc.data() as BlogPost;
-      const lastmod = post.updatedAt?.toDate().toISOString().split('T')[0] ||
-                      post.createdAt?.toDate().toISOString().split('T')[0];
+      const lastmod =
+        post.updatedAt?.toDate().toISOString().split('T')[0] ||
+        post.createdAt?.toDate().toISOString().split('T')[0];
 
       urls.push({
         loc: `${SITE_URL}/blog/${doc.id}`,
         lastmod: lastmod,
         changefreq: 'monthly',
-        priority: 0.8
+        priority: 0.8,
       });
     });
   } catch (error) {
@@ -90,7 +91,7 @@ export const generateSitemap = async (): Promise<string> => {
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
-  urls.forEach(url => {
+  urls.forEach((url) => {
     xml += '  <url>\n';
     xml += `    <loc>${url.loc}</loc>\n`;
     if (url.lastmod) {

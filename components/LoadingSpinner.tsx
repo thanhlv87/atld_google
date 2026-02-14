@@ -10,12 +10,13 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ size = 'medium', messag
     small: 'h-6 w-6',
     medium: 'h-12 w-12',
     large: 'h-16 w-16',
-    fullscreen: 'h-20 w-20'
+    fullscreen: 'h-20 w-20',
   };
 
-  const containerClasses = size === 'fullscreen'
-    ? 'fixed inset-0 flex items-center justify-center bg-white bg-opacity-90 z-50'
-    : 'flex items-center justify-center p-8';
+  const containerClasses =
+    size === 'fullscreen'
+      ? 'fixed inset-0 flex items-center justify-center bg-white bg-opacity-90 z-50'
+      : 'flex items-center justify-center p-8';
 
   return (
     <div className={containerClasses}>
@@ -40,11 +41,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ size = 'medium', messag
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
           ></path>
         </svg>
-        {message && (
-          <p className="mt-4 text-neutral-dark font-medium animate-pulse">
-            {message}
-          </p>
-        )}
+        {message && <p className="mt-4 text-neutral-dark font-medium animate-pulse">{message}</p>}
       </div>
     </div>
   );

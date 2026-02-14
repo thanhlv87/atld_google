@@ -20,47 +20,47 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <HomePage />
+        element: <HomePage />,
       },
       {
         path: 'requests',
-        element: <RequestsPage />
+        element: <RequestsPage />,
       },
       {
         path: 'blog',
-        element: <BlogPage />
+        element: <BlogPage />,
       },
       {
         path: 'blog/:slug',
-        element: <BlogDetailPage />
+        element: <BlogDetailPage />,
       },
       {
         path: 'documents',
-        element: <DocumentsPage />
+        element: <DocumentsPage />,
       },
       {
         path: 'chat',
-        element: <ChatPage />
+        element: <ChatPage />,
       },
       {
         path: 'admin',
-        element: <AdminPage />
+        element: <AdminPage />,
       },
       // All partners page
       {
         path: 'partners',
-        element: <AllPartnersPage />
+        element: <AllPartnersPage />,
       },
       // Training landing pages - using dynamic route with param
       {
         path: 'training/:type',
-        element: <TrainingLandingPage />
+        element: <TrainingLandingPage />,
       },
       // Catch-all redirect to home
       {
         path: '*',
-        element: <Navigate to="/" replace />
-      }
-    ]
-  }
+        element: <Navigate to="/" replace />,
+      },
+    ],
+  },
 ]);

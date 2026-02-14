@@ -12,7 +12,7 @@ import {
   getDoc,
   serverTimestamp,
   Timestamp,
-  type User
+  type User,
 } from '../services/firebaseConfig';
 import { ChatMessage, ChatRoom, TrainingRequest } from '../types';
 import LoadingSpinner from './LoadingSpinner';
@@ -68,10 +68,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const messagesData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as ChatMessage));
+      const messagesData = snapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          }) as ChatMessage
+      );
       setMessages(messagesData);
       setLoading(false);
 
@@ -128,7 +131,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
           url: downloadURL,
           name: selectedFile.name,
           type: getFileType(selectedFile.type),
-          size: selectedFile.size
+          size: selectedFile.size,
         };
       }
 
@@ -143,7 +146,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
         message: messageText,
         read: false,
         createdAt: serverTimestamp(),
-        ...(attachment && { attachment })
+        ...(attachment && { attachment }),
       });
 
       // Update room's last message
@@ -152,7 +155,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
       await updateDoc(roomRef, {
         lastMessage: messageText,
         lastMessageTime: serverTimestamp(),
-        [unreadField]: (userRole === 'client' ? room.unreadCount.partner : room.unreadCount.client) + 1
+        [unreadField]:
+          (userRole === 'client' ? room.unreadCount.partner : room.unreadCount.client) + 1,
       });
 
       setNewMessage('');
@@ -202,9 +206,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
             <h3 className="font-bold text-lg">
               {userRole === 'partner' ? room.clientName : room.partnerName}
             </h3>
-            <p className="text-sm text-white/80">
-              Yêu cầu đào tạo #{room.requestId.slice(0, 8)}
-            </p>
+            <p className="text-sm text-white/80">Yêu cầu đào tạo #{room.requestId.slice(0, 8)}</p>
           </div>
           {request && (
             <button
@@ -355,27 +357,39 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
                               isOwn ? 'bg-white/20' : 'bg-gray-200'
                             } hover:opacity-80 transition-opacity`}
                           >
-                            <i className={`fas ${
-                              msg.attachment.type === 'pdf' ? 'fa-file-pdf text-red-500' : 'fa-file text-blue-500'
-                            } text-2xl`}></i>
+                            <i
+                              className={`fas ${
+                                msg.attachment.type === 'pdf'
+                                  ? 'fa-file-pdf text-red-500'
+                                  : 'fa-file text-blue-500'
+                              } text-2xl`}
+                            ></i>
                             <div className="flex-1 min-w-0">
-                              <p className={`text-sm font-medium truncate ${isOwn ? 'text-white' : 'text-gray-800'}`}>
+                              <p
+                                className={`text-sm font-medium truncate ${isOwn ? 'text-white' : 'text-gray-800'}`}
+                              >
                                 {msg.attachment.name}
                               </p>
                               <p className={`text-xs ${isOwn ? 'text-white/80' : 'text-gray-500'}`}>
                                 {formatFileSize(msg.attachment.size)}
                               </p>
                             </div>
-                            <i className={`fas fa-download ${isOwn ? 'text-white' : 'text-gray-600'}`}></i>
+                            <i
+                              className={`fas fa-download ${isOwn ? 'text-white' : 'text-gray-600'}`}
+                            ></i>
                           </a>
                         )}
                       </div>
                     )}
                     <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
                   </div>
-                  <p className={`text-xs text-gray-400 mt-1 px-3 ${isOwn ? 'text-right' : 'text-left'}`}>
+                  <p
+                    className={`text-xs text-gray-400 mt-1 px-3 ${isOwn ? 'text-right' : 'text-left'}`}
+                  >
                     {formatTime(msg.createdAt)}
-                    {isOwn && msg.read && <i className="fas fa-check-double ml-1 text-blue-500"></i>}
+                    {isOwn && msg.read && (
+                      <i className="fas fa-check-double ml-1 text-blue-500"></i>
+                    )}
                   </p>
                 </div>
               </div>
@@ -390,10 +404,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
         {/* File preview */}
         {selectedFile && (
           <div className="mb-2 flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-            <i className={`fas ${
-              selectedFile.type.startsWith('image/') ? 'fa-image' :
-              selectedFile.type === 'application/pdf' ? 'fa-file-pdf' : 'fa-file'
-            } text-blue-500`}></i>
+            <i
+              className={`fas ${
+                selectedFile.type.startsWith('image/')
+                  ? 'fa-image'
+                  : selectedFile.type === 'application/pdf'
+                    ? 'fa-file-pdf'
+                    : 'fa-file'
+              } text-blue-500`}
+            ></i>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-800 truncate">{selectedFile.name}</p>
               <p className="text-xs text-gray-500">{formatFileSize(selectedFile.size)}</p>
@@ -436,7 +455,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ room, currentUser, userRole, us
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder={uploading ? "Đang tải file..." : "Nhập tin nhắn..."}
+            placeholder={uploading ? 'Đang tải file...' : 'Nhập tin nhắn...'}
             className="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary"
             disabled={sending}
           />

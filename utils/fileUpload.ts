@@ -7,11 +7,7 @@ import { storage, storageRef, uploadBytes, getDownloadURL } from '../services/fi
  * @param userId - User ID for unique filename
  * @returns Download URL of uploaded file
  */
-export const uploadFile = async (
-  file: File,
-  folder: string,
-  userId: string
-): Promise<string> => {
+export const uploadFile = async (file: File, folder: string, userId: string): Promise<string> => {
   const timestamp = Date.now();
   const filename = `${userId}_${timestamp}_${file.name}`;
   const filePath = `${folder}/${filename}`;
@@ -46,7 +42,7 @@ export const formatFileSize = (bytes: number): string => {
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 };
 
 /**
@@ -74,7 +70,7 @@ export const validateFile = (file: File, maxSizeMB: number = 10): string | null 
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'text/plain'
+    'text/plain',
   ];
 
   if (!allowedTypes.includes(file.type)) {

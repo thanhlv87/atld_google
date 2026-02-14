@@ -1,126 +1,131 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Email Template Preview - Partner Notification</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 20px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-    }
-    .preview-container {
-      max-width: 800px;
-      margin: 0 auto;
-      background-color: white;
-      border-radius: 12px;
-      padding: 30px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    }
-    .preview-header {
-      text-align: center;
-      margin-bottom: 30px;
-      padding-bottom: 20px;
-      border-bottom: 2px solid #e5e7eb;
-    }
-    .preview-header h1 {
-      margin: 0 0 10px 0;
-      color: #1e293b;
-      font-size: 28px;
-    }
-    .preview-header p {
-      margin: 0;
-      color: #64748b;
-      font-size: 16px;
-    }
-    .toggle-section {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      margin-bottom: 30px;
-      flex-wrap: wrap;
-    }
-    .toggle-btn {
-      padding: 12px 24px;
-      border: 2px solid #3b82f6;
-      background-color: white;
-      color: #3b82f6;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-    .toggle-btn:hover {
-      background-color: #3b82f6;
-      color: white;
-      transform: translateY(-2px);
-    }
-    .toggle-btn.active {
-      background-color: #3b82f6;
-      color: white;
-    }
-    #emailFrame {
-      width: 100%;
-      min-height: 800px;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      background-color: #f5f5f5;
-    }
-    .info-box {
-      background-color: #eff6ff;
-      border-left: 4px solid #3b82f6;
-      padding: 16px;
-      margin-top: 20px;
-      border-radius: 4px;
-    }
-    .info-box p {
-      margin: 0;
-      color: #1e40af;
-      line-height: 1.6;
-    }
-  </style>
-</head>
-<body>
-  <div class="preview-container">
-    <div class="preview-header">
-      <h1>📧 Email Template Preview</h1>
-      <p>Preview email thông báo đối tác khi có yêu cầu đào tạo mới</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Template Preview - Partner Notification</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      .preview-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+      .preview-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e5e7eb;
+      }
+      .preview-header h1 {
+        margin: 0 0 10px 0;
+        color: #1e293b;
+        font-size: 28px;
+      }
+      .preview-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 16px;
+      }
+      .toggle-section {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+      }
+      .toggle-btn {
+        padding: 12px 24px;
+        border: 2px solid #3b82f6;
+        background-color: white;
+        color: #3b82f6;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+      }
+      .toggle-btn:hover {
+        background-color: #3b82f6;
+        color: white;
+        transform: translateY(-2px);
+      }
+      .toggle-btn.active {
+        background-color: #3b82f6;
+        color: white;
+      }
+      #emailFrame {
+        width: 100%;
+        min-height: 800px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background-color: #f5f5f5;
+      }
+      .info-box {
+        background-color: #eff6ff;
+        border-left: 4px solid #3b82f6;
+        padding: 16px;
+        margin-top: 20px;
+        border-radius: 4px;
+      }
+      .info-box p {
+        margin: 0;
+        color: #1e40af;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="preview-container">
+      <div class="preview-header">
+        <h1>📧 Email Template Preview</h1>
+        <p>Preview email thông báo đối tác khi có yêu cầu đào tạo mới</p>
+      </div>
+
+      <div class="toggle-section">
+        <button class="toggle-btn active" onclick="showNormalEmail()">Email thường</button>
+        <button class="toggle-btn" onclick="showUrgentEmail()">Email khẩn cấp</button>
+      </div>
+
+      <iframe id="emailFrame" frameborder="0"></iframe>
+
+      <div class="info-box">
+        <p>
+          <strong>💡 Lưu ý:</strong> Email template này sử dụng HTML responsive, tương thích với mọi
+          email client (Gmail, Outlook, Apple Mail, etc.). Design tự động adapt cho mobile và
+          desktop.
+        </p>
+      </div>
     </div>
 
-    <div class="toggle-section">
-      <button class="toggle-btn active" onclick="showNormalEmail()">Email thường</button>
-      <button class="toggle-btn" onclick="showUrgentEmail()">Email khẩn cấp</button>
-    </div>
+    <script>
+      function getEmailTemplate(isUrgent = false) {
+        const trainingDetails = [
+          { type: 'Team Building', group: 'Nhóm 20-50 người', participants: 35 },
+          { type: 'Kỹ năng lãnh đạo', group: 'Nhóm 10-20 người', participants: 15 },
+        ];
 
-    <iframe id="emailFrame" frameborder="0"></iframe>
+        const clientInfo = {
+          clientName: 'Nguyễn Văn A',
+          clientEmail: 'nguyenvana@company.com',
+          clientPhone: '0901234567',
+          location: 'Hà Nội',
+          description:
+            'Công ty chúng tôi muốn tổ chức khóa đào tạo team building và kỹ năng lãnh đạo cho đội ngũ quản lý cấp trung. Mong muốn giảng viên có kinh nghiệm thực tế trong lĩnh vực quản lý doanh nghiệp.',
+          trainingDuration: '2 ngày',
+          preferredTime: 'Tháng 12/2024',
+        };
 
-    <div class="info-box">
-      <p><strong>💡 Lưu ý:</strong> Email template này sử dụng HTML responsive, tương thích với mọi email client (Gmail, Outlook, Apple Mail, etc.).
-      Design tự động adapt cho mobile và desktop.</p>
-    </div>
-  </div>
-
-  <script>
-    function getEmailTemplate(isUrgent = false) {
-      const trainingDetails = [
-        { type: "Team Building", group: "Nhóm 20-50 người", participants: 35 },
-        { type: "Kỹ năng lãnh đạo", group: "Nhóm 10-20 người", participants: 15 }
-      ];
-
-      const clientInfo = {
-        clientName: "Nguyễn Văn A",
-        clientEmail: "nguyenvana@company.com",
-        clientPhone: "0901234567",
-        location: "Hà Nội",
-        description: "Công ty chúng tôi muốn tổ chức khóa đào tạo team building và kỹ năng lãnh đạo cho đội ngũ quản lý cấp trung. Mong muốn giảng viên có kinh nghiệm thực tế trong lĩnh vực quản lý doanh nghiệp.",
-        trainingDuration: "2 ngày",
-        preferredTime: "Tháng 12/2024"
-      };
-
-      return `
+        return `
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -312,7 +317,9 @@
       <!-- Training Details Section -->
       <div class="section">
         <div class="section-title">📚 Nội dung đào tạo yêu cầu</div>
-        ${trainingDetails.map(detail => `
+        ${trainingDetails
+          .map(
+            (detail) => `
           <div class="training-item">
             <strong>${detail.type}</strong>
             <div class="meta">
@@ -320,7 +327,9 @@
               <span>🎓 Số lượng: ${detail.participants} học viên</span>
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
 
       <div class="divider"></div>
@@ -394,30 +403,30 @@
 </body>
 </html>
       `;
-    }
+      }
 
-    function showNormalEmail() {
-      const iframe = document.getElementById('emailFrame');
-      iframe.srcdoc = getEmailTemplate(false);
+      function showNormalEmail() {
+        const iframe = document.getElementById('emailFrame');
+        iframe.srcdoc = getEmailTemplate(false);
 
-      // Update button states
-      document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-    }
+        // Update button states
+        document.querySelectorAll('.toggle-btn').forEach((btn) => btn.classList.remove('active'));
+        event.target.classList.add('active');
+      }
 
-    function showUrgentEmail() {
-      const iframe = document.getElementById('emailFrame');
-      iframe.srcdoc = getEmailTemplate(true);
+      function showUrgentEmail() {
+        const iframe = document.getElementById('emailFrame');
+        iframe.srcdoc = getEmailTemplate(true);
 
-      // Update button states
-      document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-    }
+        // Update button states
+        document.querySelectorAll('.toggle-btn').forEach((btn) => btn.classList.remove('active'));
+        event.target.classList.add('active');
+      }
 
-    // Show normal email by default
-    window.onload = function() {
-      showNormalEmail();
-    };
-  </script>
-</body>
+      // Show normal email by default
+      window.onload = function () {
+        showNormalEmail();
+      };
+    </script>
+  </body>
 </html>

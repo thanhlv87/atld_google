@@ -7,6 +7,7 @@ Email template mới được thiết kế để gửi thông báo đẹp và ch
 ## ✨ Tính năng
 
 ### Design
+
 - 🎨 **Modern & Professional**: Gradient header, rounded corners, shadow effects
 - 📱 **Responsive**: Tự động adapt cho mobile và desktop
 - 🔵 **Brand Colors**: Sử dụng màu primary blue (#3b82f6) cho consistency
@@ -14,6 +15,7 @@ Email template mới được thiết kế để gửi thông báo đẹp và ch
 - 📊 **Clear Layout**: Sections rõ ràng với dividers và icons
 
 ### Nội dung
+
 - 📚 **Training Details**: Hiển thị từng nội dung đào tạo với card design
 - 👤 **Client Info**: Grid layout dễ đọc với icons
 - 📝 **Description**: Highlighted description box
@@ -22,6 +24,7 @@ Email template mới được thiết kế để gửi thông báo đẹp và ch
 - 🔗 **Clickable Links**: Email và phone có thể click để liên hệ ngay
 
 ### Email Client Support
+
 ✅ Gmail
 ✅ Outlook
 ✅ Apple Mail
@@ -33,6 +36,7 @@ Email template mới được thiết kế để gửi thông báo đẹp và ch
 ### Cách 1: Mở file HTML preview
 
 1. Mở file `email-preview.html` trong browser:
+
    ```bash
    open email-preview.html
    # hoặc
@@ -54,62 +58,66 @@ Email template mới được thiết kế để gửi thông báo đẹp và ch
 ## 📝 Sử dụng trong code
 
 ### Import
+
 ```typescript
 import { generatePartnerNotificationEmail } from '../utils/emailTemplates';
 ```
 
 ### Generate email HTML
+
 ```typescript
 const emailHtml = generatePartnerNotificationEmail(
-  trainingDetails,  // Array of { type, group, participants }
-  clientInfo,       // Object with client information
-  isUrgent          // boolean - true for urgent requests
+  trainingDetails, // Array of { type, group, participants }
+  clientInfo, // Object with client information
+  isUrgent // boolean - true for urgent requests
 );
 ```
 
 ### Send email
+
 ```typescript
 await sendEmail(
-  recipientEmails,  // string[] - array of email addresses
-  subject,          // string - email subject
-  emailHtml         // string - HTML content from generator
+  recipientEmails, // string[] - array of email addresses
+  subject, // string - email subject
+  emailHtml // string - HTML content from generator
 );
 ```
 
 ### Ví dụ đầy đủ
+
 ```typescript
 const trainingDetails = [
   {
-    type: "Team Building",
-    group: "Nhóm 20-50 người",
-    participants: 35
+    type: 'Team Building',
+    group: 'Nhóm 20-50 người',
+    participants: 35,
   },
   {
-    type: "Kỹ năng lãnh đạo",
-    group: "Nhóm 10-20 người",
-    participants: 15
-  }
+    type: 'Kỹ năng lãnh đạo',
+    group: 'Nhóm 10-20 người',
+    participants: 15,
+  },
 ];
 
 const clientInfo = {
-  clientName: "Nguyễn Văn A",
-  clientEmail: "nguyenvana@company.com",
-  clientPhone: "0901234567",
-  location: "Hà Nội",
-  description: "Mô tả yêu cầu...",
-  trainingDuration: "2 ngày",
-  preferredTime: "Tháng 12/2024"
+  clientName: 'Nguyễn Văn A',
+  clientEmail: 'nguyenvana@company.com',
+  clientPhone: '0901234567',
+  location: 'Hà Nội',
+  description: 'Mô tả yêu cầu...',
+  trainingDuration: '2 ngày',
+  preferredTime: 'Tháng 12/2024',
 };
 
 const emailHtml = generatePartnerNotificationEmail(
   trainingDetails,
   clientInfo,
-  false  // isUrgent = false
+  false // isUrgent = false
 );
 
 await sendEmail(
-  ["partner@example.com"],
-  "🎯 Yêu cầu đào tạo mới: Team Building, Kỹ năng lãnh đạo",
+  ['partner@example.com'],
+  '🎯 Yêu cầu đào tạo mới: Team Building, Kỹ năng lãnh đạo',
   emailHtml
 );
 ```
@@ -151,18 +159,19 @@ background-color: #ef4444;
 ### Thay đổi fonts
 
 ```css
-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+font-family:
+  -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 ```
 
 ### Thay đổi layout spacing
 
 ```css
 .content {
-  padding: 40px 30px;  /* Vertical | Horizontal */
+  padding: 40px 30px; /* Vertical | Horizontal */
 }
 
 .section {
-  margin-bottom: 32px;  /* Spacing between sections */
+  margin-bottom: 32px; /* Spacing between sections */
 }
 ```
 
@@ -230,6 +239,7 @@ Sau khi gửi email, check Firestore document trong collection `mail`:
 ## 📝 Changelog
 
 ### v1.0.0 (2024-11-11)
+
 - Initial release with beautiful responsive design
 - Support for urgent/normal variants
 - Mobile-optimized layout

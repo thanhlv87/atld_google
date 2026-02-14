@@ -1,12 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  db,
-  collection,
-  query,
-  where,
-  onSnapshot,
-  type User
-} from '../services/firebaseConfig';
+import { db, collection, query, where, onSnapshot, type User } from '../services/firebaseConfig';
 
 /**
  * Hook to count unread messages for the current user
@@ -47,16 +40,10 @@ export const useUnreadMessages = (
       q = query(roomsCollection);
     } else if (userRole === 'partner') {
       // Partners see rooms where they are the partner
-      q = query(
-        roomsCollection,
-        where('partnerId', '==', user.uid)
-      );
+      q = query(roomsCollection, where('partnerId', '==', user.uid));
     } else {
       // Clients see rooms where they are the client
-      q = query(
-        roomsCollection,
-        where('clientId', '==', user.uid)
-      );
+      q = query(roomsCollection, where('clientId', '==', user.uid));
     }
 
     const unsubscribe = onSnapshot(q, (snapshot) => {

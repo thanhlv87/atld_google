@@ -14,7 +14,7 @@ import {
   storageRef,
   uploadBytes,
   getDownloadURL,
-  type User
+  type User,
 } from '../services/firebaseConfig';
 import { BlogComment } from '../types';
 import LoadingSpinner from './LoadingSpinner';
@@ -50,10 +50,13 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const commentsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as BlogComment));
+      const commentsData = snapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          }) as BlogComment
+      );
       setComments(commentsData);
       setLoading(false);
     });
@@ -79,11 +82,17 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
 
         for (const file of files) {
           const originalSize = file.size;
-          const compressedBlob = await compressImage(file, { maxWidth: 1080, maxHeight: 1080, quality: 0.8 });
+          const compressedBlob = await compressImage(file, {
+            maxWidth: 1080,
+            maxHeight: 1080,
+            quality: 0.8,
+          });
           const compressedFile = new File([compressedBlob], file.name, { type: file.type });
           const compressedSize = compressedFile.size;
 
-          console.log(`Compressed ${file.name}: ${formatFileSize(originalSize)} → ${formatFileSize(compressedSize)}`);
+          console.log(
+            `Compressed ${file.name}: ${formatFileSize(originalSize)} → ${formatFileSize(compressedSize)}`
+          );
 
           compressedFiles.push(compressedFile);
           newPreviewUrls.push(URL.createObjectURL(compressedBlob));
@@ -148,13 +157,13 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
         authorRole: isAdmin ? 'admin' : 'user',
         content: commentText.trim(),
         images: imageUrls,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
 
       // Reset form
       setCommentText('');
       setImageFiles([]);
-      imagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
+      imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
       setImagePreviewUrls([]);
 
       alert('Bình luận đã được đăng thành công!');
@@ -185,7 +194,7 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
@@ -210,7 +219,9 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
         <form onSubmit={handleSubmit} className="mb-8 border-b border-gray-200 pb-6">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-orange-500 flex items-center justify-center text-white font-bold flex-shrink-0">
-              {currentUser.displayName?.charAt(0).toUpperCase() || currentUser.email?.charAt(0).toUpperCase() || 'U'}
+              {currentUser.displayName?.charAt(0).toUpperCase() ||
+                currentUser.email?.charAt(0).toUpperCase() ||
+                'U'}
             </div>
             <div className="flex-1">
               <textarea
@@ -245,7 +256,9 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
 
               <div className="flex items-center gap-3 mt-3">
                 {/* Image Upload - All users can upload */}
-                <label className={`cursor-pointer transition-colors ${compressing ? 'text-gray-400' : 'text-gray-600 hover:text-primary'}`}>
+                <label
+                  className={`cursor-pointer transition-colors ${compressing ? 'text-gray-400' : 'text-gray-600 hover:text-primary'}`}
+                >
                   <input
                     type="file"
                     accept="image/*"
@@ -295,7 +308,11 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
         <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p className="text-sm text-gray-700 flex items-center gap-2">
             <i className="fas fa-info-circle text-blue-500"></i>
-            Vui lòng <a href="/login" className="text-primary hover:underline font-semibold">đăng nhập</a> để bình luận
+            Vui lòng{' '}
+            <a href="/login" className="text-primary hover:underline font-semibold">
+              đăng nhập
+            </a>{' '}
+            để bình luận
           </p>
         </div>
       )}
@@ -311,11 +328,13 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
           comments.map((comment) => (
             <div key={comment.id} className="border-b border-gray-200 pb-4 last:border-0">
               <div className="flex items-start gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 ${
-                  comment.authorRole === 'admin'
-                    ? 'bg-gradient-to-br from-purple-500 to-blue-500'
-                    : 'bg-gradient-to-br from-gray-400 to-gray-600'
-                }`}>
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 ${
+                    comment.authorRole === 'admin'
+                      ? 'bg-gradient-to-br from-purple-500 to-blue-500'
+                      : 'bg-gradient-to-br from-gray-400 to-gray-600'
+                  }`}
+                >
                   {comment.authorName.charAt(0).toUpperCase()}
                 </div>
 

@@ -22,16 +22,19 @@ Code gửi email đã được implement nhưng **cần cài đặt Firebase Ext
 ### Cách 1: Deploy qua Firebase CLI (Khuyến nghị)
 
 1. **Cài đặt Firebase CLI** (nếu chưa có):
+
    ```bash
    npm install -g firebase-tools
    ```
 
 2. **Login vào Firebase**:
+
    ```bash
    firebase login
    ```
 
 3. **Deploy Firestore rules**:
+
    ```bash
    firebase deploy --only firestore:rules
    ```
@@ -53,6 +56,7 @@ Nếu không muốn dùng CLI, bạn có thể copy/paste rules trực tiếp:
 5. Click **Publish**
 
 **Lưu ý:** Rules cho phép:
+
 - ✅ Bất kỳ ai cũng có thể tạo training requests (public form)
 - ✅ Bất kỳ ai cũng có thể tạo email documents (cần cho extension)
 - ✅ Chỉ authenticated users mới đọc/update được data
@@ -77,9 +81,11 @@ Nếu không muốn dùng CLI, bạn có thể copy/paste rules trực tiếp:
 Điền các thông tin sau khi được hỏi:
 
 #### A. Collection path
+
 ```
 mail
 ```
+
 (Phải khớp với code trong `firebaseConfig.ts:30`)
 
 #### B. SMTP Connection
@@ -95,6 +101,7 @@ Email từ: your-email@gmail.com
 ```
 
 **Cách tạo Gmail App Password:**
+
 1. Vào [Google Account Security](https://myaccount.google.com/security)
 2. Bật "2-Step Verification" nếu chưa có
 3. Tìm "App passwords" → Generate new password
@@ -112,6 +119,7 @@ Email từ: noreply@yourdomain.com
 ```
 
 **Cách lấy SendGrid API Key:**
+
 1. Đăng ký tài khoản tại [SendGrid](https://sendgrid.com/)
 2. Vào Settings → API Keys → Create API Key
 3. Chọn "Full Access" hoặc "Restricted Access" với Mail Send permission
@@ -122,6 +130,7 @@ Email từ: noreply@yourdomain.com
 Tham khảo tài liệu của từng service để lấy thông tin SMTP.
 
 #### C. Default reply-to email (optional)
+
 ```
 support@yourdomain.com
 ```
@@ -187,6 +196,7 @@ Nếu có lỗi, field `delivery.error` sẽ chứa thông tin lỗi.
 2. Mở ứng dụng và submit form yêu cầu đào tạo
 
 3. Mở **Browser Console** (F12) để xem logs:
+
    ```
    🔍 Tìm đối tác phù hợp cho các loại đào tạo: [...]
    📊 Tìm thấy X đối tác đã approved và đăng ký nhận email
@@ -205,6 +215,7 @@ Nếu có lỗi, field `delivery.error` sẽ chứa thông tin lỗi.
 ### ⚠️ Vấn đề 0: Lỗi HTTP 400 - Permission Denied khi submit form
 
 **Triệu chứng:**
+
 - User thấy message: "Có lỗi khi gửi email thông báo"
 - Browser Console hiển thị: `Failed to load resource: the server responded with a status of 400 ()`
 - Console log: `❌ Error sending notification emails` với error code `permission-denied`
@@ -223,6 +234,7 @@ Firestore Security Rules chưa cho phép write vào collection `mail`.
 2. **Deploy Firestore Rules mới:**
 
    **Option A - Dùng Firebase CLI (Nhanh nhất):**
+
    ```bash
    # Trong thư mục project
    firebase deploy --only firestore:rules
@@ -249,6 +261,7 @@ Firestore Security Rules chưa cho phép write vào collection `mail`.
    - Kiểm tra Browser Console → Phải thấy: `✅ Email đã được queue thành công`
 
 **Debugging tips:**
+
 - Mở Browser Console (F12) trước khi submit form
 - Xem detailed error logs với error code
 - Nếu vẫn lỗi `permission-denied`, check lại rules đã publish chưa
@@ -297,12 +310,14 @@ Check logs:
 ### Xem logs gửi email
 
 **Firebase Console:**
+
 ```
 Extensions → Trigger Email from Firestore → View in Cloud Console
 ```
 
 **Browser Console:**
 Khi submit form, bạn sẽ thấy các logs:
+
 - 🔍 Tìm đối tác
 - 📊 Số lượng đối tác
 - ✅ Đối tác phù hợp
@@ -312,6 +327,7 @@ Khi submit form, bạn sẽ thấy các logs:
 
 **Firestore Console:**
 Xem collection `mail` để theo dõi:
+
 - Documents được tạo
 - Field `delivery.state` cho biết trạng thái
 - Field `delivery.error` nếu có lỗi
@@ -321,6 +337,7 @@ Xem collection `mail` để theo dõi:
 **Firebase Extension:** Miễn phí
 
 **Email service:**
+
 - Gmail: Miễn phí (giới hạn ~500 emails/day)
 - SendGrid: Free tier 100 emails/day, sau đó $14.95/month cho 40K emails
 - AWS SES: $0.10 per 1000 emails

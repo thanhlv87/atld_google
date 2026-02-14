@@ -5,6 +5,7 @@
 ### Tính năng Chat CHƯA HOẠT ĐỘNG đầy đủ
 
 Hiện tại hệ thống có:
+
 - ✅ Giao diện Chat (ChatPage, ChatList, ChatWindow)
 - ✅ Firestore rules cho chatRooms và chatMessages
 - ❌ **KHÔNG CÓ CODE TẠO PHÒNG CHAT TỰ ĐỘNG**
@@ -17,6 +18,7 @@ Hiện tại hệ thống có:
 ### QuoteForm.tsx (Gửi báo giá)
 
 Sau khi đối tác gửi báo giá thành công:
+
 ```typescript
 // Line 74-88: Tạo document báo giá
 const quoteData = {
@@ -111,9 +113,9 @@ if (existingRooms.empty) {
     lastMessageTime: serverTimestamp(),
     unreadCount: {
       client: 1,
-      partner: 0
+      partner: 0,
     },
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
   };
 
   const chatRoomRef = await addDoc(chatRoomsCollection, chatRoomData);
@@ -127,7 +129,7 @@ if (existingRooms.empty) {
     senderRole: 'partner',
     message: `Chào bạn! Tôi đã gửi báo giá ${priceNumber.toLocaleString('vi-VN')} VND cho yêu cầu đào tạo của bạn. Vui lòng xem chi tiết và cho tôi biết ý kiến của bạn.`,
     read: false,
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
   });
 }
 ```
@@ -141,6 +143,7 @@ if (existingRooms.empty) {
 #### Bước 1: Thêm tính năng đăng nhập cho khách hàng
 
 Khi khách hàng submit yêu cầu, hỏi:
+
 - "Bạn có muốn tạo tài khoản để theo dõi báo giá và chat với đối tác không?"
 - Nếu có → Đăng nhập Google → Lưu `clientId` vào request
 
@@ -160,6 +163,7 @@ if (request.clientId) {
 Admin vào trang "Quản lý yêu cầu" → Chọn request → "Tạo phòng chat"
 
 Code:
+
 ```typescript
 const createChatRoom = async (request: TrainingRequest, quote: Quote) => {
   await addDoc(collection(db, 'chatRooms'), {
@@ -170,9 +174,9 @@ const createChatRoom = async (request: TrainingRequest, quote: Quote) => {
     partnerId: quote.partnerId,
     partnerName: quote.partnerName,
     partnerEmail: quote.partnerEmail,
-    lastMessage: "Phòng chat đã được tạo bởi Admin",
+    lastMessage: 'Phòng chat đã được tạo bởi Admin',
     lastMessageTime: serverTimestamp(),
-    unreadCount: { client: 0, partner: 0 }
+    unreadCount: { client: 0, partner: 0 },
   });
 };
 ```
@@ -212,14 +216,14 @@ const createChatRoom = async (request: TrainingRequest, quote: Quote) => {
 
 ## 📊 So Sánh Các Option
 
-| Tính năng | Option 1 (Không đăng nhập) | Option 2 (Có đăng nhập) | Option 3 (Thủ công) |
-|-----------|----------------------------|-------------------------|---------------------|
-| Khách hàng đăng nhập? | ❌ Không | ✅ Có | ❌ Không |
-| Tạo chatRoom tự động? | ⚠️ Một chiều | ✅ Hai chiều | ❌ Thủ công |
-| Chat realtime? | ❌ Không | ✅ Có | ⚠️ Một chiều |
-| Độ phức tạp | Thấp | Cao | Rất thấp |
-| Thời gian triển khai | 1-2 ngày | 1-2 tuần | 1 ngày |
-| Trải nghiệm người dùng | Trung bình | Tốt nhất | Kém |
+| Tính năng              | Option 1 (Không đăng nhập) | Option 2 (Có đăng nhập) | Option 3 (Thủ công) |
+| ---------------------- | -------------------------- | ----------------------- | ------------------- |
+| Khách hàng đăng nhập?  | ❌ Không                   | ✅ Có                   | ❌ Không            |
+| Tạo chatRoom tự động?  | ⚠️ Một chiều               | ✅ Hai chiều            | ❌ Thủ công         |
+| Chat realtime?         | ❌ Không                   | ✅ Có                   | ⚠️ Một chiều        |
+| Độ phức tạp            | Thấp                       | Cao                     | Rất thấp            |
+| Thời gian triển khai   | 1-2 ngày                   | 1-2 tuần                | 1 ngày              |
+| Trải nghiệm người dùng | Trung bình                 | Tốt nhất                | Kém                 |
 
 ---
 
@@ -261,9 +265,9 @@ export const createChatRoomForQuote = async (
     lastMessageTime: serverTimestamp(),
     unreadCount: {
       client: 1,
-      partner: 0
+      partner: 0,
     },
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
   };
 
   const roomRef = await addDoc(chatRoomsRef, roomData);
@@ -276,7 +280,7 @@ export const createChatRoomForQuote = async (
     senderRole: 'partner',
     message: `Xin chào ${request.clientName}! Tôi đã gửi báo giá ${quote.price.toLocaleString('vi-VN')} VND cho yêu cầu đào tạo của bạn. Chi tiết: ${quote.notes}`,
     read: false,
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
   });
 
   return roomRef.id;
@@ -308,21 +312,27 @@ try {
 ## ❓ FAQ
 
 ### Q: Tại sao admin không chat được với đối tác?
+
 **A:** Vì không có phòng chat nào được tạo. Admin cần tạo phòng chat thủ công hoặc code cần tự động tạo.
 
 ### Q: Khách hàng có chat được không?
+
 **A:** Chỉ khi:
+
 1. Khách hàng đăng nhập
 2. Có phòng chat được tạo (tự động hoặc thủ công)
 3. Khách hàng vào trang "Tin nhắn"
 
 ### Q: Đối tác có thể chat với khách hàng không?
+
 **A:** Hiện tại KHÔNG, vì:
+
 1. Không có phòng chat
 2. Khách hàng chưa đăng nhập (không có `clientId`)
 3. Chỉ liên hệ qua email
 
 ### Q: Cần làm gì để chat hoạt động?
+
 **A:** Chọn 1 trong 3 option trên và triển khai code.
 
 ---
@@ -330,16 +340,19 @@ try {
 ## 🎓 KẾT LUẬN
 
 **Thực trạng:**
+
 - ✅ Giao diện chat đã có
 - ✅ Firestore rules đã có
 - ❌ Logic tạo phòng chat CHƯA CÓ
 - ❌ Khách hàng chưa có tài khoản
 
 **Khuyến nghị:**
+
 - **Ngắn hạn:** Dùng email để liên hệ (đang hoạt động tốt)
 - **Dài hạn:** Cho phép khách hàng đăng nhập + Tự động tạo chat room
 
 **Ưu tiên:**
+
 1. Sửa QuoteForm để tạo chatRoom tự động (1-2 ngày)
 2. Thêm đăng nhập cho khách hàng (1 tuần)
 3. Test và deploy (2-3 ngày)

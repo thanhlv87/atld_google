@@ -8,7 +8,7 @@ import {
   orderBy,
   onSnapshot,
   limit as firestoreLimit,
-  getDocs
+  getDocs,
 } from '../services/firebaseConfig';
 import { BlogPost } from '../types';
 import BlogCard from '../components/BlogCard';
@@ -36,16 +36,19 @@ const BlogPage: React.FC = () => {
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const postsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as BlogPost));
+      const postsData = snapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          }) as BlogPost
+      );
       setPosts(postsData);
       setFilteredPosts(postsData);
       setLoading(false);
 
       // Extract unique categories
-      const uniqueCategories = Array.from(new Set(postsData.map(p => p.category)));
+      const uniqueCategories = Array.from(new Set(postsData.map((p) => p.category)));
       setCategories(uniqueCategories);
     });
 
@@ -57,16 +60,17 @@ const BlogPage: React.FC = () => {
 
     // Filter by category
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(post => post.category === selectedCategory);
+      filtered = filtered.filter((post) => post.category === selectedCategory);
     }
 
     // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(post =>
-        post.title.toLowerCase().includes(query) ||
-        post.excerpt.toLowerCase().includes(query) ||
-        post.tags.some(tag => tag.toLowerCase().includes(query))
+      filtered = filtered.filter(
+        (post) =>
+          post.title.toLowerCase().includes(query) ||
+          post.excerpt.toLowerCase().includes(query) ||
+          post.tags.some((tag) => tag.toLowerCase().includes(query))
       );
     }
 
@@ -106,7 +110,7 @@ const BlogPage: React.FC = () => {
           'quy định an toàn lao động',
           'hướng dẫn ATVSLĐ',
           'case study an toàn',
-          'SafetyConnect blog'
+          'SafetyConnect blog',
         ]}
       />
 
@@ -155,7 +159,7 @@ const BlogPage: React.FC = () => {
               Tất cả ({posts.length})
             </button>
             {categories.map((category) => {
-              const count = posts.filter(p => p.category === category).length;
+              const count = posts.filter((p) => p.category === category).length;
               return (
                 <button
                   key={category}
@@ -175,7 +179,8 @@ const BlogPage: React.FC = () => {
 
         {/* Results Count */}
         <div className="mb-6 text-gray-600">
-          Hiển thị {startIndex + 1} - {Math.min(endIndex, filteredPosts.length)} trong tổng số {filteredPosts.length} bài viết
+          Hiển thị {startIndex + 1} - {Math.min(endIndex, filteredPosts.length)} trong tổng số{' '}
+          {filteredPosts.length} bài viết
         </div>
 
         {/* Blog Grid */}
@@ -189,10 +194,7 @@ const BlogPage: React.FC = () => {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
               {currentPosts.map((post) => (
-                <BlogCard
-                  key={post.id}
-                  post={post}
-                />
+                <BlogCard key={post.id} post={post} />
               ))}
             </div>
 
@@ -228,7 +230,11 @@ const BlogPage: React.FC = () => {
                       </button>
                     );
                   } else if (page === currentPage - 2 || page === currentPage + 2) {
-                    return <span key={page} className="px-2 text-gray-400">...</span>;
+                    return (
+                      <span key={page} className="px-2 text-gray-400">
+                        ...
+                      </span>
+                    );
                   }
                   return null;
                 })}
