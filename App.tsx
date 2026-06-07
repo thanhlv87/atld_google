@@ -87,6 +87,12 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (!user) {
+      setTrainingRequests([]);
+      setLoadingRequests(false);
+      return;
+    }
+
     const requestsCollection = collection(db, 'trainingRequests');
     const q = query(requestsCollection, orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(
@@ -106,7 +112,7 @@ const App: React.FC = () => {
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [user]);
 
   // Get current page from location
   const getCurrentPage = (): string => {

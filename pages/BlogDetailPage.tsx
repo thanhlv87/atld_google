@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   db,
@@ -20,9 +20,11 @@ import BlogCard from '../components/BlogCard';
 import LazyImage from '../components/LazyImage';
 import BlogCommentSection from '../components/BlogCommentSection';
 import SEOHead from '../components/SEOHead';
+import { AppContext } from '../App';
 
 const BlogDetailPage: React.FC = () => {
   const navigate = useNavigate();
+  const { isAdmin } = useContext(AppContext);
   const { slug } = useParams<{ slug: string }>();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
@@ -43,11 +45,18 @@ const BlogDetailPage: React.FC = () => {
 
         // Try to find post by slug first
         let postData: BlogPost | null = null;
-        const slugQuery = query(
-          collection(db, 'blogPosts'),
-          where('slug', '==', slug),
-          firestoreLimit(1)
-        );
+        const slugQuery = isAdmin
+          ? query(
+              collection(db, 'blogPosts'),
+              where('slug', '==', slug),
+              firestoreLimit(1)
+            )
+          : query(
+              collection(db, 'blogPosts'),
+              where('slug', '==', slug),
+              where('published', '==', true),
+              firestoreLimit(1)
+            );
         const slugSnapshot = await getDocs(slugQuery);
 
         if (!slugSnapshot.empty) {
@@ -126,18 +135,22 @@ const BlogDetailPage: React.FC = () => {
           // Ignore permission errors for view count
         }
 
-        // Fetch related posts (same category, limit 3)
+        // Fetch related posts (same category, filter and sort on client to avoid composite index and permission errors)
         const relatedQuery = query(
           collection(db, 'blogPosts'),
-          where('published', '==', true),
           where('category', '==', postData.category),
-          orderBy('publishedAt', 'desc'),
-          firestoreLimit(4)
+          where('published', '==', true),
+          firestoreLimit(15)
         );
         const relatedSnapshot = await getDocs(relatedQuery);
         const related = relatedSnapshot.docs
           .map((doc) => ({ id: doc.id, ...doc.data() }) as BlogPost)
           .filter((p) => p.id !== postData!.id)
+          .sort((a, b) => {
+            const timeA = a.publishedAt?.toDate().getTime() || a.createdAt?.toDate().getTime() || 0;
+            const timeB = b.publishedAt?.toDate().getTime() || b.createdAt?.toDate().getTime() || 0;
+            return timeB - timeA;
+          })
           .slice(0, 3);
         setRelatedPosts(related);
 

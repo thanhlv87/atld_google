@@ -1,22 +1,15 @@
-const { onDocumentCreated } = require('firebase-functions/v2/firestore');
-const { onCall, onRequest } = require('firebase-functions/v2/https');
+const functions = require('firebase-functions/v1');
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
-const { defineSecret } = require('firebase-functions/params');
 const axios = require('axios');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 initializeApp();
 const db = getFirestore();
 
-// Gemini AI Configuration
-// Get your API key from: https://aistudio.google.com/app/apikey
-// Set via: firebase functions:secrets:set GEMINI_API_KEY
-const geminiApiKey = defineSecret('GEMINI_API_KEY');
-
 // Telegram Bot Configuration
 const TELEGRAM_BOT_TOKEN = '8474740440:AAFmqXZVe0tMLX1KVkuvrV1x-cLPTIo_CSI';
-const TELEGRAM_CHAT_ID = '-4801062641'; // Your Telegram Chat ID
+const TELEGRAM_CHAT_ID = '-1003352885569'; // Your Telegram Chat ID
 
 /**
  * Send message to Telegram
@@ -98,49 +91,41 @@ ${additionalInfo ? `\n💬 <b>Ghi chú:</b> ${additionalInfo}` : ''}
 
 ⏰ <b>Thời gian:</b> ${date}
 
-🔗 <a href="https://atld.web.app/admin">Xem chi tiết</a>
+🔗 <a href="https://antoan.web.app/admin">Xem chi tiết</a>
   `.trim();
 }
 
 /**
- * Cloud Function: Triggered when a new training request is created
+ * Cloud Function V1: Triggered when a new training request is created
  */
-exports.notifyNewTrainingRequest = onDocumentCreated('trainingRequests/{requestId}', async (event) => {
-  const snapshot = event.data;
-  if (!snapshot) {
-    console.log('No data associated with the event');
-    return;
-  }
+exports.notifyNewTrainingRequest = functions.firestore
+  .document('trainingRequests/{requestId}')
+  .onCreate(async (snapshot, context) => {
+    const requestData = snapshot.data();
+    const requestId = context.params.requestId;
 
-  const requestData = snapshot.data();
-  const requestId = event.params.requestId;
+    console.log('New training request created:', requestId);
 
-  console.log('New training request created:', requestId);
-  console.log('Request data:', JSON.stringify(requestData, null, 2));
+    if (!TELEGRAM_CHAT_ID) {
+      console.warn('TELEGRAM_CHAT_ID not configured. Skipping notification.');
+      return;
+    }
 
-  // Check if Telegram Chat ID is configured
-  if (!TELEGRAM_CHAT_ID) {
-    console.warn('TELEGRAM_CHAT_ID not configured. Skipping notification.');
-    return;
-  }
-
-  try {
-    const message = formatTrainingRequestMessage(requestData);
-    await sendTelegramMessage(message);
-    console.log('Notification sent for request:', requestId);
-  } catch (error) {
-    console.error('Error in notifyNewTrainingRequest:', error);
-    // Don't throw error to avoid function retry
-  }
-});
+    try {
+      const message = formatTrainingRequestMessage(requestData);
+      await sendTelegramMessage(message);
+      console.log('Notification sent for request:', requestId);
+    } catch (error) {
+      console.error('Error in notifyNewTrainingRequest:', error);
+    }
+  });
 
 /**
- * Callable function: Test Telegram notification
+ * Cloud Function V1: Test Telegram notification
  */
-exports.testTelegramNotification = onCall(async (request) => {
-  // Only allow authenticated users
-  if (!request.auth) {
-    throw new Error('User must be authenticated');
+exports.testTelegramNotification = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
   const testMessage = `
@@ -150,7 +135,7 @@ exports.testTelegramNotification = onCall(async (request) => {
 
 ✅ Bot đang hoạt động bình thường!
 
-👤 <b>Tested by:</b> ${request.auth.token.email || 'Unknown'}
+👤 <b>Tested by:</b> ${context.auth.token.email || 'Unknown'}
 
 ⏰ ${new Date().toLocaleString('vi-VN')}
   `.trim();
@@ -160,33 +145,34 @@ exports.testTelegramNotification = onCall(async (request) => {
     return { success: true, message: 'Test notification sent successfully' };
   } catch (error) {
     console.error('Test notification failed:', error);
-    throw new Error('Failed to send test notification: ' + error.message);
+    throw new functions.https.HttpsError('internal', 'Failed to send test notification: ' + error.message);
   }
 });
 
 /**
- * AI Blog Writer - Generate blog post using Gemini AI
+ * Cloud Function V1: Generate blog post using Gemini AI
  */
-exports.generateBlogPost = onCall({ secrets: [geminiApiKey] }, async (request) => {
-  // Only allow authenticated users
-  if (!request.auth) {
-    throw new Error('User must be authenticated');
+exports.generateBlogPost = functions.runWith({ secrets: ['GEMINI_API_KEY'] }).https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { topic, category, keywords } = request.data;
+  const { topic, category, keywords } = data;
 
   if (!topic) {
-    throw new Error('Topic is required');
+    throw new functions.https.HttpsError('invalid-argument', 'Topic is required');
   }
 
   console.log('Generating blog post for topic:', topic);
 
   try {
-    // Initialize Gemini AI with secret
-    const genAI = new GoogleGenerativeAI(geminiApiKey.value());
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new functions.https.HttpsError('failed-precondition', 'GEMINI_API_KEY secret is not set on the server.');
+    }
+    const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-    // Craft specialized prompt for Occupational Safety blog (SEO-optimized)
     const prompt = `Bạn là một chuyên gia về An toàn Lao động tại Việt Nam, đồng thời là chuyên gia SEO. Hãy viết một bài blog chuyên nghiệp, chi tiết, hữu ích và TỐI ƯU SEO về chủ đề sau:
 
 Chủ đề: ${topic}
@@ -223,16 +209,13 @@ Trả về theo định dạng JSON với cấu trúc sau:
     const response = await result.response;
     const text = response.text();
 
-    // Parse JSON response
     let blogData;
     try {
-      // Extract JSON from markdown code blocks if present
       const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/) || text.match(/```\s*([\s\S]*?)\s*```/);
       const jsonText = jsonMatch ? jsonMatch[1] : text;
       blogData = JSON.parse(jsonText);
     } catch (parseError) {
       console.error('Failed to parse AI response as JSON:', parseError);
-      // Fallback: return raw text
       blogData = {
         title: topic,
         excerpt: text.substring(0, 200) + '...',
@@ -250,30 +233,32 @@ Trả về theo định dạng JSON với cấu trúc sau:
 
   } catch (error) {
     console.error('Error generating blog post:', error);
-    throw new Error('Failed to generate blog post: ' + error.message);
+    throw new functions.https.HttpsError('internal', 'Failed to generate blog post: ' + error.message);
   }
 });
 
 /**
- * AI Blog Helper - Improve existing content, generate title/excerpt/tags
+ * Cloud Function V1: AI Blog Helper - Improve existing content, generate title/excerpt/tags
  */
-exports.improveBlogContent = onCall({ secrets: [geminiApiKey] }, async (request) => {
-  // Only allow authenticated users
-  if (!request.auth) {
-    throw new Error('User must be authenticated');
+exports.improveBlogContent = functions.runWith({ secrets: ['GEMINI_API_KEY'] }).https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { action, content, context } = request.data;
+  const { action, content, context: blogContext } = data;
 
   if (!action) {
-    throw new Error('Action is required');
+    throw new functions.https.HttpsError('invalid-argument', 'Action is required');
   }
 
   console.log('Improving blog content, action:', action);
 
   try {
-    // Initialize Gemini AI with secret
-    const genAI = new GoogleGenerativeAI(geminiApiKey.value());
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new functions.https.HttpsError('failed-precondition', 'GEMINI_API_KEY secret is not set on the server.');
+    }
+    const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     let prompt = '';
@@ -328,14 +313,13 @@ Trả về dưới dạng JSON array: ["tag1", "tag2", "tag3", ...]`;
         break;
 
       default:
-        throw new Error('Invalid action');
+        throw new functions.https.HttpsError('invalid-argument', 'Invalid action');
     }
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
     let text = response.text();
 
-    // Try to parse JSON if applicable
     if (action === 'generate_title' || action === 'generate_tags') {
       try {
         const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/) || text.match(/\[[\s\S]*?\]/);
@@ -354,7 +338,7 @@ Trả về dưới dạng JSON array: ["tag1", "tag2", "tag3", ...]`;
 
   } catch (error) {
     console.error('Error improving content:', error);
-    throw new Error('Failed to improve content: ' + error.message);
+    throw new functions.https.HttpsError('internal', 'Failed to improve content: ' + error.message);
   }
 });
 
@@ -393,6 +377,15 @@ const CRAWLER_USER_AGENTS = [
   'SemrushBot',
   'AhrefsBot',
   'DotBot',
+  'gptbot',
+  'chatgpt-user',
+  'claudebot',
+  'anthropic-ai',
+  'perplexitybot',
+  'oai-searchbot',
+  'meta-externalagent',
+  'bytespider',
+  'gemini',
 ];
 
 function isCrawler(userAgent) {
@@ -406,42 +399,35 @@ function isCrawler(userAgent) {
  */
 async function serveSPAForBrowser(res) {
   try {
-    const response = await fetch('https://atld.web.app/index.html');
+    const response = await fetch('https://antoan.web.app/index.html');
     const html = await response.text();
     res.set('Content-Type', 'text/html; charset=utf-8');
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.send(html);
   } catch (error) {
     console.error('Error fetching index.html:', error);
-    // Last resort fallback
-    res.redirect(302, 'https://atld.web.app/');
+    res.redirect(302, 'https://antoan.web.app/');
   }
 }
 
 /**
- * SEO-friendly Blog Post Meta Tags for Social Media Crawlers
- * Serves HTML with proper OG tags for Facebook, Twitter, Zalo etc.
- * Regular browsers receive the SPA's index.html directly (no redirect loop).
- * Supports slug-based URLs with fallback to document ID for backward compatibility.
+ * SEO-friendly Blog Post Meta Tags for Social Media Crawlers (V1)
  */
-exports.blogMetaTags = onRequest(async (req, res) => {
+exports.blogMetaTags = functions.https.onRequest(async (req, res) => {
   const urlPath = req.url || req.path;
   const userAgent = req.headers['user-agent'] || '';
 
-  // Extract slug/id from path: /blog/SLUG_OR_ID
   const pathMatch = urlPath.match(/\/blog\/([^/?#]+)/);
   const slugOrId = pathMatch ? pathMatch[1] : '';
 
   console.log('blogMetaTags called:', { urlPath, slugOrId, isCrawler: isCrawler(userAgent) });
 
-  // If NOT a crawler (regular browser), serve the SPA directly
   if (!isCrawler(userAgent)) {
     return serveSPAForBrowser(res);
   }
 
-  // If accessing /blog listing (crawler), redirect to homepage
   if (!slugOrId || slugOrId === 'blog') {
-    res.redirect(302, 'https://atld.web.app/');
+    res.redirect(302, 'https://antoan.web.app/');
     return;
   }
 
@@ -449,7 +435,6 @@ exports.blogMetaTags = onRequest(async (req, res) => {
     let postDoc = null;
     let postId = slugOrId;
 
-    // Try to find by slug first
     const slugQuery = db.collection('blogPosts').where('slug', '==', slugOrId).limit(1);
     const slugSnapshot = await slugQuery.get();
 
@@ -457,7 +442,6 @@ exports.blogMetaTags = onRequest(async (req, res) => {
       postDoc = slugSnapshot.docs[0];
       postId = postDoc.id;
     } else {
-      // Fallback: try by document ID (backward compatibility)
       const idDoc = await db.collection('blogPosts').doc(slugOrId).get();
       if (idDoc.exists) {
         postDoc = idDoc;
@@ -467,14 +451,13 @@ exports.blogMetaTags = onRequest(async (req, res) => {
 
     if (!postDoc || !postDoc.exists) {
       console.log('Post not found:', slugOrId);
-      res.redirect(302, 'https://atld.web.app/blog');
+      res.redirect(302, 'https://antoan.web.app/blog');
       return;
     }
 
     const post = postDoc.data();
-    // Use slug in URL if available, otherwise use ID
     const blogSlug = post.slug || postId;
-    const url = `https://atld.web.app/blog/${blogSlug}`;
+    const url = `https://antoan.web.app/blog/${blogSlug}`;
 
     const title = escapeHtml(post.title);
     const excerpt = escapeHtml(post.excerpt);
@@ -566,20 +549,18 @@ exports.blogMetaTags = onRequest(async (req, res) => {
     res.send(html);
   } catch (error) {
     console.error('Error fetching blog post:', error);
-    res.redirect(302, 'https://atld.web.app/blog');
+    res.redirect(302, 'https://antoan.web.app/blog');
   }
 });
 
 /**
- * Dynamic Sitemap Generator
- * Generates sitemap.xml dynamically with all published blog posts using slug-based URLs.
+ * Dynamic Sitemap Generator (V1)
  */
-exports.dynamicSitemap = onRequest(async (req, res) => {
+exports.dynamicSitemap = functions.https.onRequest(async (req, res) => {
   try {
-    const BASE_URL = 'https://atld.web.app';
+    const BASE_URL = 'https://antoan.web.app';
     const today = new Date().toISOString().split('T')[0];
 
-    // Static pages
     const staticPages = [
       { url: '/', changefreq: 'daily', priority: '1.0' },
       { url: '/blog', changefreq: 'daily', priority: '0.9' },
@@ -597,17 +578,14 @@ exports.dynamicSitemap = onRequest(async (req, res) => {
       { url: '/training/so-cap-cuu', changefreq: 'monthly', priority: '0.8' },
     ];
 
-    // Fetch all published blog posts
     const blogSnapshot = await db.collection('blogPosts')
       .where('published', '==', true)
       .orderBy('publishedAt', 'desc')
       .get();
 
-    // Build XML
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
-    // Add static pages
     staticPages.forEach(page => {
       xml += '  <url>\n';
       xml += `    <loc>${BASE_URL}${page.url}</loc>\n`;
@@ -617,7 +595,6 @@ exports.dynamicSitemap = onRequest(async (req, res) => {
       xml += '  </url>\n';
     });
 
-    // Add blog posts with slug-based URLs
     blogSnapshot.forEach(doc => {
       const post = doc.data();
       const blogSlug = post.slug || doc.id;
@@ -644,3 +621,159 @@ exports.dynamicSitemap = onRequest(async (req, res) => {
   }
 });
 
+/**
+ * SEO-friendly Training Landing Page Meta Tags for Search Engine and AI Crawlers
+ */
+exports.trainingMetaTags = functions.https.onRequest(async (req, res) => {
+  const urlPath = req.url || req.path;
+  const userAgent = req.headers['user-agent'] || '';
+
+  const pathMatch = urlPath.match(/\/training\/([^/?#]+)/);
+  const trainingType = pathMatch ? pathMatch[1] : '';
+
+  console.log('trainingMetaTags called:', { urlPath, trainingType, isCrawler: isCrawler(userAgent) });
+
+  if (!isCrawler(userAgent)) {
+    return serveSPAForBrowser(res);
+  }
+
+  const trainingData = {
+    'an-toan-dien': {
+      title: 'Huấn Luyện An Toàn Điện Trực Tuyến & Online',
+      metaDescription: 'Huấn luyện an toàn điện trực tuyến (online) phối hợp thực hành thực tế, cấp chứng chỉ nhanh theo Nghị định 44. Tiết kiệm thời gian, tối ưu chi phí cho doanh nghiệp.',
+      keywords: 'huấn luyện an toàn điện trực tuyến, đào tạo an toàn điện online, chứng chỉ an toàn điện, an toàn lao động điện',
+      certificate: 'Chứng chỉ An Toàn Điện theo Nghị định 44/2016/NĐ-CP',
+      imageUrl: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&h=400&fit=crop'
+    },
+    'an-toan-xay-dung': {
+      title: 'Huấn Luyện An Toàn Xây Dựng Trực Tuyến & Online',
+      metaDescription: 'Huấn luyện an toàn xây dựng trực tuyến, online kết hợp thực hành công trường cho công nhân và kỹ sư. Cấp chứng chỉ an toàn lao động xây dựng hợp pháp nhanh chóng.',
+      keywords: 'huấn luyện an toàn xây dựng online, đào tạo an toàn xây dựng trực tuyến, chứng chỉ xây dựng, an toàn lao động xây dựng',
+      certificate: 'Chứng chỉ An Toàn Xây Dựng theo Nghị định 44/2016/NĐ-CP',
+      imageUrl: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&h=400&fit=crop'
+    },
+    'an-toan-hoa-chat': {
+      title: 'Huấn Luyện An Toàn Hóa Chất Online & Trực Tiếp',
+      metaDescription: 'Đào tạo và huấn luyện an toàn hóa chất trực tuyến cho doanh nghiệp. Học về MSDS, phân loại hóa chất, xử lý sự cố tràn đổ hóa chất. Cấp chứng chỉ hợp lệ.',
+      keywords: 'huấn luyện an toàn hóa chất trực tuyến, đào tạo an toàn hóa chất online, chứng chỉ hóa chất, an toàn lao động hóa chất',
+      certificate: 'Chứng chỉ An Toàn Hóa Chất theo quy định',
+      imageUrl: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&h=400&fit=crop'
+    },
+    'pccc': {
+      title: 'Huấn Luyện Phòng Cháy Chữa Cháy (PCCC) Online & Trực Tiếp',
+      metaDescription: 'Đào tạo và huấn luyện PCCC trực tuyến, online kết hợp diễn tập chữa cháy, cứu hộ cứu nạn. Cấp chứng chỉ PCCC hợp lệ theo Nghị định 136 nhanh chóng.',
+      keywords: 'huấn luyện pccc trực tuyến, đào tạo pccc online, chứng chỉ pccc, an toàn cháy nổ, nghị định 136',
+      certificate: 'Chứng chỉ PCCC theo Nghị định 136/2020/NĐ-CP',
+      imageUrl: 'https://images.unsplash.com/photo-1587588354456-ae376af71a25?w=800&h=400&fit=crop'
+    },
+    'an-toan-buc-xa': {
+      title: 'Huấn Luyện An Toàn Bức Xạ Trực Tuyến & Online',
+      metaDescription: 'Đào tạo và huấn luyện an toàn bức xạ online/trực tiếp cho cán bộ, nhân viên y tế. Cấp chứng chỉ an toàn bức xạ đúng quy định pháp luật.',
+      keywords: 'đào tạo an toàn bức xạ trực tuyến, huấn luyện an toàn bức xạ online, chứng chỉ an toàn bức xạ, phòng hộ bức xạ',
+      certificate: 'Chứng chỉ An Toàn Bức Xạ theo Luật Năng lượng nguyên tử',
+      imageUrl: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&h=400&fit=crop'
+    },
+    'quan-trac-moi-truong': {
+      title: 'Đào Tạo Quan Trắc Môi Trường',
+      metaDescription: 'Đào tạo quan trắc môi trường nước, không khí, đất. Học lấy mẫu, phân tích môi trường. Cấp chứng chỉ quan trắc môi trường hợp lệ.',
+      keywords: 'đào tạo quan trắc môi trường, lấy mẫu môi trường, phân tích môi trường, chứng chỉ quan trắc',
+      certificate: 'Chứng chỉ Quan Trắc Môi Trường theo Luật Bảo vệ môi trường',
+      imageUrl: 'https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=800&h=400&fit=crop'
+    },
+    'danh-gia-phan-loai-lao-dong': {
+      title: 'Đào Tạo Đánh Giá Phân Loại Lao Động',
+      metaDescription: 'Đào tạo đánh giá phân loại lao động cho HR, quản lý nhân sự. Học về định mức lao động, đánh giá năng lực. Cấp chứng chỉ hợp lệ.',
+      keywords: 'đánh giá lao động, phân loại lao động, định mức lao động, quản lý nhân sự',
+      certificate: 'Chứng chỉ Đánh Giá Phân Loại Lao Động',
+      imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=400&fit=crop'
+    },
+    'so-cap-cuu': {
+      title: 'Huấn Luyện Sơ Cấp Cứu Trực Tuyến & Online',
+      metaDescription: 'Đào tạo và huấn luyện sơ cấp cứu trực tuyến (online) cho cán bộ, công nhân. Học lý thuyết nhanh, thực hành thực tế, cấp chứng chỉ sơ cấp cứu hợp lệ.',
+      keywords: 'huấn luyện sơ cấp cứu trực tuyến, đào tạo sơ cấp cứu online, CPR, sơ cứu ban đầu, chứng chỉ sơ cấp cứu',
+      certificate: 'Chứng chỉ Sơ Cấp Cứu (First Aid Certificate)',
+      imageUrl: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=800&h=400&fit=crop'
+    }
+  };
+
+  const data = trainingData[trainingType];
+
+  if (!data) {
+    res.redirect(302, 'https://antoan.web.app/');
+    return;
+  }
+
+  const url = `https://antoan.web.app/training/${trainingType}`;
+  const title = escapeHtml(data.title);
+  const excerpt = escapeHtml(data.metaDescription);
+  const siteName = 'SafetyConnect';
+  const coverImage = data.imageUrl;
+  const keywords = escapeHtml(data.keywords);
+  const certificate = escapeHtml(data.certificate);
+
+  const html = `
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Primary Meta Tags -->
+  <title>${title} | ${siteName}</title>
+  <meta name="title" content="${title} | ${siteName}" />
+  <meta name="description" content="${excerpt}" />
+  <meta name="keywords" content="${keywords}" />
+  <meta name="author" content="SafetyConnect" />
+  <link rel="canonical" href="${url}" />
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="${url}" />
+  <meta property="og:title" content="${title}" />
+  <meta property="og:description" content="${excerpt}" />
+  <meta property="og:image" content="${coverImage}" />
+  <meta property="og:site_name" content="${siteName}" />
+  <meta property="og:locale" content="vi_VN" />
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="${url}" />
+  <meta property="twitter:title" content="${title}" />
+  <meta property="twitter:description" content="${excerpt}" />
+  <meta property="twitter:image" content="${coverImage}" />
+  
+  <!-- JSON-LD Course Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "${title}",
+    "description": "${excerpt}",
+    "provider": {
+      "@type": "Organization",
+      "name": "${siteName}",
+      "sameAs": "https://antoan.web.app/"
+    },
+    "educationalCredentialAwarded": "${certificate}",
+    "offers": {
+      "@type": "Offer",
+      "category": "Education",
+      "price": "0",
+      "priceCurrency": "VND",
+      "description": "Đăng ký nhận báo giá huấn luyện miễn phí từ các đối tác"
+    }
+  }
+  </script>
+  
+  <!-- Redirect to actual SPA page -->
+  <meta http-equiv="refresh" content="0; url=${url}" />
+  <script>window.location.href = "${url}";</script>
+</head>
+<body>
+  <p>Redirecting to <a href="${url}">${title}</a>...</p>
+</body>
+</html>`;
+
+  res.set('Cache-Control', 'public, max-age=3600, s-maxage=7200');
+  res.send(html);
+});

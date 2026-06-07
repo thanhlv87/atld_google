@@ -45,8 +45,7 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
     const commentsCollection = collection(db, 'blogComments');
     const q = query(
       commentsCollection,
-      where('postId', '==', postId),
-      orderBy('createdAt', 'desc')
+      where('postId', '==', postId)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -57,6 +56,12 @@ const BlogCommentSection: React.FC<BlogCommentSectionProps> = ({ postId, current
             ...doc.data(),
           }) as BlogComment
       );
+      // Sort on client side to avoid composite index error
+      commentsData.sort((a, b) => {
+        const timeA = a.createdAt?.toDate()?.getTime() || 0;
+        const timeB = b.createdAt?.toDate()?.getTime() || 0;
+        return timeB - timeA;
+      });
       setComments(commentsData);
       setLoading(false);
     });

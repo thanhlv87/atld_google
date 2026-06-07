@@ -121,7 +121,8 @@ const TrainingRequestForm: React.FC = () => {
         clientSubscribesToEmails: clientSubscribesToEmails,
       });
 
-      // Gửi email thông báo cho các đối tác phù hợp
+      /* 
+      // Gửi email thông báo cho các đối tác phù hợp (Được vô hiệu hóa do hệ thống chuyển sang dùng thông báo Telegram)
       let emailNotificationMessage = '';
       try {
         // Lấy danh sách đối tác có năng lực phù hợp
@@ -180,12 +181,9 @@ const TrainingRequestForm: React.FC = () => {
         emailNotificationMessage =
           ' (Lưu ý: Có lỗi khi gửi email thông báo, nhưng yêu cầu của bạn đã được lưu thành công)';
       }
+      */
 
-      setSuccess(
-        'Yêu cầu của bạn đã được gửi thành công!' +
-        emailNotificationMessage +
-        ' Các đơn vị đào tạo sẽ sớm liên hệ với bạn.'
-      );
+      setSuccess('Yêu cầu của bạn đã được gửi thành công! Các đơn vị đào tạo sẽ sớm liên hệ với bạn.');
       setFormData(initialFormState);
       setTrainingDetails([initialDetailState]);
       setIsUrgent(false);

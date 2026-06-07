@@ -42,7 +42,7 @@ const BenefitsSection: React.FC = () => {
                     <BenefitCard
                         icon="fa-rocket"
                         title="Kết nối nhanh chóng"
-                        description="Tiếp cận hàng chục đối tác đào tạo uy tín chỉ với một yêu cầu duy nhất, tiết kiệm thời gian tìm kiếm."
+                        description="Tiếp cận hàng chục đối tác đào tạo uy tín chỉ với một yêu cầu, tiết kiệm thời gian tìm kiếm."
                         gradient="from-blue-500 to-blue-700"
                     />
                     <BenefitCard

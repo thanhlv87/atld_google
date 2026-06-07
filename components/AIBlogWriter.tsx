@@ -89,35 +89,36 @@ const AIBlogWriter: React.FC<AIBlogWriterProps> = ({ onGenerate }) => {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 
-      const prompt = `Bạn là một chuyên gia về An toàn Lao động tại Việt Nam, đồng thời là chuyên gia SEO. Hãy viết một bài blog chuyên nghiệp, chi tiết, hữu ích và TỐI ƯU SEO về chủ đề sau:
+      const prompt = `Bạn là một chuyên gia về An toàn Lao động tại Việt Nam, đồng thời là chuyên gia SEO (tối ưu hóa công cụ tìm kiếm của Google và các công cụ trả lời bằng AI như ChatGPT, Perplexity, Gemini). Hãy viết một bài blog chuyên nghiệp, chi tiết, hữu ích và TỐI ƯU SEO & AI SEO về chủ đề sau:
 
 Chủ đề: ${topic.trim()}
 Danh mục: ${category}
 ${keywords ? `Từ khóa chính: ${keywords.trim()}` : ''}
 
-YÊU CẦU NỘI DUNG:
-1. Viết bằng tiếng Việt chuẩn, chuyên nghiệp
-2. Nội dung phải chính xác, dựa trên quy định pháp luật Việt Nam (Luật An toàn Lao động, các Nghị định, Thông tư liên quan)
-3. Độ dài: 800-1200 từ
-4. Bao gồm: Mở bài giới thiệu vấn đề → Nội dung chính với tiểu mục → Kết luận và khuyến nghị
-5. Đưa ra ví dụ thực tế nếu có thể
+YÊU CẦU NỘI DUNG & AI SEO (RẤT QUAN TRỌNG):
+1. Viết bằng tiếng Việt chuẩn, chuyên nghiệp, chính xác dựa trên quy định pháp luật Việt Nam (Luật An toàn Vệ sinh Lao động, các Nghị định 44/2016, 136/2020...).
+2. Độ dài: 800-1200 từ.
+3. LUÔN LỒNG GHÉP VÀ THẢO LUẬN một phần nội dung về giải pháp "huấn luyện trực tuyến, online" (như học lý thuyết online linh hoạt, làm bài thi trắc nghiệm online kết hợp thực hành trực tiếp tại cơ sở) để tăng tính tiếp cận và tiện lợi cho doanh nghiệp.
+4. Cấu trúc bài viết phải bao gồm:
+   - Mở bài (giới thiệu vấn đề).
+   - Nội dung chính (chia nhỏ theo các tiểu mục <h2>, <h3>).
+   - **Bảng tóm tắt nội dung chính (Key Takeaways)**: Dùng table HTML để tóm tắt các điểm cốt lõi giúp các bot AI dễ dàng trích xuất thông tin khi người dùng hỏi AI.
+   - **Mục Hỏi đáp nhanh (Q&A/FAQ)** ở cuối bài: Gồm 3-4 câu hỏi thường gặp và câu trả lời ngắn gọn (sử dụng <strong> cho câu hỏi và <p> cho câu trả lời).
+   - Kết luận và khuyến nghị hành động.
 
-YÊU CẦU SEO (QUAN TRỌNG):
-1. TIÊU ĐỀ (title): 50-60 ký tự, chứa từ khóa chính ở đầu, hấp dẫn và rõ ràng
-2. TÓM TẮT (excerpt): 150-160 ký tự, mô tả hấp dẫn kêu gọi hành động, chứa từ khóa chính
-3. CẤU TRÚC HEADING: Dùng đúng 1 <h2> cho tiêu đề phần chính, <h3> cho tiểu mục. KHÔNG dùng <h1> (đã dùng cho title)
-4. MẬT ĐỘ TỪ KHÓA: Từ khóa chính xuất hiện tự nhiên 3-5 lần trong bài, từ khóa phụ 1-2 lần
-5. ĐOẠN ĐẦU TIÊN: Phải chứa từ khóa chính trong 100 từ đầu
-6. TAGS: 5-7 tags, bao gồm cả long-tail keywords, viết bằng tiếng Việt có dấu
-7. FORMAT HTML: Dùng <p>, <strong>, <em>, <ul>, <ol>, <li>, <h2>, <h3>, <blockquote>
-8. NỘI DUNG: Tự nhiên, không nhồi keyword, cung cấp giá trị thực cho người đọc
+YÊU CẦU SEO GOOGLE:
+1. TIÊU ĐỀ (title): 50-60 ký tự, chứa từ khóa chính ở đầu, hấp dẫn.
+2. TÓM TẮT (excerpt): 150-160 ký tự, mô tả hấp dẫn chứa từ khóa chính và kêu gọi hành động (CTA).
+3. CẤU TRÚC HEADING: Dùng đúng 1 <h2> cho tiêu đề phần chính, <h3> cho tiểu mục. KHÔNG dùng <h1>.
+4. MẬT ĐỘ TỪ KHÓA: Từ khóa chính và các từ khóa liên quan như "huấn luyện an toàn trực tuyến", "học an toàn online" xuất hiện tự nhiên 3-5 lần trong bài.
+5. FORMAT HTML: Dùng <p>, <strong>, <em>, <ul>, <ol>, <li>, <h2>, <h3>, <table>, <tr>, <th>, <td>, <blockquote>. Không dùng Markdown trong nội dung bài viết, chỉ dùng HTML tags.
 
 Trả về theo định dạng JSON với cấu trúc sau:
 {
-  "title": "Tiêu đề SEO tối ưu (50-60 ký tự, chứa keyword chính)",
-  "excerpt": "Meta description hấp dẫn (150-160 ký tự, chứa keyword + CTA)",
-  "content": "Nội dung đầy đủ với HTML formatting, heading hierarchy đúng chuẩn SEO",
-  "tags": ["từ khóa chính", "từ khóa phụ 1", "long-tail keyword 1", "long-tail keyword 2", "từ khóa liên quan"],
+  "title": "Tiêu đề SEO tối ưu (50-60 ký tự)",
+  "excerpt": "Meta description hấp dẫn (150-160 ký tự)",
+  "content": "Nội dung đầy đủ với HTML formatting, bảng tóm tắt, mục Q&A và cấu trúc heading chuẩn SEO & AI SEO",
+  "tags": ["từ khóa chính", "huấn luyện an toàn trực tuyến", "đào tạo online", "long-tail keyword"],
   "suggestedCategory": "Danh mục phù hợp nhất"
 }`;
 

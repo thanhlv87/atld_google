@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { db, doc, updateDoc, arrayUnion, type User } from '../services/firebaseConfig';
 import { TrainingRequest } from '../types';
 import { PartnerStatus } from '../App';
-import html2canvas from 'html2canvas';
+import html2canvas from 'html2canvas-pro';
 import QuoteForm from './QuoteForm';
 
 interface TrainingRequestCardProps {

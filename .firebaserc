@@ -1,15 +1,15 @@
 {
   "projects": {
-    "default": "gen-lang-client-0113063590"
+    "default": "atld-connect"
   },
   "targets": {
-    "gen-lang-client-0113063590": {
+    "atld-connect": {
       "hosting": {
         "main": [
-          "gen-lang-client-0113063590"
+          "antoan"
         ],
         "atld": [
-          "atld"
+          "atld-connect"
         ]
       }
     }

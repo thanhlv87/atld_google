@@ -11,6 +11,7 @@ interface SEOHeadProps {
   publishedTime?: string;
   modifiedTime?: string;
   articleSection?: string;
+  schema?: any; // Thêm Schema JSON-LD tùy chọn
 }
 
 const SEOHead: React.FC<SEOHeadProps> = ({
@@ -24,6 +25,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
   publishedTime,
   modifiedTime,
   articleSection,
+  schema,
 }) => {
   useEffect(() => {
     // Update title
@@ -49,9 +51,8 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     updateMetaTag('property', 'og:type', type);
     updateMetaTag('property', 'og:site_name', 'SafetyConnect');
 
-    if (url) {
-      updateMetaTag('property', 'og:url', url);
-    }
+    const canonicalUrl = url || window.location.href;
+    updateMetaTag('property', 'og:url', canonicalUrl);
 
     // Article-specific Open Graph tags
     if (type === 'article') {
@@ -74,15 +75,31 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     updateMetaTag('property', 'twitter:title', title);
     updateMetaTag('property', 'twitter:description', description);
     updateMetaTag('property', 'twitter:image', image);
-
-    if (url) {
-      updateMetaTag('property', 'twitter:url', url);
-    }
+    updateMetaTag('property', 'twitter:url', canonicalUrl);
 
     // Update canonical URL
-    if (url) {
-      updateCanonicalLink(url);
+    updateCanonicalLink(canonicalUrl);
+
+    // Update or create custom JSON-LD schema
+    const existingScript = document.querySelector('script[data-seo-schema="true"]');
+    if (existingScript) {
+      existingScript.remove();
     }
+    if (schema) {
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.setAttribute('data-seo-schema', 'true');
+      script.text = typeof schema === 'string' ? schema : JSON.stringify(schema);
+      document.head.appendChild(script);
+    }
+
+    return () => {
+      // Cleanup custom schema on unmount
+      const scriptToCleanup = document.querySelector('script[data-seo-schema="true"]');
+      if (scriptToCleanup) {
+        scriptToCleanup.remove();
+      }
+    };
   }, [
     title,
     description,
@@ -94,6 +111,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     publishedTime,
     modifiedTime,
     articleSection,
+    schema,
   ]);
 
   return null;

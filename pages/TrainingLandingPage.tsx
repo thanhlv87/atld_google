@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import SEOHead from '../components/SEOHead';
 
 export type TrainingTypeKey =
   | 'an-toan-dien'
@@ -31,13 +32,14 @@ const trainingData: Record<
   }
 > = {
   'an-toan-dien': {
-    title: 'Đào Tạo An Toàn Điện',
+    title: 'Huấn Luyện An Toàn Điện Trực Tuyến & Online',
     description:
-      'Khóa đào tạo an toàn điện chuyên nghiệp, đầy đủ kiến thức và kỹ năng vận hành, sửa chữa điện an toàn theo quy định Nhà nước',
+      'Khóa huấn luyện an toàn điện trực tuyến, online lý thuyết kết hợp thực hành chuyên nghiệp, đầy đủ kỹ năng vận hành, sửa chữa điện an toàn theo quy định Nhà nước',
     metaDescription:
-      'Đào tạo an toàn điện chuyên nghiệp, cấp chứng chỉ theo Nghị định 44. Học viên được trang bị kiến thức về điện an toàn, vận hành thiết bị điện, xử lý sự cố.',
+      'Huấn luyện an toàn điện trực tuyến (online) phối hợp thực hành thực tế, cấp chứng chỉ nhanh theo Nghị định 44. Tiết kiệm thời gian, tối ưu chi phí cho doanh nghiệp.',
     keywords: [
-      'đào tạo an toàn điện',
+      'huấn luyện an toàn điện trực tuyến',
+      'đào tạo an toàn điện online',
       'chứng chỉ an toàn điện',
       'huấn luyện điện công nghiệp',
       'an toàn lao động điện',
@@ -81,13 +83,14 @@ const trainingData: Record<
     iconClass: 'fa-bolt',
   },
   'an-toan-xay-dung': {
-    title: 'Đào Tạo An Toàn Xây Dựng',
+    title: 'Huấn Luyện An Toàn Xây Dựng Trực Tuyến & Online',
     description:
-      'Khóa đào tạo an toàn xây dựng toàn diện, trang bị kiến thức và kỹ năng làm việc an toàn tại công trường xây dựng',
+      'Khóa huấn luyện an toàn xây dựng online và trực tiếp toàn diện, trang bị kiến thức và kỹ năng làm việc an toàn tại công trường xây dựng',
     metaDescription:
-      'Đào tạo an toàn xây dựng cho công nhân, kỹ sư xây dựng. Cấp chứng chỉ hợp lệ, đúng quy định. Học thực tế tại công trường.',
+      'Huấn luyện an toàn xây dựng trực tuyến, online kết hợp thực hành công trường cho công nhân và kỹ sư. Cấp chứng chỉ an toàn lao động xây dựng hợp pháp nhanh chóng.',
     keywords: [
-      'đào tạo an toàn xây dựng',
+      'huấn luyện an toàn xây dựng online',
+      'đào tạo an toàn xây dựng trực tuyến',
       'huấn luyện công trường',
       'chứng chỉ xây dựng',
       'an toàn lao động xây dựng',
@@ -131,13 +134,14 @@ const trainingData: Record<
     iconClass: 'fa-hard-hat',
   },
   'an-toan-hoa-chat': {
-    title: 'Đào Tạo An Toàn Hóa Chất',
+    title: 'Huấn Luyện An Toàn Hóa Chất Online & Trực Tiếp',
     description:
-      'Khóa đào tạo an toàn hóa chất, hướng dẫn xử lý, bảo quản và sử dụng hóa chất đúng quy định',
+      'Khóa huấn luyện an toàn hóa chất trực tuyến (online) phần lý thuyết và hướng dẫn thực hành xử lý, bảo quản hóa chất tại doanh nghiệp',
     metaDescription:
-      'Đào tạo an toàn hóa chất cho doanh nghiệp. Học về MSDS, phân loại hóa chất, xử lý sự cố hóa chất. Cấp chứng chỉ hợp lệ.',
+      'Đào tạo và huấn luyện an toàn hóa chất trực tuyến cho doanh nghiệp. Học về MSDS, phân loại hóa chất, xử lý sự cố tràn đổ hóa chất. Cấp chứng chỉ hợp lệ.',
     keywords: [
-      'đào tạo an toàn hóa chất',
+      'huấn luyện an toàn hóa chất trực tuyến',
+      'đào tạo an toàn hóa chất online',
       'xử lý hóa chất',
       'MSDS',
       'chứng chỉ hóa chất',
@@ -181,13 +185,14 @@ const trainingData: Record<
     iconClass: 'fa-flask',
   },
   pccc: {
-    title: 'Đào Tạo Phòng Cháy Chữa Cháy (PCCC)',
+    title: 'Huấn Luyện Phòng Cháy Chữa Cháy (PCCC) Online & Trực Tiếp',
     description:
-      'Khóa đào tạo phòng cháy chữa cháy chuyên nghiệp, trang bị kiến thức và kỹ năng xử lý tình huống cháy nổ',
+      'Khóa huấn luyện phòng cháy chữa cháy lý thuyết online kết hợp diễn tập thực hành chữa cháy và cứu nạn tại cơ sở',
     metaDescription:
-      'Đào tạo PCCC cho doanh nghiệp, cán bộ, công nhân. Học thực hành sử dụng bình chữa cháy, thoát hiểm, cứu nạn. Cấp chứng chỉ hợp lệ.',
+      'Đào tạo và huấn luyện PCCC trực tuyến, online kết hợp diễn tập chữa cháy, cứu hộ cứu nạn. Cấp chứng chỉ PCCC hợp lệ theo Nghị định 136 nhanh chóng.',
     keywords: [
-      'đào tạo pccc',
+      'huấn luyện pccc trực tuyến',
+      'đào tạo pccc online',
       'phòng cháy chữa cháy',
       'chứng chỉ pccc',
       'an toàn cháy nổ',
@@ -231,17 +236,17 @@ const trainingData: Record<
     iconClass: 'fa-fire-extinguisher',
   },
   'an-toan-buc-xa': {
-    title: 'Đào Tạo An Toàn Bức Xạ',
+    title: 'Huấn Luyện An Toàn Bức Xạ Trực Tuyến & Online',
     description:
-      'Khóa đào tạo an toàn bức xạ chuyên nghiệp, trang bị kiến thức về phòng hộ và quản lý an toàn bức xạ',
+      'Khóa huấn luyện an toàn bức xạ trực tuyến phần lý thuyết phòng hộ và quản lý an toàn nguồn phóng xạ theo luật định',
     metaDescription:
-      'Đào tạo an toàn bức xạ cho cán bộ, nhân viên làm việc trong môi trường bức xạ. Cấp chứng chỉ an toàn bức xạ theo quy định.',
+      'Đào tạo và huấn luyện an toàn bức xạ online/trực tiếp cho cán bộ, nhân viên y tế. Cấp chứng chỉ an toàn bức xạ đúng quy định pháp luật.',
     keywords: [
-      'đào tạo an toàn bức xạ',
+      'đào tạo an toàn bức xạ trực tuyến',
+      'huấn luyện an toàn bức xạ online',
       'chứng chỉ an toàn bức xạ',
       'phòng hộ bức xạ',
       'kiểm soát bức xạ',
-      'an toàn hạt nhân',
     ],
     benefits: [
       'Hiểu rõ nguy cơ và tác hại của bức xạ',
@@ -384,12 +389,19 @@ const trainingData: Record<
     iconClass: 'fa-clipboard-check',
   },
   'so-cap-cuu': {
-    title: 'Đào Tạo Sơ Cấp Cứu',
+    title: 'Huấn Luyện Sơ Cấp Cứu Trực Tuyến & Online',
     description:
-      'Khóa đào tạo sơ cấp cứu cơ bản, trang bị kỹ năng xử lý tình huống cấp cứu tại nơi làm việc',
+      'Khóa huấn luyện sơ cấp cứu cơ bản online lý thuyết và thực hành băng bó, CPR xử lý chấn thương tại doanh nghiệp',
     metaDescription:
-      'Đào tạo sơ cấp cứu cho doanh nghiệp. Học CPR, xử lý chấn thương, sơ cứu ban đầu. Cấp chứng chỉ sơ cấp cứu quốc tế.',
-    keywords: ['đào tạo sơ cấp cứu', 'CPR', 'sơ cứu ban đầu', 'chứng chỉ sơ cấp cứu', 'first aid'],
+      'Đào tạo và huấn luyện sơ cấp cứu trực tuyến (online) cho cán bộ, công nhân. Học lý thuyết nhanh, thực hành thực tế, cấp chứng chỉ sơ cấp cứu hợp lệ.',
+    keywords: [
+      'huấn luyện sơ cấp cứu trực tuyến',
+      'đào tạo sơ cấp cứu online',
+      'CPR',
+      'sơ cứu ban đầu',
+      'chứng chỉ sơ cấp cứu',
+      'first aid',
+    ],
     benefits: [
       'Kỹ năng sơ cứu cơ bản',
       'CPR và sử dụng AED',
@@ -437,24 +449,9 @@ const TrainingLandingPage: React.FC = () => {
   const data = trainingData[trainingType];
 
   useEffect(() => {
-    if (!data) return;
-
-    // Update page title and meta description for SEO
-    document.title = `${data.title} - SafetyConnect`;
-
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute('content', data.metaDescription);
-    }
-
-    const metaKeywords = document.querySelector('meta[name="keywords"]');
-    if (metaKeywords) {
-      metaKeywords.setAttribute('content', data.keywords.join(', '));
-    }
-
     // Scroll to top
     window.scrollTo(0, 0);
-  }, [trainingType, data]);
+  }, [trainingType]);
 
   if (!data) {
     return (
@@ -467,8 +464,35 @@ const TrainingLandingPage: React.FC = () => {
     );
   }
 
+  const courseSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    'name': `${data.title} trực tuyến, online & trực tiếp`,
+    'description': data.metaDescription,
+    'provider': {
+      '@type': 'Organization',
+      'name': 'SafetyConnect',
+      'sameAs': 'https://antoan.web.app/'
+    },
+    'educationalCredentialAwarded': data.certificate,
+    'offers': {
+      '@type': 'Offer',
+      'category': 'Education',
+      'price': '0',
+      'priceCurrency': 'VND',
+      'description': 'Đăng ký nhận báo giá huấn luyện miễn phí từ các đối tác'
+    }
+  };
+
   return (
     <div className="bg-neutral-light min-h-screen">
+      <SEOHead
+        title={`${data.title} Trực Tuyến, Online | SafetyConnect`}
+        description={data.metaDescription}
+        url={`https://antoan.web.app/training/${trainingType}`}
+        keywords={[...data.keywords, 'huấn luyện trực tuyến', 'đào tạo online', 'học an toàn online']}
+        schema={courseSchema}
+      />
       {/* Hero Section */}
       <div className={`bg-gradient-to-r ${data.bgColor} text-white py-16 relative overflow-hidden`}>
         <div className="absolute inset-0 opacity-10">
@@ -643,7 +667,7 @@ const TrainingLandingPage: React.FC = () => {
           </h2>
           <div className="prose max-w-none">
             <p className="text-gray-700 leading-relaxed mb-4">
-              SafetyConnect là nền tảng kết nối hàng đầu giữa doanh nghiệp và các đơn vị đào tạo an
+              SafetyConnect là nền tảng kết nối chuyên nghiệp giữa doanh nghiệp và các đơn vị đào tạo an
               toàn lao động chuyên nghiệp. Với mạng lưới hơn 50+ đối tác đào tạo uy tín trên toàn
               quốc, chúng tôi cam kết mang đến cho bạn:
             </p>

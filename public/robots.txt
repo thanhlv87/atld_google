@@ -1,9 +1,38 @@
 # SafetyConnect - Robots.txt
-# Allow all search engines to crawl the site
+# Allow search engines and AI bots to crawl the site
 
+# AI Search Crawlers
+User-agent: GPTBot
+Allow: /
+Allow: /blog/
+Allow: /training/
+Disallow: /admin
+Disallow: /chat
+Disallow: /requests
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /blog/
+Allow: /training/
+Disallow: /admin
+Disallow: /chat
+Disallow: /requests
+
+User-agent: PerplexityBot
+Allow: /
+Allow: /blog/
+Allow: /training/
+Disallow: /admin
+
+User-agent: Applebot
+Allow: /
+Allow: /blog/
+Allow: /training/
+Disallow: /admin
+
+# Standard Search Engines
 User-agent: *
 Allow: /
-
 # Disallow admin and private areas
 Disallow: /admin
 Disallow: /dashboard
@@ -17,7 +46,7 @@ Allow: /training
 Allow: /training/*
 
 # Sitemap location
-Sitemap: https://atld.web.app/sitemap.xml
+Sitemap: https://antoan.web.app/sitemap.xml
 
 # Crawl-delay for good measure (optional)
 Crawl-delay: 0.5

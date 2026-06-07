@@ -25,20 +25,20 @@ const HeroSection: React.FC = () => {
                 <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 animate-fade-in">
                     <i className="fas fa-shield-alt text-white"></i>
                     <span className="text-sm font-semibold text-white">
-                        Nền tảng kết nối đào tạo ATLD #1 Việt Nam
+                        Nền tảng kết nối huấn luyện an toàn lao động trực tuyến & trực tiếp chuyên nghiệp
                     </span>
                 </div>
 
                 <h1 className="text-4xl md:text-7xl font-extrabold mb-6 leading-tight animate-fade-in-up">
-                    Nền tảng kết nối
+                    Huấn luyện & Đào tạo
                     <br />
                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-yellow-200 to-white">
-                        Đào tạo An toàn Lao động
+                        An toàn Lao động Trực tuyến
                     </span>
                 </h1>
 
                 <p className="text-lg md:text-2xl max-w-3xl mx-auto mb-10 text-white/95 leading-relaxed animate-fade-in-up delay-200">
-                    Kết nối doanh nghiệp với các đối tác đào tạo ATLD uy tín trên toàn quốc.
+                    Kết nối doanh nghiệp với các đối tác huấn luyện an toàn lao động trực tuyến (online) và trực tiếp uy tín trên toàn quốc.
                 </p>
 
                 <div className="flex flex-wrap justify-center items-center gap-4 animate-fade-in-up delay-300">
