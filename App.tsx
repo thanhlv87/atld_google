@@ -159,6 +159,24 @@ const App: React.FC = () => {
           </ErrorBoundary>
         </main>
         <Footer />
+        
+        {/* Floating Zalo Button */}
+        <a
+          href="https://zalo.me/0982722036"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#0068FF] text-white rounded-full shadow-lg hover:shadow-2xl hover:scale-110 transition-all duration-300 group"
+          title="Chat qua Zalo"
+          id="zalo-floating-button"
+        >
+          <span className="absolute right-16 bg-white text-neutral-dark text-sm font-semibold px-3 py-1.5 rounded-lg shadow-md border opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">
+            Chat Zalo: 0982 722 036
+          </span>
+          <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current">
+            <path d="M12 2C6.477 2 2 6.03 2 11c0 2.685 1.326 5.074 3.407 6.696-.134.785-.49 2.875-.544 3.23-.092.6.21.614.475.438.25-.166 3.013-2.052 3.659-2.483.953.256 1.956.391 3 .391 5.523 0 10-4.03 10-9s-4.477-9-10-9zm2.466 11.235h-3.32v-1.043l2.09-2.584H11.56v-1.222h3.22v.975l-2.09 2.585h2.15v1.289h-.374z" />
+          </svg>
+        </a>
+
         {isLoginModalOpen && (
           <Suspense fallback={null}>
             <LoginModal onClose={() => setLoginModalOpen(false)} />
